@@ -1,14 +1,27 @@
-import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
+import { devtools } from '@tanstack/devtools-vite'
+import { paraglideVitePlugin } from '@inlang/paraglide-js'
 
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    host: '0.0.0.0',
-    port: 5173,
-    watch: {
-      usePolling: true,
-    },
-  },
+import { tanstackStart } from '@tanstack/react-start/plugin/vite'
+
+import viteReact, { reactCompilerPreset } from '@vitejs/plugin-react'
+import babel from '@rolldown/plugin-babel'
+import tailwindcss from '@tailwindcss/vite'
+
+const config = defineConfig({
+  resolve: { tsconfigPaths: true },
+  plugins: [
+    devtools(),
+    paraglideVitePlugin({
+      project: './project.inlang',
+      outdir: './src/paraglide',
+      strategy: ['url', 'baseLocale'],
+    }),
+    tailwindcss(),
+    tanstackStart(),
+    viteReact(),
+    babel({ presets: [reactCompilerPreset()] }),
+  ],
 })
+
+export default config
