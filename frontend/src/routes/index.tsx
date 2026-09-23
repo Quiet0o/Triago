@@ -1,14 +1,36 @@
-import { createFileRoute } from '@tanstack/react-router'
+import * as React from "react"
+import { createFileRoute } from "@tanstack/react-router"
 
-export const Route = createFileRoute('/')({ component: Home })
+import { AppSidebar } from "#/components/dashboard/app-sidebar.tsx"
+import { SiteHeader } from "#/components/dashboard/site-header.tsx"
+import { DataTable } from "#/components/dashboard/data-table.tsx"
+import {
+  SidebarInset,
+  SidebarProvider,
+} from "#/components/ui/sidebar.tsx"
+import { TooltipProvider } from "#/components/ui/tooltip.tsx"
 
-function Home() {
+export const Route = createFileRoute("/")({
+  component: DashboardPage,
+})
+
+function DashboardPage() {
+  const [globalSearch, setGlobalSearch] = React.useState("")
+
   return (
-    <div className="p-8">
-      <h1 className="text-4xl font-bold">Welcome to TanStack Start</h1>
-      <p className="mt-4 text-lg">
-        Edit <code>src/routes/index.tsx</code> to get started.
-      </p>
-    </div>
+    <TooltipProvider>
+      <SidebarProvider>
+        <AppSidebar variant="inset" />
+        <SidebarInset>
+          <SiteHeader
+            searchQuery={globalSearch}
+            onSearchChange={setGlobalSearch}
+          />
+          <main className="flex flex-1 flex-col p-4 md:p-6 lg:p-8">
+            <DataTable externalSearch={globalSearch} />
+          </main>
+        </SidebarInset>
+      </SidebarProvider>
+    </TooltipProvider>
   )
 }

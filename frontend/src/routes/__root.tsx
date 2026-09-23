@@ -42,7 +42,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TanStack Start Starter',
+        title: 'Triago — Dashboard',
       },
     ],
     links: [
@@ -52,6 +52,11 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       },
     ],
   }),
+  notFoundComponent: () => (
+    <div className="flex h-screen w-full items-center justify-center p-8 text-muted-foreground">
+      Nie znaleziono strony (404)
+    </div>
+  ),
   shellComponent: RootDocument,
 })
 
