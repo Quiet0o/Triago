@@ -1,0 +1,8 @@
+.git
+.idea
+var/cache/*
+!var/cache/.gitkeep
+var/log/*
+!var/log/.gitkeep
+.env.local
+.env.*.local
