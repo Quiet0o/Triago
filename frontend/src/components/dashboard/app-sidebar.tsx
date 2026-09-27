@@ -131,7 +131,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               </Button>
             </TooltipTrigger>
             <TooltipContent side={state === 'collapsed' ? 'right' : 'bottom'}>
-              {state === 'collapsed' ? 'Rozwiń panel boczny' : 'Zwiń panel boczny'}
+              {state === 'collapsed'
+                ? 'Rozwiń panel boczny'
+                : 'Zwiń panel boczny'}
             </TooltipContent>
           </Tooltip>
         </div>

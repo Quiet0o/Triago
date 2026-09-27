@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import * as React from 'react'
+import * as React from 'react';
 import {
   ArrowUpDown,
   ArrowUp,
@@ -17,7 +17,7 @@ import {
   Search,
   SlidersHorizontal,
   XCircle,
-} from 'lucide-react'
+} from 'lucide-react';
 
 import {
   Table,
@@ -26,11 +26,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '#/components/ui/table.tsx'
-import { Button } from '#/components/ui/button.tsx'
-import { Input } from '#/components/ui/input.tsx'
-import { Badge } from '#/components/ui/badge.tsx'
-import { Checkbox } from '#/components/ui/checkbox.tsx'
+} from '#/components/ui/table.tsx';
+import { Button } from '#/components/ui/button.tsx';
+import { Input } from '#/components/ui/input.tsx';
+import { Badge } from '#/components/ui/badge.tsx';
+import { Checkbox } from '#/components/ui/checkbox.tsx';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -39,8 +39,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '#/components/ui/dropdown-menu.tsx'
-import { Avatar, AvatarFallback } from '#/components/ui/avatar.tsx'
+} from '#/components/ui/dropdown-menu.tsx';
+import { Avatar, AvatarFallback } from '#/components/ui/avatar.tsx';
 import {
   Card,
   CardContent,
@@ -48,24 +48,24 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '#/components/ui/card.tsx'
+} from '#/components/ui/card.tsx';
 
-export type TransactionStatus = 'paid' | 'pending' | 'refunded' | 'failed'
+export type TransactionStatus = 'paid' | 'pending' | 'refunded' | 'failed';
 
 export type Transaction = {
-  id: string
+  id: string;
   customer: {
-    name: string
-    email: string
-    avatarFallback: string
-  }
-  type: 'Subskrypcja' | 'Jednorazowy' | 'Licencja B2B'
-  status: TransactionStatus
-  method: string
-  date: string
-  amount: number
-  currency: string
-}
+    name: string;
+    email: string;
+    avatarFallback: string;
+  };
+  type: 'Subskrypcja' | 'Jednorazowy' | 'Licencja B2B';
+  status: TransactionStatus;
+  method: string;
+  date: string;
+  amount: number;
+  currency: string;
+};
 
 export const initialTransactions: Transaction[] = [
   {
@@ -236,7 +236,7 @@ export const initialTransactions: Transaction[] = [
     amount: 5200.0,
     currency: 'PLN',
   },
-]
+];
 
 function renderStatusBadge(status: TransactionStatus) {
   switch (status) {
@@ -249,7 +249,7 @@ function renderStatusBadge(status: TransactionStatus) {
           <CheckCircle2 className="mr-1 size-3" />
           Opłacono
         </Badge>
-      )
+      );
     case 'pending':
       return (
         <Badge
@@ -259,7 +259,7 @@ function renderStatusBadge(status: TransactionStatus) {
           <Clock className="mr-1 size-3" />
           Oczekuje
         </Badge>
-      )
+      );
     case 'refunded':
       return (
         <Badge
@@ -269,7 +269,7 @@ function renderStatusBadge(status: TransactionStatus) {
           <RotateCcw className="mr-1 size-3" />
           Zwrócono
         </Badge>
-      )
+      );
     case 'failed':
       return (
         <Badge
@@ -279,23 +279,23 @@ function renderStatusBadge(status: TransactionStatus) {
           <XCircle className="mr-1 size-3" />
           Błąd
         </Badge>
-      )
+      );
   }
 }
 
-type SortField = 'customer' | 'date' | 'amount'
+type SortField = 'customer' | 'date' | 'amount';
 
 export function DataTable({
   externalSearch = '',
 }: {
-  externalSearch?: string
+  externalSearch?: string;
 }) {
-  const [data] = React.useState<Transaction[]>(() => initialTransactions)
-  const [sortField, setSortField] = React.useState<SortField | null>('date')
-  const [sortOrder, setSortOrder] = React.useState<'asc' | 'desc'>('desc')
-  const [statusFilter, setStatusFilter] = React.useState<string>('all')
-  const [internalSearch, setInternalSearch] = React.useState<string>('')
-  const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set())
+  const [data] = React.useState<Transaction[]>(() => initialTransactions);
+  const [sortField, setSortField] = React.useState<SortField | null>('date');
+  const [sortOrder, setSortOrder] = React.useState<'asc' | 'desc'>('desc');
+  const [statusFilter, setStatusFilter] = React.useState<string>('all');
+  const [internalSearch, setInternalSearch] = React.useState<string>('');
+  const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
   const [visibleColumns, setVisibleColumns] = React.useState<
     Record<string, boolean>
   >({
@@ -306,104 +306,104 @@ export function DataTable({
     method: true,
     date: true,
     amount: true,
-  })
-  const [page, setPage] = React.useState<number>(1)
-  const pageSize = 8
+  });
+  const [page, setPage] = React.useState<number>(1);
+  const pageSize = 8;
 
-  const activeSearch = externalSearch || internalSearch
+  const activeSearch = externalSearch || internalSearch;
 
   const toggleSort = (field: SortField) => {
     if (sortField === field) {
       if (sortOrder === 'asc') {
-        setSortOrder('desc')
+        setSortOrder('desc');
       } else {
-        setSortField(null)
+        setSortField(null);
       }
     } else {
-      setSortField(field)
-      setSortOrder('asc')
+      setSortField(field);
+      setSortOrder('asc');
     }
-  }
+  };
 
   const filteredAndSortedData = React.useMemo(() => {
-    let result = [...data]
+    let result = [...data];
 
     // Status filter
     if (statusFilter !== 'all') {
-      result = result.filter((item) => item.status === statusFilter)
+      result = result.filter((item) => item.status === statusFilter);
     }
 
     // Search filter
     if (activeSearch.trim()) {
-      const q = activeSearch.toLowerCase().trim()
+      const q = activeSearch.toLowerCase().trim();
       result = result.filter(
         (item) =>
           item.id.toLowerCase().includes(q) ||
           item.customer.name.toLowerCase().includes(q) ||
           item.customer.email.toLowerCase().includes(q) ||
-          item.method.toLowerCase().includes(q),
-      )
+          item.method.toLowerCase().includes(q)
+      );
     }
 
     // Sorting
     if (sortField) {
       result.sort((a, b) => {
-        let valA: string | number = ''
-        let valB: string | number = ''
+        let valA: string | number = '';
+        let valB: string | number = '';
 
         if (sortField === 'customer') {
-          valA = a.customer.name
-          valB = b.customer.name
+          valA = a.customer.name;
+          valB = b.customer.name;
         } else if (sortField === 'date') {
-          valA = a.date
-          valB = b.date
-        } else if (sortField === 'amount') {
-          valA = a.amount
-          valB = b.amount
+          valA = a.date;
+          valB = b.date;
+        } else {
+          valA = a.amount;
+          valB = b.amount;
         }
 
-        if (valA < valB) return sortOrder === 'asc' ? -1 : 1
-        if (valA > valB) return sortOrder === 'asc' ? 1 : -1
-        return 0
-      })
+        if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+        if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+        return 0;
+      });
     }
 
-    return result
-  }, [data, statusFilter, activeSearch, sortField, sortOrder])
+    return result;
+  }, [data, statusFilter, activeSearch, sortField, sortOrder]);
 
   const totalPages = Math.max(
     1,
-    Math.ceil(filteredAndSortedData.length / pageSize),
-  )
+    Math.ceil(filteredAndSortedData.length / pageSize)
+  );
   const paginatedData = React.useMemo(() => {
-    const start = (page - 1) * pageSize
-    return filteredAndSortedData.slice(start, start + pageSize)
-  }, [filteredAndSortedData, page, pageSize])
+    const start = (page - 1) * pageSize;
+    return filteredAndSortedData.slice(start, start + pageSize);
+  }, [filteredAndSortedData, page, pageSize]);
 
   // Select all handler
   const isAllSelected =
     paginatedData.length > 0 &&
-    paginatedData.every((item) => selectedIds.has(item.id))
+    paginatedData.every((item) => selectedIds.has(item.id));
 
   const toggleSelectAll = () => {
-    const next = new Set(selectedIds)
+    const next = new Set(selectedIds);
     if (isAllSelected) {
-      paginatedData.forEach((item) => next.delete(item.id))
+      paginatedData.forEach((item) => next.delete(item.id));
     } else {
-      paginatedData.forEach((item) => next.add(item.id))
+      paginatedData.forEach((item) => next.add(item.id));
     }
-    setSelectedIds(next)
-  }
+    setSelectedIds(next);
+  };
 
   const toggleSelectRow = (id: string) => {
-    const next = new Set(selectedIds)
+    const next = new Set(selectedIds);
     if (next.has(id)) {
-      next.delete(id)
+      next.delete(id);
     } else {
-      next.add(id)
+      next.add(id);
     }
-    setSelectedIds(next)
-  }
+    setSelectedIds(next);
+  };
 
   // Export CSV
   const handleExportCSV = () => {
@@ -416,7 +416,7 @@ export function DataTable({
       'Metoda',
       'Data',
       'Kwota',
-    ]
+    ];
     const rows = filteredAndSortedData.map((trx) => [
       trx.id,
       `"${trx.customer.name}"`,
@@ -426,33 +426,33 @@ export function DataTable({
       `"${trx.method}"`,
       `"${trx.date}"`,
       `${trx.amount} ${trx.currency}`,
-    ])
+    ]);
 
     const csvContent =
       'data:text/csv;charset=utf-8,' +
-      [headers.join(','), ...rows.map((r) => r.join(','))].join('\n')
-    const encodedUri = encodeURI(csvContent)
-    const link = document.createElement('a')
-    link.setAttribute('href', encodedUri)
+      [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
     link.setAttribute(
       'download',
-      `transakcje_${new Date().toISOString().slice(0, 10)}.csv`,
-    )
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  }
+      `transakcje_${new Date().toISOString().slice(0, 10)}.csv`
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const renderSortIcon = (field: SortField) => {
     if (sortField !== field) {
-      return <ArrowUpDown className="ml-1 size-3 text-muted-foreground" />
+      return <ArrowUpDown className="ml-1 size-3 text-muted-foreground" />;
     }
     return sortOrder === 'asc' ? (
       <ArrowUp className="ml-1 size-3 text-foreground" />
     ) : (
       <ArrowDown className="ml-1 size-3 text-foreground" />
-    )
-  }
+    );
+  };
 
   return (
     <Card className="rounded-xl border shadow-sm">
@@ -515,8 +515,8 @@ export function DataTable({
               variant={statusFilter === tab.value ? 'secondary' : 'ghost'}
               size="sm"
               onClick={() => {
-                setStatusFilter(tab.value)
-                setPage(1)
+                setStatusFilter(tab.value);
+                setPage(1);
               }}
               className={`h-8 rounded-lg px-3 text-xs transition-colors ${
                 statusFilter === tab.value
@@ -540,8 +540,8 @@ export function DataTable({
               placeholder="Filtruj tabelę..."
               value={internalSearch}
               onChange={(e) => {
-                setInternalSearch(e.target.value)
-                setPage(1)
+                setInternalSearch(e.target.value);
+                setPage(1);
               }}
               className="h-8 pl-8 text-xs bg-background"
             />
@@ -815,5 +815,5 @@ export function DataTable({
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }
