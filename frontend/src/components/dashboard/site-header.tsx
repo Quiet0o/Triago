@@ -1,7 +1,7 @@
-import { Bell, Search } from "lucide-react"
+import { Bell, Search } from 'lucide-react';
 
-import { Separator } from "#/components/ui/separator.tsx"
-import { SidebarTrigger } from "#/components/ui/sidebar.tsx"
+import { Separator } from '#/components/ui/separator.tsx';
+import { SidebarTrigger } from '#/components/ui/sidebar.tsx';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,25 +9,21 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "#/components/ui/breadcrumb.tsx"
-import { Button } from "#/components/ui/button.tsx"
-import { Input } from "#/components/ui/input.tsx"
+} from '#/components/ui/breadcrumb.tsx';
+import { Button } from '#/components/ui/button.tsx';
+import { Input } from '#/components/ui/input.tsx';
 
 export function SiteHeader({
   searchQuery,
   onSearchChange,
 }: {
-  searchQuery?: string
-  onSearchChange?: (val: string) => void
+  searchQuery?: string;
+  onSearchChange?: (val: string) => void;
 }) {
   return (
     <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between border-b bg-background/95 px-4 backdrop-blur-sm transition-[width,height] ease-linear lg:px-6">
       <div className="flex items-center gap-2 sm:gap-3">
-        <SidebarTrigger className="-ml-1" />
-        <Separator
-          orientation="vertical"
-          className="mx-1 h-4 sm:mx-2"
-        />
+        <Separator orientation="vertical" className="mx-1 h-4 sm:mx-2" />
         <Breadcrumb className="hidden sm:block">
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -51,7 +47,7 @@ export function SiteHeader({
           <Input
             type="search"
             placeholder="Szukaj..."
-            value={searchQuery ?? ""}
+            value={searchQuery ?? ''}
             onChange={(e) => onSearchChange?.(e.target.value)}
             className="h-9 w-full bg-muted/40 pl-8 pr-3 text-sm focus-visible:bg-background"
           />
@@ -68,5 +64,5 @@ export function SiteHeader({
         </Button>
       </div>
     </header>
-  )
+  );
 }

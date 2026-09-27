@@ -1,0 +1,13 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "app": {
+    "name": "Triago"
+  },
+  "navbar": {
+    "teams": "Zespoły",
+    "assignments": "Zadania",
+    "recent": "Ostatnie",
+    "favorites": "Oznaczone",
+    "settings": "Ustawienia"
+  }
+}

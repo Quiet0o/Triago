@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import * as React from "react"
+import * as React from 'react'
 import {
   ArrowUpDown,
   ArrowUp,
@@ -17,7 +17,7 @@ import {
   Search,
   SlidersHorizontal,
   XCircle,
-} from "lucide-react"
+} from 'lucide-react'
 
 import {
   Table,
@@ -26,11 +26,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "#/components/ui/table.tsx"
-import { Button } from "#/components/ui/button.tsx"
-import { Input } from "#/components/ui/input.tsx"
-import { Badge } from "#/components/ui/badge.tsx"
-import { Checkbox } from "#/components/ui/checkbox.tsx"
+} from '#/components/ui/table.tsx'
+import { Button } from '#/components/ui/button.tsx'
+import { Input } from '#/components/ui/input.tsx'
+import { Badge } from '#/components/ui/badge.tsx'
+import { Checkbox } from '#/components/ui/checkbox.tsx'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -39,8 +39,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "#/components/ui/dropdown-menu.tsx"
-import { Avatar, AvatarFallback } from "#/components/ui/avatar.tsx"
+} from '#/components/ui/dropdown-menu.tsx'
+import { Avatar, AvatarFallback } from '#/components/ui/avatar.tsx'
 import {
   Card,
   CardContent,
@@ -48,9 +48,9 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "#/components/ui/card.tsx"
+} from '#/components/ui/card.tsx'
 
-export type TransactionStatus = "paid" | "pending" | "refunded" | "failed"
+export type TransactionStatus = 'paid' | 'pending' | 'refunded' | 'failed'
 
 export type Transaction = {
   id: string
@@ -59,7 +59,7 @@ export type Transaction = {
     email: string
     avatarFallback: string
   }
-  type: "Subskrypcja" | "Jednorazowy" | "Licencja B2B"
+  type: 'Subskrypcja' | 'Jednorazowy' | 'Licencja B2B'
   status: TransactionStatus
   method: string
   date: string
@@ -69,178 +69,178 @@ export type Transaction = {
 
 export const initialTransactions: Transaction[] = [
   {
-    id: "TRX-9481",
+    id: 'TRX-9481',
     customer: {
-      name: "Aleksandra Nowak",
-      email: "a.nowak@technova.pl",
-      avatarFallback: "AN",
+      name: 'Aleksandra Nowak',
+      email: 'a.nowak@technova.pl',
+      avatarFallback: 'AN',
     },
-    type: "Licencja B2B",
-    status: "paid",
-    method: "Przelew P24",
-    date: "2026-09-23 20:45",
+    type: 'Licencja B2B',
+    status: 'paid',
+    method: 'Przelew P24',
+    date: '2026-09-23 20:45',
     amount: 3499.0,
-    currency: "PLN",
+    currency: 'PLN',
   },
   {
-    id: "TRX-9480",
+    id: 'TRX-9480',
     customer: {
-      name: "Mateusz Wiśniewski",
-      email: "m.wisniewski@gmail.com",
-      avatarFallback: "MW",
+      name: 'Mateusz Wiśniewski',
+      email: 'm.wisniewski@gmail.com',
+      avatarFallback: 'MW',
     },
-    type: "Subskrypcja",
-    status: "paid",
-    method: "Visa •••• 4242",
-    date: "2026-09-23 19:12",
+    type: 'Subskrypcja',
+    status: 'paid',
+    method: 'Visa •••• 4242',
+    date: '2026-09-23 19:12',
     amount: 149.0,
-    currency: "PLN",
+    currency: 'PLN',
   },
   {
-    id: "TRX-9479",
+    id: 'TRX-9479',
     customer: {
-      name: "Karolina Dąbrowska",
-      email: "karolina@dabrowska-studio.com",
-      avatarFallback: "KD",
+      name: 'Karolina Dąbrowska',
+      email: 'karolina@dabrowska-studio.com',
+      avatarFallback: 'KD',
     },
-    type: "Jednorazowy",
-    status: "pending",
-    method: "BLIK",
-    date: "2026-09-23 18:30",
+    type: 'Jednorazowy',
+    status: 'pending',
+    method: 'BLIK',
+    date: '2026-09-23 18:30',
     amount: 620.0,
-    currency: "PLN",
+    currency: 'PLN',
   },
   {
-    id: "TRX-9478",
+    id: 'TRX-9478',
     customer: {
-      name: "Piotr Lewandowski",
-      email: "piotr.lewandowski@apexcorp.pl",
-      avatarFallback: "PL",
+      name: 'Piotr Lewandowski',
+      email: 'piotr.lewandowski@apexcorp.pl',
+      avatarFallback: 'PL',
     },
-    type: "Licencja B2B",
-    status: "paid",
-    method: "Mastercard •••• 8812",
-    date: "2026-09-23 16:55",
+    type: 'Licencja B2B',
+    status: 'paid',
+    method: 'Mastercard •••• 8812',
+    date: '2026-09-23 16:55',
     amount: 8900.0,
-    currency: "PLN",
+    currency: 'PLN',
   },
   {
-    id: "TRX-9477",
+    id: 'TRX-9477',
     customer: {
-      name: "Ewa Kamińska",
-      email: "ewa.k@onet.pl",
-      avatarFallback: "EK",
+      name: 'Ewa Kamińska',
+      email: 'ewa.k@onet.pl',
+      avatarFallback: 'EK',
     },
-    type: "Subskrypcja",
-    status: "refunded",
-    method: "Visa •••• 1092",
-    date: "2026-09-22 14:20",
+    type: 'Subskrypcja',
+    status: 'refunded',
+    method: 'Visa •••• 1092',
+    date: '2026-09-22 14:20',
     amount: -149.0,
-    currency: "PLN",
+    currency: 'PLN',
   },
   {
-    id: "TRX-9476",
+    id: 'TRX-9476',
     customer: {
-      name: "Tomasz Zieliński",
-      email: "tomasz@zielinskigroup.eu",
-      avatarFallback: "TZ",
+      name: 'Tomasz Zieliński',
+      email: 'tomasz@zielinskigroup.eu',
+      avatarFallback: 'TZ',
     },
-    type: "Jednorazowy",
-    status: "failed",
-    method: "Mastercard •••• 5531",
-    date: "2026-09-22 11:05",
+    type: 'Jednorazowy',
+    status: 'failed',
+    method: 'Mastercard •••• 5531',
+    date: '2026-09-22 11:05',
     amount: 1250.0,
-    currency: "PLN",
+    currency: 'PLN',
   },
   {
-    id: "TRX-9475",
+    id: 'TRX-9475',
     customer: {
-      name: "Monika Szymańska",
-      email: "m.szymanska@vortex.io",
-      avatarFallback: "MS",
+      name: 'Monika Szymańska',
+      email: 'm.szymanska@vortex.io',
+      avatarFallback: 'MS',
     },
-    type: "Licencja B2B",
-    status: "paid",
-    method: "Przelew SEPA",
-    date: "2026-09-22 09:40",
+    type: 'Licencja B2B',
+    status: 'paid',
+    method: 'Przelew SEPA',
+    date: '2026-09-22 09:40',
     amount: 4500.0,
-    currency: "PLN",
+    currency: 'PLN',
   },
   {
-    id: "TRX-9474",
+    id: 'TRX-9474',
     customer: {
-      name: "Krzysztof Kozłowski",
-      email: "krzysztof.k@wp.pl",
-      avatarFallback: "KK",
+      name: 'Krzysztof Kozłowski',
+      email: 'krzysztof.k@wp.pl',
+      avatarFallback: 'KK',
     },
-    type: "Subskrypcja",
-    status: "paid",
-    method: "BLIK",
-    date: "2026-09-21 21:18",
+    type: 'Subskrypcja',
+    status: 'paid',
+    method: 'BLIK',
+    date: '2026-09-21 21:18',
     amount: 89.0,
-    currency: "PLN",
+    currency: 'PLN',
   },
   {
-    id: "TRX-9473",
+    id: 'TRX-9473',
     customer: {
-      name: "Magdalena Wójcik",
-      email: "magda.wojcik@designlab.pl",
-      avatarFallback: "MW",
+      name: 'Magdalena Wójcik',
+      email: 'magda.wojcik@designlab.pl',
+      avatarFallback: 'MW',
     },
-    type: "Jednorazowy",
-    status: "paid",
-    method: "Visa •••• 9923",
-    date: "2026-09-21 17:50",
+    type: 'Jednorazowy',
+    status: 'paid',
+    method: 'Visa •••• 9923',
+    date: '2026-09-21 17:50',
     amount: 490.0,
-    currency: "PLN",
+    currency: 'PLN',
   },
   {
-    id: "TRX-9472",
+    id: 'TRX-9472',
     customer: {
-      name: "Jakub Jankowski",
-      email: "jakub@jankowski-it.com",
-      avatarFallback: "JJ",
+      name: 'Jakub Jankowski',
+      email: 'jakub@jankowski-it.com',
+      avatarFallback: 'JJ',
     },
-    type: "Licencja B2B",
-    status: "pending",
-    method: "Przelew tradycyjny",
-    date: "2026-09-21 13:10",
+    type: 'Licencja B2B',
+    status: 'pending',
+    method: 'Przelew tradycyjny',
+    date: '2026-09-21 13:10',
     amount: 2800.0,
-    currency: "PLN",
+    currency: 'PLN',
   },
   {
-    id: "TRX-9471",
+    id: 'TRX-9471',
     customer: {
-      name: "Zofia Mazur",
-      email: "zofia.mazur@outlook.com",
-      avatarFallback: "ZM",
+      name: 'Zofia Mazur',
+      email: 'zofia.mazur@outlook.com',
+      avatarFallback: 'ZM',
     },
-    type: "Subskrypcja",
-    status: "paid",
-    method: "Mastercard •••• 4114",
-    date: "2026-09-20 18:22",
+    type: 'Subskrypcja',
+    status: 'paid',
+    method: 'Mastercard •••• 4114',
+    date: '2026-09-20 18:22',
     amount: 149.0,
-    currency: "PLN",
+    currency: 'PLN',
   },
   {
-    id: "TRX-9470",
+    id: 'TRX-9470',
     customer: {
-      name: "Rafał Krawczyk",
-      email: "rafal.krawczyk@krawczyk-logistyka.pl",
-      avatarFallback: "RK",
+      name: 'Rafał Krawczyk',
+      email: 'rafal.krawczyk@krawczyk-logistyka.pl',
+      avatarFallback: 'RK',
     },
-    type: "Licencja B2B",
-    status: "paid",
-    method: "Przelew P24",
-    date: "2026-09-20 10:15",
+    type: 'Licencja B2B',
+    status: 'paid',
+    method: 'Przelew P24',
+    date: '2026-09-20 10:15',
     amount: 5200.0,
-    currency: "PLN",
+    currency: 'PLN',
   },
 ]
 
 function renderStatusBadge(status: TransactionStatus) {
   switch (status) {
-    case "paid":
+    case 'paid':
       return (
         <Badge
           variant="outline"
@@ -250,7 +250,7 @@ function renderStatusBadge(status: TransactionStatus) {
           Opłacono
         </Badge>
       )
-    case "pending":
+    case 'pending':
       return (
         <Badge
           variant="outline"
@@ -260,7 +260,7 @@ function renderStatusBadge(status: TransactionStatus) {
           Oczekuje
         </Badge>
       )
-    case "refunded":
+    case 'refunded':
       return (
         <Badge
           variant="outline"
@@ -270,7 +270,7 @@ function renderStatusBadge(status: TransactionStatus) {
           Zwrócono
         </Badge>
       )
-    case "failed":
+    case 'failed':
       return (
         <Badge
           variant="outline"
@@ -283,20 +283,22 @@ function renderStatusBadge(status: TransactionStatus) {
   }
 }
 
-type SortField = "customer" | "date" | "amount"
+type SortField = 'customer' | 'date' | 'amount'
 
 export function DataTable({
-  externalSearch = "",
+  externalSearch = '',
 }: {
   externalSearch?: string
 }) {
   const [data] = React.useState<Transaction[]>(() => initialTransactions)
-  const [sortField, setSortField] = React.useState<SortField | null>("date")
-  const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">("desc")
-  const [statusFilter, setStatusFilter] = React.useState<string>("all")
-  const [internalSearch, setInternalSearch] = React.useState<string>("")
+  const [sortField, setSortField] = React.useState<SortField | null>('date')
+  const [sortOrder, setSortOrder] = React.useState<'asc' | 'desc'>('desc')
+  const [statusFilter, setStatusFilter] = React.useState<string>('all')
+  const [internalSearch, setInternalSearch] = React.useState<string>('')
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set())
-  const [visibleColumns, setVisibleColumns] = React.useState<Record<string, boolean>>({
+  const [visibleColumns, setVisibleColumns] = React.useState<
+    Record<string, boolean>
+  >({
     id: true,
     customer: true,
     type: true,
@@ -312,14 +314,14 @@ export function DataTable({
 
   const toggleSort = (field: SortField) => {
     if (sortField === field) {
-      if (sortOrder === "asc") {
-        setSortOrder("desc")
+      if (sortOrder === 'asc') {
+        setSortOrder('desc')
       } else {
         setSortField(null)
       }
     } else {
       setSortField(field)
-      setSortOrder("asc")
+      setSortOrder('asc')
     }
   }
 
@@ -327,7 +329,7 @@ export function DataTable({
     let result = [...data]
 
     // Status filter
-    if (statusFilter !== "all") {
+    if (statusFilter !== 'all') {
       result = result.filter((item) => item.status === statusFilter)
     }
 
@@ -339,29 +341,29 @@ export function DataTable({
           item.id.toLowerCase().includes(q) ||
           item.customer.name.toLowerCase().includes(q) ||
           item.customer.email.toLowerCase().includes(q) ||
-          item.method.toLowerCase().includes(q)
+          item.method.toLowerCase().includes(q),
       )
     }
 
     // Sorting
     if (sortField) {
       result.sort((a, b) => {
-        let valA: string | number = ""
-        let valB: string | number = ""
+        let valA: string | number = ''
+        let valB: string | number = ''
 
-        if (sortField === "customer") {
+        if (sortField === 'customer') {
           valA = a.customer.name
           valB = b.customer.name
-        } else if (sortField === "date") {
+        } else if (sortField === 'date') {
           valA = a.date
           valB = b.date
-        } else if (sortField === "amount") {
+        } else if (sortField === 'amount') {
           valA = a.amount
           valB = b.amount
         }
 
-        if (valA < valB) return sortOrder === "asc" ? -1 : 1
-        if (valA > valB) return sortOrder === "asc" ? 1 : -1
+        if (valA < valB) return sortOrder === 'asc' ? -1 : 1
+        if (valA > valB) return sortOrder === 'asc' ? 1 : -1
         return 0
       })
     }
@@ -369,7 +371,10 @@ export function DataTable({
     return result
   }, [data, statusFilter, activeSearch, sortField, sortOrder])
 
-  const totalPages = Math.max(1, Math.ceil(filteredAndSortedData.length / pageSize))
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredAndSortedData.length / pageSize),
+  )
   const paginatedData = React.useMemo(() => {
     const start = (page - 1) * pageSize
     return filteredAndSortedData.slice(start, start + pageSize)
@@ -402,7 +407,16 @@ export function DataTable({
 
   // Export CSV
   const handleExportCSV = () => {
-    const headers = ["ID", "Klient", "Email", "Typ", "Status", "Metoda", "Data", "Kwota"]
+    const headers = [
+      'ID',
+      'Klient',
+      'Email',
+      'Typ',
+      'Status',
+      'Metoda',
+      'Data',
+      'Kwota',
+    ]
     const rows = filteredAndSortedData.map((trx) => [
       trx.id,
       `"${trx.customer.name}"`,
@@ -414,11 +428,16 @@ export function DataTable({
       `${trx.amount} ${trx.currency}`,
     ])
 
-    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((r) => r.join(","))].join("\n")
+    const csvContent =
+      'data:text/csv;charset=utf-8,' +
+      [headers.join(','), ...rows.map((r) => r.join(','))].join('\n')
     const encodedUri = encodeURI(csvContent)
-    const link = document.createElement("a")
-    link.setAttribute("href", encodedUri)
-    link.setAttribute("download", `transakcje_${new Date().toISOString().slice(0, 10)}.csv`)
+    const link = document.createElement('a')
+    link.setAttribute('href', encodedUri)
+    link.setAttribute(
+      'download',
+      `transakcje_${new Date().toISOString().slice(0, 10)}.csv`,
+    )
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -428,7 +447,7 @@ export function DataTable({
     if (sortField !== field) {
       return <ArrowUpDown className="ml-1 size-3 text-muted-foreground" />
     }
-    return sortOrder === "asc" ? (
+    return sortOrder === 'asc' ? (
       <ArrowUp className="ml-1 size-3 text-foreground" />
     ) : (
       <ArrowDown className="ml-1 size-3 text-foreground" />
@@ -469,31 +488,31 @@ export function DataTable({
         {/* Status Filter Tabs */}
         <div className="flex flex-wrap items-center gap-1.5">
           {[
-            { label: "Wszystkie", value: "all", count: data.length },
+            { label: 'Wszystkie', value: 'all', count: data.length },
             {
-              label: "Opłacone",
-              value: "paid",
-              count: data.filter((d) => d.status === "paid").length,
+              label: 'Opłacone',
+              value: 'paid',
+              count: data.filter((d) => d.status === 'paid').length,
             },
             {
-              label: "W toku",
-              value: "pending",
-              count: data.filter((d) => d.status === "pending").length,
+              label: 'W toku',
+              value: 'pending',
+              count: data.filter((d) => d.status === 'pending').length,
             },
             {
-              label: "Zwrócone",
-              value: "refunded",
-              count: data.filter((d) => d.status === "refunded").length,
+              label: 'Zwrócone',
+              value: 'refunded',
+              count: data.filter((d) => d.status === 'refunded').length,
             },
             {
-              label: "Błędy",
-              value: "failed",
-              count: data.filter((d) => d.status === "failed").length,
+              label: 'Błędy',
+              value: 'failed',
+              count: data.filter((d) => d.status === 'failed').length,
             },
           ].map((tab) => (
             <Button
               key={tab.value}
-              variant={statusFilter === tab.value ? "secondary" : "ghost"}
+              variant={statusFilter === tab.value ? 'secondary' : 'ghost'}
               size="sm"
               onClick={() => {
                 setStatusFilter(tab.value)
@@ -501,8 +520,8 @@ export function DataTable({
               }}
               className={`h-8 rounded-lg px-3 text-xs transition-colors ${
                 statusFilter === tab.value
-                  ? "bg-background font-medium shadow-xs"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? 'bg-background font-medium shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               {tab.label}
@@ -541,13 +560,13 @@ export function DataTable({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
               {[
-                { id: "id", label: "ID" },
-                { id: "customer", label: "Klient" },
-                { id: "type", label: "Typ" },
-                { id: "status", label: "Status" },
-                { id: "method", label: "Płatność" },
-                { id: "date", label: "Data" },
-                { id: "amount", label: "Kwota" },
+                { id: 'id', label: 'ID' },
+                { id: 'customer', label: 'Klient' },
+                { id: 'type', label: 'Typ' },
+                { id: 'status', label: 'Status' },
+                { id: 'method', label: 'Płatność' },
+                { id: 'date', label: 'Data' },
+                { id: 'amount', label: 'Kwota' },
               ].map((col) => (
                 <DropdownMenuCheckboxItem
                   key={col.id}
@@ -587,10 +606,10 @@ export function DataTable({
                   <Button
                     variant="ghost"
                     className="-ml-3 h-8 text-xs font-medium"
-                    onClick={() => toggleSort("customer")}
+                    onClick={() => toggleSort('customer')}
                   >
                     Klient
-                    {renderSortIcon("customer")}
+                    {renderSortIcon('customer')}
                   </Button>
                 </TableHead>
               )}
@@ -608,10 +627,10 @@ export function DataTable({
                   <Button
                     variant="ghost"
                     className="-ml-3 h-8 text-xs font-medium"
-                    onClick={() => toggleSort("date")}
+                    onClick={() => toggleSort('date')}
                   >
                     Data
-                    {renderSortIcon("date")}
+                    {renderSortIcon('date')}
                   </Button>
                 </TableHead>
               )}
@@ -620,10 +639,10 @@ export function DataTable({
                   <Button
                     variant="ghost"
                     className="-mr-3 h-8 text-xs font-medium"
-                    onClick={() => toggleSort("amount")}
+                    onClick={() => toggleSort('amount')}
                   >
                     Kwota
-                    {renderSortIcon("amount")}
+                    {renderSortIcon('amount')}
                   </Button>
                 </TableHead>
               )}
@@ -635,7 +654,7 @@ export function DataTable({
               paginatedData.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={selectedIds.has(row.id) && "selected"}
+                  data-state={selectedIds.has(row.id) && 'selected'}
                   className="transition-colors hover:bg-muted/40"
                 >
                   <TableCell className="px-4">
@@ -695,13 +714,13 @@ export function DataTable({
                       <span
                         className={
                           row.amount < 0
-                            ? "text-rose-600 dark:text-rose-400"
-                            : "text-foreground font-semibold"
+                            ? 'text-rose-600 dark:text-rose-400'
+                            : 'text-foreground font-semibold'
                         }
                       >
-                        {row.amount > 0 ? "+" : ""}
-                        {new Intl.NumberFormat("pl-PL", {
-                          style: "currency",
+                        {row.amount > 0 ? '+' : ''}
+                        {new Intl.NumberFormat('pl-PL', {
+                          style: 'currency',
                           currency: row.currency,
                         }).format(row.amount)}
                       </span>
@@ -716,16 +735,22 @@ export function DataTable({
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuLabel>Akcje dla {row.id}</DropdownMenuLabel>
+                        <DropdownMenuLabel>
+                          Akcje dla {row.id}
+                        </DropdownMenuLabel>
                         <DropdownMenuItem
                           onClick={() => navigator.clipboard.writeText(row.id)}
                         >
                           Kopiuj ID transakcji
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>Pokaż szczegóły klienta</DropdownMenuItem>
+                        <DropdownMenuItem>
+                          Pokaż szczegóły klienta
+                        </DropdownMenuItem>
                         <DropdownMenuItem>Pobierz fakturę VAT</DropdownMenuItem>
-                        <DropdownMenuItem>Wyślij potwierdzenie</DropdownMenuItem>
+                        <DropdownMenuItem>
+                          Wyślij potwierdzenie
+                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-destructive focus:text-destructive">
                           Zwróć płatność
@@ -753,7 +778,8 @@ export function DataTable({
         <div className="flex items-center gap-1">
           {selectedIds.size > 0 ? (
             <span>
-              Zaznaczono {selectedIds.size} z {filteredAndSortedData.length} wierszy
+              Zaznaczono {selectedIds.size} z {filteredAndSortedData.length}{' '}
+              wierszy
             </span>
           ) : (
             <span>Łącznie: {filteredAndSortedData.length} pozycji</span>

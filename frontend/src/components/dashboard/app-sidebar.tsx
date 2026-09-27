@@ -1,6 +1,6 @@
-"use client"
+'use client';
 
-import * as React from "react"
+import * as React from 'react';
 import {
   LayoutDashboard,
   CreditCard,
@@ -16,7 +16,9 @@ import {
   User,
   Bell,
   Command,
-} from "lucide-react"
+  PanelLeftOpen,
+  PanelLeftClose,
+} from 'lucide-react';
 
 import {
   Sidebar,
@@ -32,7 +34,9 @@ import {
   SidebarMenuItem,
   SidebarRail,
   SidebarSeparator,
-} from "#/components/ui/sidebar.tsx"
+  SidebarTrigger,
+  useSidebar,
+} from '#/components/ui/sidebar.tsx';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,98 +45,100 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "#/components/ui/dropdown-menu.tsx"
+} from '#/components/ui/dropdown-menu.tsx';
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from "#/components/ui/avatar.tsx"
-
-const mainNavItems = [
-  {
-    title: "Pulpit",
-    url: "#",
-    icon: LayoutDashboard,
-    badge: null,
-    isActive: false,
-  },
-  {
-    title: "Transakcje",
-    url: "#",
-    icon: CreditCard,
-    badge: "12 nowych",
-    isActive: true,
-  },
-  {
-    title: "Klienci",
-    url: "#",
-    icon: Users,
-    badge: null,
-    isActive: false,
-  },
-  {
-    title: "Produkty",
-    url: "#",
-    icon: ShoppingBag,
-    badge: null,
-    isActive: false,
-  },
-  {
-    title: "Raporty",
-    url: "#",
-    icon: FileText,
-    badge: null,
-    isActive: false,
-  },
-  {
-    title: "Analityka",
-    url: "#",
-    icon: BarChart3,
-    badge: null,
-    isActive: false,
-  },
-]
-
-const secondaryNavItems = [
-  {
-    title: "Ustawienia",
-    url: "#",
-    icon: Settings,
-  },
-  {
-    title: "Pomoc i FAQ",
-    url: "#",
-    icon: HelpCircle,
-  },
-]
+} from '#/components/ui/avatar.tsx';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '#/components/ui/tooltip.tsx';
+import { Button } from '#/components/ui/button.tsx';
+import { m } from '#/paraglide/messages';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { state, toggleSidebar } = useSidebar();
+
+  const mainNavItems = [
+    {
+      title: m['navbar.recent'](),
+      url: '#',
+      icon: LayoutDashboard,
+      badge: null,
+      isActive: false,
+    },
+    {
+      title: m['navbar.favorites'](),
+      url: '#',
+      icon: Sparkles,
+      badge: null,
+      isActive: false,
+    },
+    {
+      title: m['navbar.teams'](),
+      url: '#',
+      icon: Users,
+      badge: null,
+      isActive: false,
+    },
+  ];
+
+  const secondaryNavItems = [
+    {
+      title: m['navbar.settings'](),
+      url: '#',
+      icon: Settings,
+    },
+  ];
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                <Command className="size-4" />
-              </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">Triago</span>
-                <span className="truncate text-xs text-muted-foreground">
-                  Workspace Enterprise
+        <div className="flex items-center justify-between p-1 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:gap-2">
+          <div className="flex items-center gap-2 overflow-hidden px-1">
+            <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
+              <Command className="size-4" />
+            </div>
+            <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
+              <span className="truncate font-semibold tracking-tight text-foreground">
+                Triago
+              </span>
+            </div>
+          </div>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleSidebar}
+                data-sidebar="trigger"
+                data-slot="sidebar-trigger"
+                className="size-8 rounded-lg hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
+              >
+                {state === 'collapsed' ? (
+                  <PanelLeftOpen className="size-4" />
+                ) : (
+                  <PanelLeftClose className="size-4" />
+                )}
+                <span className="sr-only">
+                  {state === 'collapsed'
+                    ? 'Rozwiń panel boczny'
+                    : 'Zwiń panel boczny'}
                 </span>
-              </div>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side={state === 'collapsed' ? 'right' : 'bottom'}>
+              {state === 'collapsed' ? 'Rozwiń panel boczny' : 'Zwiń panel boczny'}
+            </TooltipContent>
+          </Tooltip>
+        </div>
       </SidebarHeader>
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Aplikacja</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {mainNavItems.map((item) => (
@@ -147,11 +153,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       <span>{item.title}</span>
                     </a>
                   </SidebarMenuButton>
-                  {item.badge && (
-                    <SidebarMenuBadge className="rounded-full bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
-                      {item.badge}
-                    </SidebarMenuBadge>
-                  )}
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
@@ -161,7 +162,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarSeparator />
 
         <SidebarGroup className="mt-auto">
-          <SidebarGroupLabel>Preferencje</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {secondaryNavItems.map((item) => (
@@ -218,7 +218,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">Jan Kowalski</span>
+                      <span className="truncate font-semibold">
+                        Jan Kowalski
+                      </span>
                       <span className="truncate text-xs text-muted-foreground">
                         jan.kowalski@triago.pl
                       </span>
@@ -257,7 +259,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
-      <SidebarRail />
     </Sidebar>
-  )
+  );
 }
