@@ -15,11 +15,11 @@ import {
   type ColumnVisibilityState,
   type RowSelectionState,
 } from '@tanstack/react-table';
-import type { Ticket, Sprint } from './ticket-types';
+import type { Ticket, Sprint } from '../tickets/types';
 import {
   ticketColumns,
   ticketTableFeatures,
-} from './ticket-columns';
+} from '../tickets/ticket-columns';
 import {
   Table,
   TableBody,

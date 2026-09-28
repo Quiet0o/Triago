@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 
-import { AppSidebar } from '#/components/dashboard/app-sidebar.tsx';
-import { SiteHeader } from '#/components/dashboard/site-header.tsx';
-import { DataTable } from '#/components/dashboard/data-table.tsx';
+import { AppSidebar } from '#/components/dashboard/layout/app-sidebar.tsx';
+import { SiteHeader } from '#/components/dashboard/layout/site-header.tsx';
+import { DataTable } from '#/components/dashboard/views/data-table.tsx';
 import { SidebarInset, SidebarProvider } from '#/components/ui/sidebar.tsx';
 import { TooltipProvider } from '#/components/ui/tooltip.tsx';
 

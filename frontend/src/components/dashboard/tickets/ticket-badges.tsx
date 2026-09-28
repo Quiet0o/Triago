@@ -30,7 +30,7 @@ import type {
   TicketPriority,
   TicketStatus,
   TicketPerson,
-} from './ticket-types';
+} from './types';
 
 // ── Type config ──────────────────────────────────────────────────────
 const typeConfig: Record<

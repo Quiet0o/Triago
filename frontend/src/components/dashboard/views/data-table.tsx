@@ -17,8 +17,8 @@ import {
 } from '#/components/ui/tabs.tsx';
 import { BacklogView } from './backlog-view';
 import { PlaceholderTab } from './placeholder-tab';
-import type { MockData } from './ticket-types';
-import mockData from './mock-tickets.json';
+import type { MockData } from '../tickets/types';
+import mockData from '../data/mock-tickets.json';
 
 const data = mockData as MockData;
 

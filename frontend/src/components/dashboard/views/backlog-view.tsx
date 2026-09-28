@@ -8,7 +8,7 @@ import {
   Filter,
 } from 'lucide-react';
 import type { SortingState, ColumnVisibilityState } from '@tanstack/react-table';
-import type { Ticket, Sprint } from './ticket-types';
+import type { Ticket, Sprint } from '../tickets/types';
 import { SprintSection } from './sprint-section';
 import { Button } from '#/components/ui/button.tsx';
 import { Input } from '#/components/ui/input.tsx';

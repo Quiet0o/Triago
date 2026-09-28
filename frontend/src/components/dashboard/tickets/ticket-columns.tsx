@@ -11,7 +11,7 @@ import {
   createFilteredRowModel,
   type ColumnDef,
 } from '@tanstack/react-table';
-import type { Ticket } from './ticket-types';
+import type { Ticket } from './types';
 import {
   TicketTypeIcon,
   PriorityBadge,
