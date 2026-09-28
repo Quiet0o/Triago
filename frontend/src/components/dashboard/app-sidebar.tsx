@@ -3,13 +3,8 @@
 import * as React from 'react';
 import {
   LayoutDashboard,
-  CreditCard,
   Users,
-  ShoppingBag,
-  FileText,
-  BarChart3,
   Settings,
-  HelpCircle,
   Sparkles,
   ChevronsUpDown,
   LogOut,
@@ -18,6 +13,7 @@ import {
   Command,
   PanelLeftOpen,
   PanelLeftClose,
+  Clock,
 } from 'lucide-react';
 
 import {
@@ -26,15 +22,11 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarRail,
   SidebarSeparator,
-  SidebarTrigger,
   useSidebar,
 } from '#/components/ui/sidebar.tsx';
 import {
@@ -58,16 +50,54 @@ import {
 } from '#/components/ui/tooltip.tsx';
 import { Button } from '#/components/ui/button.tsx';
 import { m } from '#/paraglide/messages';
+import { cn } from 'cn';
+
+type BadgeType = 'urgent' | 'info' | 'subtle';
+
+const badgeStyles: Record<BadgeType, string> = {
+  urgent:
+    'bg-destructive/15 text-destructive dark:bg-destructive/25 dark:text-destructive-foreground ring-1 ring-destructive/20',
+  info: 'bg-blue-500/12 text-blue-700 dark:bg-blue-400/20 dark:text-blue-300 ring-1 ring-blue-500/15',
+  subtle: 'bg-muted text-muted-foreground ring-1 ring-border',
+};
+
+function NavBadge({
+  count,
+  type = 'subtle',
+}: {
+  count: number;
+  type?: BadgeType;
+}) {
+  return (
+    <span
+      className={cn(
+        'ml-auto inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-md px-1.5 text-[0.6875rem] font-semibold leading-none tabular-nums transition-colors group-data-[collapsible=icon]:hidden',
+        badgeStyles[type]
+      )}
+    >
+      {count}
+    </span>
+  );
+}
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { state, toggleSidebar } = useSidebar();
 
   const mainNavItems = [
     {
+      title: m['navbar.assign'](),
+      url: '#',
+      icon: Clock,
+      badge: 12,
+      badgeType: 'urgent' as BadgeType,
+      isActive: false,
+    },
+    {
       title: m['navbar.recent'](),
       url: '#',
       icon: LayoutDashboard,
-      badge: null,
+      badge: 8,
+      badgeType: 'info' as BadgeType,
       isActive: false,
     },
     {
@@ -75,6 +105,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       url: '#',
       icon: Sparkles,
       badge: null,
+      badgeType: null,
       isActive: false,
     },
     {
@@ -82,6 +113,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       url: '#',
       icon: Users,
       badge: null,
+      badgeType: null,
       isActive: false,
     },
   ];
@@ -153,6 +185,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <a href={item.url} className="flex items-center gap-2">
                       <item.icon className="size-4" />
                       <span>{item.title}</span>
+                      {item.badge !== null && item.badgeType !== null && (
+                        <NavBadge count={item.badge} type={item.badgeType} />
+                      )}
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
