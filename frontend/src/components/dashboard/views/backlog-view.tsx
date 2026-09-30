@@ -27,6 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '#/components/ui/select.tsx';
+import { Avatar, AvatarFallback, AvatarGroup, AvatarGroupCount, AvatarImage } from '#/components/ui/avatar';
 
 // ── Backlog toolbar ──────────────────────────────────────────────────
 function BacklogToolbar({
@@ -95,6 +96,25 @@ function BacklogToolbar({
             <SelectItem value="niski">Niski</SelectItem>
           </SelectContent>
         </Select>
+
+        <AvatarGroup >
+          <Avatar>
+            <AvatarImage  src="https://github.com/shadcn.png" alt="@shadcn" />
+            <AvatarFallback>CN</AvatarFallback>
+          </Avatar>
+          <Avatar>
+            <AvatarImage src="https://github.com/maxleiter.png" alt="@maxleiter" />
+            <AvatarFallback>LR</AvatarFallback>
+          </Avatar>
+          <Avatar>
+            <AvatarImage
+              src="https://github.com/evilrabbit.png"
+              alt="@evilrabbit"
+            />
+            <AvatarFallback>ER</AvatarFallback>
+          </Avatar>
+          <AvatarGroupCount>+3</AvatarGroupCount>
+        </AvatarGroup>
       </div>
 
       <div className="flex items-center gap-2">

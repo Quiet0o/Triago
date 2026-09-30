@@ -22,14 +22,16 @@ export function SiteHeader({
   return (
     <header className="sticky top-0 z-10 grid h-16 grid-cols-[1fr_auto_1fr] items-center border-b bg-background/95 px-4 backdrop-blur-sm transition-[width,height] ease-linear lg:px-6">
       <div className="col-start-2 flex items-center gap-2">
-        <Input
-          type="search"
-          placeholder="Search..."
-          value={searchQuery ?? ''}
-          onChange={(e) => onSearchChange?.(e.target.value)}
-          className="h-9 w-[min(50vw,28rem)] bg-muted/40 pr-9 pl-4 text-sm focus-visible:bg-background"
-        />
-        <Search className="pointer-events-none -ml-7 mr-3 size-4 shrink-0 text-muted-foreground" />
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder="Search..."
+            value={searchQuery ?? ''}
+            onChange={(e) => onSearchChange?.(e.target.value)}
+            className="h-9 w-[min(50vw,28rem)] bg-muted/40 pl-9 pr-4 text-sm focus-visible:bg-background"
+          />
+        </div>
         <Button>
           <Plus className="size-4" />
           Create

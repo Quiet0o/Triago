@@ -48,7 +48,7 @@ export function DataTable({
               <TabsTrigger
                 key={tab.id}
                 value={tab.id}
-                className="gap-1.5 rounded-none px-3 text-[0.8125rem] data-[state=active]:shadow-none"
+                className="cursor-pointer gap-1.5 rounded-none px-3 text-[0.8125rem] data-[state=active]:shadow-none"
               >
                 <Icon className="size-3.5" />
                 {tab.label}

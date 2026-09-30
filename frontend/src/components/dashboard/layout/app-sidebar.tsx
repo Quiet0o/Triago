@@ -182,9 +182,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     isActive={item.isActive}
                     tooltip={item.title}
                   >
-                    <a href={item.url} className="flex items-center gap-2">
-                      <item.icon className="size-4" />
-                      <span>{item.title}</span>
+                    <a href={item.url} className="flex min-w-0 items-center gap-2">
+                      <item.icon className="size-4 shrink-0" />
+                      <span className="truncate">{item.title}</span>
                       {item.badge !== null && item.badgeType !== null && (
                         <NavBadge count={item.badge} type={item.badgeType} />
                       )}
@@ -204,9 +204,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               {secondaryNavItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={item.title}>
-                    <a href={item.url} className="flex items-center gap-2">
-                      <item.icon className="size-4" />
-                      <span>{item.title}</span>
+                    <a href={item.url} className="flex min-w-0 items-center gap-2">
+                      <item.icon className="size-4 shrink-0" />
+                      <span className="truncate">{item.title}</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -225,19 +225,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   size="lg"
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
-                  <Avatar className="size-8 rounded-lg">
+                  <Avatar className="size-8 rounded-lg shrink-0">
                     <AvatarImage src="" alt="Jan Kowalski" />
                     <AvatarFallback className="rounded-lg bg-primary/10 text-primary font-medium">
                       JK
                     </AvatarFallback>
                   </Avatar>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
+                  <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
                     <span className="truncate font-semibold">Jan Kowalski</span>
                     <span className="truncate text-xs text-muted-foreground">
                       jan.kowalski@triago.pl
                     </span>
                   </div>
-                  <ChevronsUpDown className="ml-auto size-4" />
+                  <ChevronsUpDown className="ml-auto size-4 shrink-0 group-data-[collapsible=icon]:hidden" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
