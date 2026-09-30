@@ -11,7 +11,7 @@ import type { Ticket } from '../../tickets/types';
 import {
   ticketColumns,
   ticketTableFeatures,
-} from '../../tickets/ticket-columns';
+} from './table-ticket-columns';
 import { Button } from '#/components/ui/button.tsx';
 import {
   Table,

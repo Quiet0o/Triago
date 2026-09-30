@@ -16,6 +16,9 @@ import {
   Ban,
   MessageSquare,
   Paperclip,
+  ChevronsUp,
+  ChevronUp,
+  Minus,
 } from 'lucide-react';
 import { Badge } from '#/components/ui/badge.tsx';
 import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar.tsx';
@@ -31,6 +34,7 @@ import type {
   TicketStatus,
   TicketPerson,
 } from './types';
+import { CriticalIcon } from '#/components/ui/icons/critical';
 
 // ── Type config ──────────────────────────────────────────────────────
 const typeConfig: Record<
@@ -66,28 +70,28 @@ const typeConfig: Record<
 
 const priorityConfig: Record<
   TicketPriority,
-  { icon: typeof ArrowUp; label: string; color: string; bg: string }
+  { icon: typeof ChevronsUp | typeof ChevronUp | typeof Minus | typeof CriticalIcon; label: string; color: string; bg: string }
 > = {
   krytyczny: {
-    icon: AlertTriangle,
+    icon: CriticalIcon,
     label: 'Krytyczny',
     color: 'text-red-600 dark:text-red-400',
     bg: 'bg-red-500/10 border-red-500/20',
   },
   wysoki: {
-    icon: ArrowUp,
+    icon: ChevronsUp,
     label: 'Wysoki',
     color: 'text-orange-600 dark:text-orange-400',
     bg: 'bg-orange-500/10 border-orange-500/20',
   },
   średni: {
-    icon: ArrowRight,
+    icon: ChevronUp,
     label: 'Średni',
     color: 'text-amber-600 dark:text-amber-400',
     bg: 'bg-amber-500/10 border-amber-500/20',
   },
   niski: {
-    icon: ArrowDown,
+    icon: Minus,
     label: 'Niski',
     color: 'text-blue-600 dark:text-blue-400',
     bg: 'bg-blue-500/10 border-blue-500/20',
