@@ -12,13 +12,13 @@ import {
   DropdownMenuTrigger,
 } from '#/components/ui/dropdown-menu.tsx';
 
-export function SiteHeader({
+export const SiteHeader = ({
   searchQuery,
   onSearchChange,
 }: {
   searchQuery?: string;
   onSearchChange?: (val: string) => void;
-}) {
+}) => {
   return (
     <header className="sticky top-0 z-10 grid h-16 grid-cols-[1fr_auto_1fr] items-center border-b bg-background/95 px-4 backdrop-blur-sm transition-[width,height] ease-linear lg:px-6">
       <div className="col-start-2 flex items-center gap-2">

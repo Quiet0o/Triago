@@ -17,8 +17,8 @@ import {
 } from '#/components/ui/tabs.tsx';
 import { BacklogView } from './backlog-view';
 import { PlaceholderTab } from './placeholder-tab';
-import type { MockData } from '../tickets/types';
-import mockData from '../data/mock-tickets.json';
+import type { MockData } from '../../tickets/types';
+import mockData from '../../data/mock-tickets.json';
 
 const data = mockData as MockData;
 
@@ -32,7 +32,7 @@ const projectTabs = [
   { id: 'formularze', label: 'Formularze', icon: ClipboardList },
 ] as const;
 
-export function DataTable({
+export function ProjectView({
   externalSearch = '',
 }: {
   externalSearch?: string;
@@ -58,7 +58,6 @@ export function DataTable({
         </TabsList>
       </div>
 
-      {/* ── Tab content ─────────────────────────────────────────────── */}
       <div className="pt-4">
         <TabsContent value="backlog" className="mt-0">
           <BacklogView

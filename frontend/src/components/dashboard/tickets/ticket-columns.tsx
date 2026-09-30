@@ -9,8 +9,8 @@ import {
   createCoreRowModel,
   createSortedRowModel,
   createFilteredRowModel,
-  type ColumnDef,
 } from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table';
 import type { Ticket } from './types';
 import {
   TicketTypeIcon,
@@ -22,6 +22,7 @@ import {
 } from './ticket-badges';
 import { Checkbox } from '#/components/ui/checkbox.tsx';
 import { Badge } from '#/components/ui/badge.tsx';
+import { Ellipsis } from 'lucide-react';
 
 // ── Features used by the ticket table ────────────────────────────────
 export const ticketTableFeatures = tableFeatures({
@@ -37,8 +38,10 @@ export const ticketTableFeatures = tableFeatures({
 
 export type TicketTableFeatures = typeof ticketTableFeatures;
 
-// ── Column helper (v9 requires TFeatures + TData) ────────────────────
 const col = createColumnHelper<TicketTableFeatures, Ticket>();
+const polishNameCollator = new Intl.Collator('pl-PL', {
+  sensitivity: 'base',
+});
 
 export const ticketColumns: ColumnDef<TicketTableFeatures, Ticket, any>[] = [
   col.display({
@@ -57,6 +60,7 @@ export const ticketColumns: ColumnDef<TicketTableFeatures, Ticket, any>[] = [
       <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
+        onClick={(event) => event.stopPropagation()}
         aria-label={`Zaznacz ${row.original.id}`}
       />
     ),
@@ -71,7 +75,7 @@ export const ticketColumns: ColumnDef<TicketTableFeatures, Ticket, any>[] = [
   }),
 
   col.accessor('id', {
-    header: 'Klucz',
+    header: 'Numer',
     cell: (info) => (
       <span className="font-mono text-xs font-semibold text-muted-foreground whitespace-nowrap">
         {info.getValue()}
@@ -102,7 +106,16 @@ export const ticketColumns: ColumnDef<TicketTableFeatures, Ticket, any>[] = [
   col.accessor('assignee', {
     header: 'Osoba',
     cell: (info) => <AssigneeAvatar size="md" person={info.getValue()} />,
-    enableSorting: false,
+    enableSorting: true,
+    sortFn: (rowA, rowB) => {
+      const nameA = rowA.original.assignee?.name ?? '';
+      const nameB = rowB.original.assignee?.name ?? '';
+
+      if (!nameA) return nameB ? 1 : 0;
+      if (!nameB) return -1;
+
+      return polishNameCollator.compare(nameA, nameB);
+    },
   }),
 
   col.accessor('storyPoints', {
@@ -145,6 +158,14 @@ export const ticketColumns: ColumnDef<TicketTableFeatures, Ticket, any>[] = [
         comments={row.original.comments}
         attachments={row.original.attachments}
       />
+    ),
+    enableSorting: false,
+  }),
+  col.display({
+    id: 'more actions',
+    header: '',
+    cell: ({ row }) => (
+      <Ellipsis className="size-4 opacity-0 transition-opacity group-hover:opacity-100 group-data-[state=selected]:opacity-100" />
     ),
     enableSorting: false,
   }),

@@ -36,9 +36,8 @@ const placeholderContent: Record<string, { icon: typeof LayoutGrid; description:
   },
 };
 
-export function PlaceholderTab({ tabId }: { tabId: string }) {
+export const PlaceholderTab = ({ tabId }: { tabId: string }) =>  {
   const config = placeholderContent[tabId];
-  if (!config) return null;
 
   const Icon = config.icon;
 

@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import type { ComponentProps } from 'react';
 import {
   LayoutDashboard,
   Users,
@@ -61,13 +61,13 @@ const badgeStyles: Record<BadgeType, string> = {
   subtle: 'bg-muted text-muted-foreground ring-1 ring-border',
 };
 
-function NavBadge({
+export const NavBadge = ({
   count,
   type = 'subtle',
 }: {
   count: number;
   type?: BadgeType;
-}) {
+}) => {
   return (
     <span
       className={cn(
@@ -80,7 +80,7 @@ function NavBadge({
   );
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export const AppSidebar = ({ ...props }: ComponentProps<typeof Sidebar>) => {
   const { state, toggleSidebar } = useSidebar();
 
   const mainNavItems = [
@@ -185,7 +185,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <a href={item.url} className="flex min-w-0 items-center gap-2">
                       <item.icon className="size-4 shrink-0" />
                       <span className="truncate">{item.title}</span>
-                      {item.badge !== null && item.badgeType !== null && (
+                      {item.badge !== null && (
                         <NavBadge count={item.badge} type={item.badgeType} />
                       )}
                     </a>

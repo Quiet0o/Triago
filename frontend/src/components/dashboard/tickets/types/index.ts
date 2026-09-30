@@ -1,4 +1,3 @@
-// ── Ticket domain types ──────────────────────────────────────────────
 export type TicketPriority = 'krytyczny' | 'wysoki' | 'średni' | 'niski';
 export type TicketStatus =
   | 'nowy'

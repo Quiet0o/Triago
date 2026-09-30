@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router';
 
 import { AppSidebar } from '#/components/dashboard/layout/app-sidebar.tsx';
 import { SiteHeader } from '#/components/dashboard/layout/site-header.tsx';
-import { DataTable } from '#/components/dashboard/views/data-table.tsx';
+import { ProjectView } from '#/components/dashboard/views/project/project-view';
 import { SidebarInset, SidebarProvider } from '#/components/ui/sidebar.tsx';
 import { TooltipProvider } from '#/components/ui/tooltip.tsx';
 
@@ -24,7 +24,7 @@ function DashboardPage() {
             onSearchChange={setGlobalSearch}
           />
           <main className="flex flex-1 flex-col p-4 md:p-6 lg:p-8">
-            <DataTable externalSearch={globalSearch} />
+            <ProjectView externalSearch={globalSearch} />
           </main>
         </SidebarInset>
       </SidebarProvider>

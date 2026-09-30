@@ -64,7 +64,6 @@ const typeConfig: Record<
   },
 };
 
-// ── Priority config ──────────────────────────────────────────────────
 const priorityConfig: Record<
   TicketPriority,
   { icon: typeof ArrowUp; label: string; color: string; bg: string }
@@ -95,7 +94,6 @@ const priorityConfig: Record<
   },
 };
 
-// ── Status config ────────────────────────────────────────────────────
 const statusConfig: Record<
   TicketStatus,
   { icon: typeof Circle; label: string; color: string; bg: string }
@@ -160,7 +158,7 @@ export function TicketTypeIcon({
   );
 }
 
-export function PriorityBadge({ priority }: { priority: TicketPriority }) {
+export const PriorityBadge = ({ priority }: { priority: TicketPriority }) => {
   const cfg = priorityConfig[priority];
   const Icon = cfg.icon;
   return (
@@ -178,7 +176,7 @@ export function PriorityBadge({ priority }: { priority: TicketPriority }) {
   );
 }
 
-export function StatusBadge({ status }: { status: TicketStatus }) {
+export const StatusBadge = ({ status }: { status: TicketStatus }) => {
   const cfg = statusConfig[status];
   const Icon = cfg.icon;
   return (
@@ -196,13 +194,13 @@ export function StatusBadge({ status }: { status: TicketStatus }) {
   );
 }
 
-export function AssigneeAvatar({
+export const AssigneeAvatar = ({
   person,
   size = 'sm',
 }: {
   person: TicketPerson | null;
   size?: 'sm' | 'md';
-}) {
+}) => {
   if (!person) {
     return (
       <Tooltip>
