@@ -10,19 +10,37 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProjectRouteRouteImport } from './routes/project/route'
+import { Route as ProjectIndexRouteImport } from './routes/project/index'
 import { Route as ProjectAppRouteImport } from './routes/project/app'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiTrpcSplatRouteImport } from './routes/api.trpc.$'
+import { Route as ProjectBacklogIndexRouteImport } from './routes/project/backlog/index'
+import { Route as ProjectBoardIndexRouteImport } from './routes/project/board/index'
+import { Route as ProjectDevelopmentIndexRouteImport } from './routes/project/development/index'
+import { Route as ProjectDocumentsIndexRouteImport } from './routes/project/documents/index'
+import { Route as ProjectSummaryIndexRouteImport } from './routes/project/summary/index'
+import { Route as ProjectTimelineIndexRouteImport } from './routes/project/timeline/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProjectAppRoute = ProjectAppRouteImport.update({
-  id: '/project/app',
-  path: '/project/app',
+const ProjectRouteRoute = ProjectRouteRouteImport.update({
+  id: '/project',
+  path: '/project',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ProjectIndexRoute = ProjectIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProjectRouteRoute,
+} as any)
+const ProjectAppRoute = ProjectAppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => ProjectRouteRoute,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
@@ -34,37 +52,126 @@ const ApiTrpcSplatRoute = ApiTrpcSplatRouteImport.update({
   path: '/api/trpc/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProjectBacklogIndexRoute = ProjectBacklogIndexRouteImport.update({
+  id: '/backlog/',
+  path: '/backlog/',
+  getParentRoute: () => ProjectRouteRoute,
+} as any)
+const ProjectBoardIndexRoute = ProjectBoardIndexRouteImport.update({
+  id: '/board/',
+  path: '/board/',
+  getParentRoute: () => ProjectRouteRoute,
+} as any)
+const ProjectDevelopmentIndexRoute = ProjectDevelopmentIndexRouteImport.update({
+  id: '/development/',
+  path: '/development/',
+  getParentRoute: () => ProjectRouteRoute,
+} as any)
+const ProjectDocumentsIndexRoute = ProjectDocumentsIndexRouteImport.update({
+  id: '/documents/',
+  path: '/documents/',
+  getParentRoute: () => ProjectRouteRoute,
+} as any)
+const ProjectSummaryIndexRoute = ProjectSummaryIndexRouteImport.update({
+  id: '/summary/',
+  path: '/summary/',
+  getParentRoute: () => ProjectRouteRoute,
+} as any)
+const ProjectTimelineIndexRoute = ProjectTimelineIndexRouteImport.update({
+  id: '/timeline/',
+  path: '/timeline/',
+  getParentRoute: () => ProjectRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/project': typeof ProjectRouteRouteWithChildren
   '/project/app': typeof ProjectAppRoute
+  '/project/': typeof ProjectIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/project/backlog/': typeof ProjectBacklogIndexRoute
+  '/project/board/': typeof ProjectBoardIndexRoute
+  '/project/development/': typeof ProjectDevelopmentIndexRoute
+  '/project/documents/': typeof ProjectDocumentsIndexRoute
+  '/project/summary/': typeof ProjectSummaryIndexRoute
+  '/project/timeline/': typeof ProjectTimelineIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/project/app': typeof ProjectAppRoute
+  '/project': typeof ProjectIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/project/backlog': typeof ProjectBacklogIndexRoute
+  '/project/board': typeof ProjectBoardIndexRoute
+  '/project/development': typeof ProjectDevelopmentIndexRoute
+  '/project/documents': typeof ProjectDocumentsIndexRoute
+  '/project/summary': typeof ProjectSummaryIndexRoute
+  '/project/timeline': typeof ProjectTimelineIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/project': typeof ProjectRouteRouteWithChildren
   '/project/app': typeof ProjectAppRoute
+  '/project/': typeof ProjectIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/project/backlog/': typeof ProjectBacklogIndexRoute
+  '/project/board/': typeof ProjectBoardIndexRoute
+  '/project/development/': typeof ProjectDevelopmentIndexRoute
+  '/project/documents/': typeof ProjectDocumentsIndexRoute
+  '/project/summary/': typeof ProjectSummaryIndexRoute
+  '/project/timeline/': typeof ProjectTimelineIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/project/app' | '/api/auth/$' | '/api/trpc/$'
+  fullPaths:
+    | '/'
+    | '/project'
+    | '/project/app'
+    | '/project/'
+    | '/api/auth/$'
+    | '/api/trpc/$'
+    | '/project/backlog/'
+    | '/project/board/'
+    | '/project/development/'
+    | '/project/documents/'
+    | '/project/summary/'
+    | '/project/timeline/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/project/app' | '/api/auth/$' | '/api/trpc/$'
-  id: '__root__' | '/' | '/project/app' | '/api/auth/$' | '/api/trpc/$'
+  to:
+    | '/'
+    | '/project/app'
+    | '/project'
+    | '/api/auth/$'
+    | '/api/trpc/$'
+    | '/project/backlog'
+    | '/project/board'
+    | '/project/development'
+    | '/project/documents'
+    | '/project/summary'
+    | '/project/timeline'
+  id:
+    | '__root__'
+    | '/'
+    | '/project'
+    | '/project/app'
+    | '/project/'
+    | '/api/auth/$'
+    | '/api/trpc/$'
+    | '/project/backlog/'
+    | '/project/board/'
+    | '/project/development/'
+    | '/project/documents/'
+    | '/project/summary/'
+    | '/project/timeline/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ProjectAppRoute: typeof ProjectAppRoute
+  ProjectRouteRoute: typeof ProjectRouteRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiTrpcSplatRoute: typeof ApiTrpcSplatRoute
 }
@@ -78,12 +185,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/project': {
+      id: '/project'
+      path: '/project'
+      fullPath: '/project'
+      preLoaderRoute: typeof ProjectRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/project/': {
+      id: '/project/'
+      path: '/'
+      fullPath: '/project/'
+      preLoaderRoute: typeof ProjectIndexRouteImport
+      parentRoute: typeof ProjectRouteRoute
+    }
     '/project/app': {
       id: '/project/app'
-      path: '/project/app'
+      path: '/app'
       fullPath: '/project/app'
       preLoaderRoute: typeof ProjectAppRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ProjectRouteRoute
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -99,12 +220,80 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiTrpcSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/project/backlog/': {
+      id: '/project/backlog/'
+      path: '/backlog'
+      fullPath: '/project/backlog/'
+      preLoaderRoute: typeof ProjectBacklogIndexRouteImport
+      parentRoute: typeof ProjectRouteRoute
+    }
+    '/project/board/': {
+      id: '/project/board/'
+      path: '/board'
+      fullPath: '/project/board/'
+      preLoaderRoute: typeof ProjectBoardIndexRouteImport
+      parentRoute: typeof ProjectRouteRoute
+    }
+    '/project/development/': {
+      id: '/project/development/'
+      path: '/development'
+      fullPath: '/project/development/'
+      preLoaderRoute: typeof ProjectDevelopmentIndexRouteImport
+      parentRoute: typeof ProjectRouteRoute
+    }
+    '/project/documents/': {
+      id: '/project/documents/'
+      path: '/documents'
+      fullPath: '/project/documents/'
+      preLoaderRoute: typeof ProjectDocumentsIndexRouteImport
+      parentRoute: typeof ProjectRouteRoute
+    }
+    '/project/summary/': {
+      id: '/project/summary/'
+      path: '/summary'
+      fullPath: '/project/summary/'
+      preLoaderRoute: typeof ProjectSummaryIndexRouteImport
+      parentRoute: typeof ProjectRouteRoute
+    }
+    '/project/timeline/': {
+      id: '/project/timeline/'
+      path: '/timeline'
+      fullPath: '/project/timeline/'
+      preLoaderRoute: typeof ProjectTimelineIndexRouteImport
+      parentRoute: typeof ProjectRouteRoute
+    }
   }
 }
 
+interface ProjectRouteRouteChildren {
+  ProjectAppRoute: typeof ProjectAppRoute
+  ProjectIndexRoute: typeof ProjectIndexRoute
+  ProjectBacklogIndexRoute: typeof ProjectBacklogIndexRoute
+  ProjectBoardIndexRoute: typeof ProjectBoardIndexRoute
+  ProjectDevelopmentIndexRoute: typeof ProjectDevelopmentIndexRoute
+  ProjectDocumentsIndexRoute: typeof ProjectDocumentsIndexRoute
+  ProjectSummaryIndexRoute: typeof ProjectSummaryIndexRoute
+  ProjectTimelineIndexRoute: typeof ProjectTimelineIndexRoute
+}
+
+const ProjectRouteRouteChildren: ProjectRouteRouteChildren = {
+  ProjectAppRoute: ProjectAppRoute,
+  ProjectIndexRoute: ProjectIndexRoute,
+  ProjectBacklogIndexRoute: ProjectBacklogIndexRoute,
+  ProjectBoardIndexRoute: ProjectBoardIndexRoute,
+  ProjectDevelopmentIndexRoute: ProjectDevelopmentIndexRoute,
+  ProjectDocumentsIndexRoute: ProjectDocumentsIndexRoute,
+  ProjectSummaryIndexRoute: ProjectSummaryIndexRoute,
+  ProjectTimelineIndexRoute: ProjectTimelineIndexRoute,
+}
+
+const ProjectRouteRouteWithChildren = ProjectRouteRoute._addFileChildren(
+  ProjectRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ProjectAppRoute: ProjectAppRoute,
+  ProjectRouteRoute: ProjectRouteRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiTrpcSplatRoute: ApiTrpcSplatRoute,
 }

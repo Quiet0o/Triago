@@ -42,11 +42,6 @@ const placeholderContent: Record<
     description:
       'Knowledge base — documentation, procedures, and FAQ related to the project.',
   },
-  forms: {
-    icon: ClipboardList,
-    title: 'Forms',
-    description: 'Ticket form setup — fields, validation rules, and templates.',
-  },
 };
 
 export const PlaceholderTab = ({ tabId }: { tabId: string }) => {
