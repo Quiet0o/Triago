@@ -8,10 +8,7 @@ import type {
   SortingState,
 } from '@tanstack/react-table';
 import type { Ticket } from '../../tickets/types';
-import {
-  ticketColumns,
-  ticketTableFeatures,
-} from './table-ticket-columns';
+import { ticketColumns, ticketTableFeatures } from './table-ticket-columns';
 import { Button } from '#/components/ui/button.tsx';
 import {
   Table,
@@ -43,7 +40,6 @@ export const TicketTable = ({
   ) => void;
   globalFilter: string;
 }) => {
-  
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   const table = useTable({
@@ -57,13 +53,13 @@ export const TicketTable = ({
     getRowId: (row) => row.id,
     enableRowSelection: true,
   });
-  
+
   const rows = table.getRowModel().rows;
 
   if (rows.length === 0) {
     return (
       <div className="flex items-center justify-center py-6 text-sm text-muted-foreground">
-        Brak zgłoszeń pasujących do filtrów.
+        No tickets matching filters.
       </div>
     );
   }
@@ -124,4 +120,4 @@ export const TicketTable = ({
       </TableBody>
     </Table>
   );
-}
+};

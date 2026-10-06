@@ -61,11 +61,11 @@ const SprintHeader = ({
           </span>
           {sprint.status === 'active' && (
             <span className="rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[0.625rem] font-semibold text-emerald-600 ring-1 ring-emerald-500/20 dark:text-emerald-400">
-              AKTYWNY
+              ACTIVE
             </span>
           )}
           <span className="rounded-md bg-muted px-1.5 py-0.5 text-[0.6875rem] font-medium tabular-nums text-muted-foreground ring-1 ring-border">
-            {ticketCount} zgłoszeń
+            {ticketCount} tickets
           </span>
           <span className="hidden items-center gap-1 text-[0.6875rem] text-muted-foreground sm:inline-flex">
             <Calendar className="size-3" />
@@ -78,7 +78,7 @@ const SprintHeader = ({
       )}
     </button>
   );
-}
+};
 
 export const SprintSection = ({
   sprint,
@@ -127,4 +127,4 @@ export const SprintSection = ({
       )}
     </div>
   );
-}
+};

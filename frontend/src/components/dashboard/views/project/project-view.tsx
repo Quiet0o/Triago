@@ -23,13 +23,13 @@ import mockData from '../../data/mock-tickets.json';
 const data = mockData as MockData;
 
 const projectTabs = [
-  { id: 'podsumowanie', label: 'Podsumowanie', icon: LayoutGrid },
+  { id: 'summary', label: 'Summary', icon: LayoutGrid },
   { id: 'backlog', label: 'Backlog', icon: List },
-  { id: 'tablica', label: 'Tablica', icon: Columns3 },
-  { id: 'programowanie', label: 'Programowanie', icon: Code2 },
-  { id: 'oś czasu', label: 'Oś czasu', icon: Clock },
-  { id: 'dokumenty', label: 'Dokumenty', icon: FileText },
-  { id: 'formularze', label: 'Formularze', icon: ClipboardList },
+  { id: 'board', label: 'Board', icon: Columns3 },
+  { id: 'development', label: 'Development', icon: Code2 },
+  { id: 'timeline', label: 'Timeline', icon: Clock },
+  { id: 'documents', label: 'Documents', icon: FileText },
+  { id: 'forms', label: 'Forms', icon: ClipboardList },
 ] as const;
 
 export function ProjectView({

@@ -78,7 +78,7 @@ export const NavBadge = ({
       {count}
     </span>
   );
-}
+};
 
 export const AppSidebar = ({ ...props }: ComponentProps<typeof Sidebar>) => {
   const { state, toggleSidebar } = useSidebar();
@@ -157,15 +157,13 @@ export const AppSidebar = ({ ...props }: ComponentProps<typeof Sidebar>) => {
                 )}
                 <span className="sr-only">
                   {state === 'collapsed'
-                    ? 'Rozwiń panel boczny'
-                    : 'Zwiń panel boczny'}
+                    ? 'Expand sidebar'
+                    : 'Collapse sidebar'}
                 </span>
               </Button>
             </TooltipTrigger>
             <TooltipContent side={state === 'collapsed' ? 'right' : 'bottom'}>
-              {state === 'collapsed'
-                ? 'Rozwiń panel boczny'
-                : 'Zwiń panel boczny'}
+              {state === 'collapsed' ? 'Expand sidebar' : 'Collapse sidebar'}
             </TooltipContent>
           </Tooltip>
         </div>
@@ -182,7 +180,10 @@ export const AppSidebar = ({ ...props }: ComponentProps<typeof Sidebar>) => {
                     isActive={item.isActive}
                     tooltip={item.title}
                   >
-                    <a href={item.url} className="flex min-w-0 items-center gap-2">
+                    <a
+                      href={item.url}
+                      className="flex min-w-0 items-center gap-2"
+                    >
                       <item.icon className="size-4 shrink-0" />
                       <span className="truncate">{item.title}</span>
                       {item.badge !== null && (
@@ -204,7 +205,10 @@ export const AppSidebar = ({ ...props }: ComponentProps<typeof Sidebar>) => {
               {secondaryNavItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={item.title}>
-                    <a href={item.url} className="flex min-w-0 items-center gap-2">
+                    <a
+                      href={item.url}
+                      className="flex min-w-0 items-center gap-2"
+                    >
                       <item.icon className="size-4 shrink-0" />
                       <span className="truncate">{item.title}</span>
                     </a>
@@ -226,15 +230,15 @@ export const AppSidebar = ({ ...props }: ComponentProps<typeof Sidebar>) => {
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
                   <Avatar className="size-8 rounded-lg shrink-0">
-                    <AvatarImage src="" alt="Jan Kowalski" />
+                    <AvatarImage src="" alt="John Doe" />
                     <AvatarFallback className="rounded-lg bg-primary/10 text-primary font-medium">
-                      JK
+                      JD
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
-                    <span className="truncate font-semibold">Jan Kowalski</span>
+                    <span className="truncate font-semibold">John Doe</span>
                     <span className="truncate text-xs text-muted-foreground">
-                      jan.kowalski@triago.pl
+                      john.doe@triago.com
                     </span>
                   </div>
                   <ChevronsUpDown className="ml-auto size-4 shrink-0 group-data-[collapsible=icon]:hidden" />
@@ -249,17 +253,15 @@ export const AppSidebar = ({ ...props }: ComponentProps<typeof Sidebar>) => {
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <Avatar className="size-8 rounded-lg">
-                      <AvatarImage src="" alt="Jan Kowalski" />
+                      <AvatarImage src="" alt="John Doe" />
                       <AvatarFallback className="rounded-lg bg-primary/10 text-primary font-medium">
-                        JK
+                        JD
                       </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">
-                        Jan Kowalski
-                      </span>
+                      <span className="truncate font-semibold">John Doe</span>
                       <span className="truncate text-xs text-muted-foreground">
-                        jan.kowalski@triago.pl
+                        john.doe@triago.com
                       </span>
                     </div>
                   </div>
@@ -268,28 +270,28 @@ export const AppSidebar = ({ ...props }: ComponentProps<typeof Sidebar>) => {
                 <DropdownMenuGroup>
                   <DropdownMenuItem>
                     <Sparkles className="mr-2 size-4" />
-                    Ulepsz do Pro
+                    Upgrade to Pro
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem>
                     <User className="mr-2 size-4" />
-                    Konto
+                    Account
                   </DropdownMenuItem>
                   <DropdownMenuItem>
                     <Bell className="mr-2 size-4" />
-                    Powiadomienia
+                    Notifications
                   </DropdownMenuItem>
                   <DropdownMenuItem>
                     <Settings className="mr-2 size-4" />
-                    Ustawienia
+                    Settings
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="text-destructive focus:text-destructive">
                   <LogOut className="mr-2 size-4" />
-                  Wyloguj się
+                  Log out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -298,4 +300,4 @@ export const AppSidebar = ({ ...props }: ComponentProps<typeof Sidebar>) => {
       </SidebarFooter>
     </Sidebar>
   );
-}
+};

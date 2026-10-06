@@ -1,10 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import type {
-  SortingState,
-  ColumnVisibilityState,
-} from '@tanstack/react-table';
+import type { ColumnVisibilityState } from '@tanstack/react-table';
 import type { Ticket, Sprint } from '../../tickets/types';
 import { BacklogTableFilters } from './backlog-table-filters';
 import { SprintSection } from './sprint-section';
@@ -108,17 +105,17 @@ export const BacklogView = ({
       {/* Summary bar */}
       <div className="flex items-center justify-between rounded-lg border bg-muted/30 px-4 py-2.5 text-xs text-muted-foreground">
         <span>
-          Łącznie: {filteredTickets.length} zgłoszeń ·{' '}
+          Total: {filteredTickets.length} tickets ·{' '}
           {filteredTickets.reduce((s, t) => s + t.storyPoints, 0)} story points
         </span>
         <span>
-          {filteredTickets.filter((t) => t.status === 'zamknięty').length}{' '}
-          zamkniętych ·{' '}
-          {filteredTickets.filter((t) => t.status === 'w_toku').length} w toku ·{' '}
+          {filteredTickets.filter((t) => t.status === 'zamknięty').length} done
+          · {filteredTickets.filter((t) => t.status === 'w_toku').length} in
+          progress ·{' '}
           {filteredTickets.filter((t) => t.status === 'zablokowany').length}{' '}
-          zablokowanych
+          blocked
         </span>
       </div>
     </div>
   );
-}
+};

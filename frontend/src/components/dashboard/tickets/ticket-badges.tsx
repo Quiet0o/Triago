@@ -4,10 +4,6 @@ import {
   BookOpen,
   ListTree,
   Lightbulb,
-  AlertTriangle,
-  ArrowUp,
-  ArrowRight,
-  ArrowDown,
   Circle,
   Loader2,
   Eye,
@@ -21,7 +17,11 @@ import {
   Minus,
 } from 'lucide-react';
 import { Badge } from '#/components/ui/badge.tsx';
-import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar.tsx';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from '#/components/ui/avatar.tsx';
 import {
   Tooltip,
   TooltipContent,
@@ -70,29 +70,35 @@ const typeConfig: Record<
 
 const priorityConfig: Record<
   TicketPriority,
-  { icon: typeof ChevronsUp | typeof ChevronUp | typeof Minus | typeof CriticalIcon; label: string; color: string; bg: string }
+  {
+    icon:
+      typeof ChevronsUp | typeof ChevronUp | typeof Minus | typeof CriticalIcon;
+    label: string;
+    color: string;
+    bg: string;
+  }
 > = {
   krytyczny: {
     icon: CriticalIcon,
-    label: 'Krytyczny',
+    label: 'Critical',
     color: 'text-red-600 dark:text-red-400',
     bg: 'bg-red-500/10 border-red-500/20',
   },
   wysoki: {
     icon: ChevronsUp,
-    label: 'Wysoki',
+    label: 'High',
     color: 'text-orange-600 dark:text-orange-400',
     bg: 'bg-orange-500/10 border-orange-500/20',
   },
   średni: {
     icon: ChevronUp,
-    label: 'Średni',
+    label: 'Medium',
     color: 'text-amber-600 dark:text-amber-400',
     bg: 'bg-amber-500/10 border-amber-500/20',
   },
   niski: {
     icon: Minus,
-    label: 'Niski',
+    label: 'Low',
     color: 'text-blue-600 dark:text-blue-400',
     bg: 'bg-blue-500/10 border-blue-500/20',
   },
@@ -104,13 +110,13 @@ const statusConfig: Record<
 > = {
   nowy: {
     icon: Circle,
-    label: 'Nowy',
+    label: 'New',
     color: 'text-slate-500 dark:text-slate-400',
     bg: 'bg-slate-500/10 border-slate-500/20',
   },
   w_toku: {
     icon: Loader2,
-    label: 'W toku',
+    label: 'In Progress',
     color: 'text-blue-600 dark:text-blue-400',
     bg: 'bg-blue-500/10 border-blue-500/20',
   },
@@ -122,19 +128,19 @@ const statusConfig: Record<
   },
   testowanie: {
     icon: FlaskConical,
-    label: 'Testowanie',
+    label: 'Testing',
     color: 'text-amber-600 dark:text-amber-400',
     bg: 'bg-amber-500/10 border-amber-500/20',
   },
   zamknięty: {
     icon: CheckCircle2,
-    label: 'Zamknięty',
+    label: 'Closed',
     color: 'text-emerald-600 dark:text-emerald-400',
     bg: 'bg-emerald-500/10 border-emerald-500/20',
   },
   zablokowany: {
     icon: Ban,
-    label: 'Zablokowany',
+    label: 'Blocked',
     color: 'text-red-600 dark:text-red-400',
     bg: 'bg-red-500/10 border-red-500/20',
   },
@@ -178,7 +184,7 @@ export const PriorityBadge = ({ priority }: { priority: TicketPriority }) => {
       {cfg.label}
     </Badge>
   );
-}
+};
 
 export const StatusBadge = ({ status }: { status: TicketStatus }) => {
   const cfg = statusConfig[status];
@@ -196,7 +202,7 @@ export const StatusBadge = ({ status }: { status: TicketStatus }) => {
       {cfg.label}
     </Badge>
   );
-}
+};
 
 export const AssigneeAvatar = ({
   person,
@@ -226,7 +232,7 @@ export const AssigneeAvatar = ({
           </Avatar>
         </TooltipTrigger>
         <TooltipContent side="top" className="text-xs">
-          Nieprzypisany
+          Unassigned
         </TooltipContent>
       </Tooltip>
     );
@@ -235,13 +241,11 @@ export const AssigneeAvatar = ({
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Avatar
-          className={cn(
-            'border',
-            size === 'sm' ? 'size-6' : 'size-7'
-          )}
-        >
-          <AvatarImage src={`https://i.pravatar.cc/150?u=${person.email}`} alt={person.name} />
+        <Avatar className={cn('border', size === 'sm' ? 'size-6' : 'size-7')}>
+          <AvatarImage
+            src={`https://i.pravatar.cc/150?u=${person.email}`}
+            alt={person.name}
+          />
           <AvatarFallback
             className={cn(
               'bg-primary/10 text-primary font-medium',
@@ -253,12 +257,14 @@ export const AssigneeAvatar = ({
         </Avatar>
       </TooltipTrigger>
       <TooltipContent side="top" className="px-3 py-2">
-        <p className="text-sm font-semibold leading-none mb-1 text-background">{person.name}</p>
+        <p className="text-sm font-semibold leading-none mb-1 text-background">
+          {person.name}
+        </p>
         <p className="text-xs leading-none text-background/70">{person.role}</p>
       </TooltipContent>
     </Tooltip>
   );
-}
+};
 
 export function StoryPointsBadge({ points }: { points: number }) {
   return (

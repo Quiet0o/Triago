@@ -14,13 +14,13 @@ import {
 } from '#/components/ui/dropdown-menu.tsx';
 
 const columns = [
-  { id: 'id', label: 'Klucz' },
+  { id: 'id', label: 'Key' },
   { id: 'status', label: 'Status' },
-  { id: 'priority', label: 'Priorytet' },
-  { id: 'assignee', label: 'Osoba' },
+  { id: 'priority', label: 'Priority' },
+  { id: 'assignee', label: 'Assignee' },
   { id: 'storyPoints', label: 'Story Points' },
-  { id: 'labels', label: 'Etykiety' },
-  { id: 'meta', label: 'Aktywność' },
+  { id: 'labels', label: 'Labels' },
+  { id: 'meta', label: 'Activity' },
 ] as const;
 
 export const ColumnVisibilityMenu = ({
@@ -35,12 +35,12 @@ export const ColumnVisibilityMenu = ({
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
           <SlidersHorizontal className="size-3.5" />
-          Kolumny
+          Columns
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-40">
         <DropdownMenuLabel className="text-xs">
-          Widoczne kolumny
+          Visible columns
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         {columns.map((column) => (
@@ -61,4 +61,4 @@ export const ColumnVisibilityMenu = ({
       </DropdownMenuContent>
     </DropdownMenu>
   );
-}
+};

@@ -53,7 +53,7 @@ export const BacklogTableFilters = ({
         <div className="relative w-full sm:w-56">
           <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Szukaj zgłoszeń..."
+            placeholder="Search tickets..."
             value={search}
             onChange={(event) => onSearchChange(event.target.value)}
             className="h-8 bg-background pl-8 text-xs"
@@ -66,27 +66,27 @@ export const BacklogTableFilters = ({
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Wszystkie</SelectItem>
-            <SelectItem value="nowy">Nowy</SelectItem>
-            <SelectItem value="w_toku">W toku</SelectItem>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="nowy">New</SelectItem>
+            <SelectItem value="w_toku">In Progress</SelectItem>
             <SelectItem value="review">Review</SelectItem>
-            <SelectItem value="testowanie">Testowanie</SelectItem>
-            <SelectItem value="zamknięty">Zamknięty</SelectItem>
-            <SelectItem value="zablokowany">Zablokowany</SelectItem>
+            <SelectItem value="testowanie">Testing</SelectItem>
+            <SelectItem value="zamknięty">Closed</SelectItem>
+            <SelectItem value="zablokowany">Blocked</SelectItem>
           </SelectContent>
         </Select>
 
         <Select value={priorityFilter} onValueChange={onPriorityFilterChange}>
           <SelectTrigger className="h-8 w-[130px] text-xs">
             <Filter className="mr-1.5 size-3" />
-            <SelectValue placeholder="Priorytet" />
+            <SelectValue placeholder="Priority" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Wszystkie</SelectItem>
-            <SelectItem value="krytyczny">Krytyczny</SelectItem>
-            <SelectItem value="wysoki">Wysoki</SelectItem>
-            <SelectItem value="średni">Średni</SelectItem>
-            <SelectItem value="niski">Niski</SelectItem>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="krytyczny">Critical</SelectItem>
+            <SelectItem value="wysoki">High</SelectItem>
+            <SelectItem value="średni">Medium</SelectItem>
+            <SelectItem value="niski">Low</SelectItem>
           </SelectContent>
         </Select>
 
@@ -118,22 +118,22 @@ export const BacklogTableFilters = ({
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
               <SlidersHorizontal className="size-3.5" />
-              Kolumny
+              Columns
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-40">
             <DropdownMenuLabel className="text-xs">
-              Widoczne kolumny
+              Visible columns
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             {[
-              { id: 'id', label: 'Klucz' },
+              { id: 'id', label: 'Key' },
               { id: 'status', label: 'Status' },
-              { id: 'priority', label: 'Priorytet' },
-              { id: 'assignee', label: 'Osoba' },
+              { id: 'priority', label: 'Priority' },
+              { id: 'assignee', label: 'Assignee' },
               { id: 'storyPoints', label: 'Story Points' },
-              { id: 'labels', label: 'Etykiety' },
-              { id: 'meta', label: 'Aktywność' },
+              { id: 'labels', label: 'Labels' },
+              { id: 'meta', label: 'Activity' },
             ].map((column) => (
               <DropdownMenuCheckboxItem
                 key={column.id}
@@ -153,9 +153,9 @@ export const BacklogTableFilters = ({
         </DropdownMenu>
         <Button size="sm" className="h-8 gap-1.5 text-xs">
           <Plus className="size-3.5" />
-          Nowe zgłoszenie
+          New ticket
         </Button>
       </div>
     </div>
   );
-}
+};

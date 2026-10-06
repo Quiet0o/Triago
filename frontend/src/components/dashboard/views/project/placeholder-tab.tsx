@@ -9,35 +9,52 @@ import {
   ClipboardList,
 } from 'lucide-react';
 
-const placeholderContent: Record<string, { icon: typeof LayoutGrid; description: string }> = {
-  podsumowanie: {
+const placeholderContent: Record<
+  string,
+  { icon: typeof LayoutGrid; title: string; description: string }
+> = {
+  summary: {
     icon: LayoutGrid,
-    description: 'Przegląd projektu — statystyki, wykresy velocity, burndown chart i podsumowanie sprintu.',
+    title: 'Summary',
+    description:
+      'Project overview — statistics, velocity charts, burndown chart, and sprint summary.',
   },
-  tablica: {
+  board: {
     icon: Columns3,
-    description: 'Widok Kanban — przeciągnij i upuść zgłoszenia między kolumnami statusów.',
+    title: 'Board',
+    description: 'Kanban view — drag and drop tickets between status columns.',
   },
-  programowanie: {
+  development: {
     icon: Code2,
-    description: 'Integracja z repozytorium — commity, pull requesty i branche powiązane ze zgłoszeniami.',
+    title: 'Development',
+    description:
+      'Repository integration — commits, pull requests, and branches linked to tickets.',
   },
-  'oś czasu': {
+  timeline: {
     icon: Clock,
-    description: 'Widok Gantt — oś czasu z terminami, zależnościami i postępem prac.',
+    title: 'Timeline',
+    description:
+      'Gantt view — timeline with deadlines, dependencies, and work progress.',
   },
-  dokumenty: {
+  documents: {
     icon: FileText,
-    description: 'Baza wiedzy — dokumentacja, procedury i FAQ powiązane z projektem.',
+    title: 'Documents',
+    description:
+      'Knowledge base — documentation, procedures, and FAQ related to the project.',
   },
-  formularze: {
+  forms: {
     icon: ClipboardList,
-    description: 'Konfiguracja formularzy zgłoszeniowych — pola, walidacja, szablony.',
+    title: 'Forms',
+    description: 'Ticket form setup — fields, validation rules, and templates.',
   },
 };
 
-export const PlaceholderTab = ({ tabId }: { tabId: string }) =>  {
-  const config = placeholderContent[tabId];
+export const PlaceholderTab = ({ tabId }: { tabId: string }) => {
+  const config = placeholderContent[tabId] ?? {
+    icon: LayoutGrid,
+    title: tabId,
+    description: 'This section is currently under development.',
+  };
 
   const Icon = config.icon;
 
@@ -48,15 +65,13 @@ export const PlaceholderTab = ({ tabId }: { tabId: string }) =>  {
       </div>
       <div className="text-center max-w-md">
         <h3 className="text-sm font-semibold text-foreground capitalize">
-          {tabId}
+          {config.title}
         </h3>
         <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
           {config.description}
         </p>
-        <p className="mt-3 text-xs text-muted-foreground/60">
-          Wkrótce dostępne
-        </p>
+        <p className="mt-3 text-xs text-muted-foreground/60">Coming soon</p>
       </div>
     </div>
   );
-}
+};

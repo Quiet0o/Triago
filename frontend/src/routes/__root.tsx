@@ -54,7 +54,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
   }),
   notFoundComponent: () => (
     <div className="flex h-screen w-full items-center justify-center p-8 text-muted-foreground">
-      Nie znaleziono strony (404)
+      Page not found (404)
     </div>
   ),
   shellComponent: RootDocument,

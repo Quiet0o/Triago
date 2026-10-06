@@ -39,7 +39,7 @@ export const ticketTableFeatures = tableFeatures({
 export type TicketTableFeatures = typeof ticketTableFeatures;
 
 const col = createColumnHelper<TicketTableFeatures, Ticket>();
-const polishNameCollator = new Intl.Collator('pl-PL', {
+const nameCollator = new Intl.Collator('en-US', {
   sensitivity: 'base',
 });
 
@@ -53,7 +53,7 @@ export const ticketColumns: ColumnDef<TicketTableFeatures, Ticket, any>[] = [
           (table.getIsSomePageRowsSelected() && 'indeterminate')
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Zaznacz wszystko"
+        aria-label="Select all"
       />
     ),
     cell: ({ row }) => (
@@ -61,7 +61,7 @@ export const ticketColumns: ColumnDef<TicketTableFeatures, Ticket, any>[] = [
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         onClick={(event) => event.stopPropagation()}
-        aria-label={`Zaznacz ${row.original.id}`}
+        aria-label={`Select ${row.original.id}`}
       />
     ),
     enableSorting: false,
@@ -75,7 +75,7 @@ export const ticketColumns: ColumnDef<TicketTableFeatures, Ticket, any>[] = [
   }),
 
   col.accessor('id', {
-    header: 'Numer',
+    header: 'Key',
     cell: (info) => (
       <span className="font-mono text-xs font-semibold text-muted-foreground whitespace-nowrap">
         {info.getValue()}
@@ -84,7 +84,7 @@ export const ticketColumns: ColumnDef<TicketTableFeatures, Ticket, any>[] = [
   }),
 
   col.accessor('title', {
-    header: 'Tytuł',
+    header: 'Title',
     cell: (info) => (
       <span className="text-sm font-medium text-foreground line-clamp-1">
         {info.getValue()}
@@ -99,12 +99,12 @@ export const ticketColumns: ColumnDef<TicketTableFeatures, Ticket, any>[] = [
   }),
 
   col.accessor('priority', {
-    header: 'Priorytet',
+    header: 'Priority',
     cell: (info) => <PriorityBadge priority={info.getValue()} />,
   }),
 
   col.accessor('assignee', {
-    header: 'Osoba',
+    header: 'Assignee',
     cell: (info) => <AssigneeAvatar size="md" person={info.getValue()} />,
     enableSorting: true,
     sortFn: (rowA, rowB) => {
@@ -114,7 +114,7 @@ export const ticketColumns: ColumnDef<TicketTableFeatures, Ticket, any>[] = [
       if (!nameA) return nameB ? 1 : 0;
       if (!nameB) return -1;
 
-      return polishNameCollator.compare(nameA, nameB);
+      return nameCollator.compare(nameA, nameB);
     },
   }),
 
@@ -124,7 +124,7 @@ export const ticketColumns: ColumnDef<TicketTableFeatures, Ticket, any>[] = [
   }),
 
   col.accessor('labels', {
-    header: 'Etykiety',
+    header: 'Labels',
     cell: (info) => {
       const labels = info.getValue();
       if (!labels.length) return null;
@@ -164,7 +164,7 @@ export const ticketColumns: ColumnDef<TicketTableFeatures, Ticket, any>[] = [
   col.display({
     id: 'more actions',
     header: '',
-    cell: ({ row }) => (
+    cell: () => (
       <Ellipsis className="size-4 opacity-0 transition-opacity group-hover:opacity-100 group-data-[state=selected]:opacity-100" />
     ),
     enableSorting: false,

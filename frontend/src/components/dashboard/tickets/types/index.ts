@@ -1,11 +1,6 @@
 export type TicketPriority = 'krytyczny' | 'wysoki' | 'średni' | 'niski';
 export type TicketStatus =
-  | 'nowy'
-  | 'w_toku'
-  | 'review'
-  | 'testowanie'
-  | 'zamknięty'
-  | 'zablokowany';
+  'nowy' | 'w_toku' | 'review' | 'testowanie' | 'zamknięty' | 'zablokowany';
 export type TicketType = 'bug' | 'task' | 'story' | 'subtask' | 'improvement';
 
 export type TicketPerson = {

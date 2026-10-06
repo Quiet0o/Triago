@@ -2,27 +2,22 @@
   "sprints": [
     {
       "id": "sprint-4",
-      "name": "Sprint 4 — Wrzesień",
-      "goal": "Integracja powiadomień e-mail i poprawa UX formularzy",
+      "name": "Sprint 4 — September",
+      "goal": "Email notifications integration and form UX improvement",
       "startDate": "2026-09-14",
       "endDate": "2026-09-28",
       "status": "active"
     },
     {
       "id": "sprint-3",
-      "name": "Sprint 3 — Wrzesień",
-      "goal": "Moduł raportów i dashboard analityczny",
+      "name": "Sprint 3 — September",
+      "goal": "Reports module and analytics dashboard",
       "startDate": "2026-08-31",
       "endDate": "2026-09-13",
       "status": "completed"
     }
   ],
-  "priorities": [
-    "krytyczny",
-    "wysoki",
-    "średni",
-    "niski"
-  ],
+  "priorities": ["krytyczny", "wysoki", "średni", "niski"],
   "statuses": [
     "nowy",
     "w_toku",
@@ -31,18 +26,12 @@
     "zamknięty",
     "zablokowany"
   ],
-  "types": [
-    "bug",
-    "task",
-    "story",
-    "subtask",
-    "improvement"
-  ],
+  "types": ["bug", "task", "story", "subtask", "improvement"],
   "tickets": [
     {
       "id": "TRG-142",
-      "title": "Powiadomienia e-mail nie wysyłają się po eskalacji",
-      "description": "Po automatycznej eskalacji ticketu na poziom L2 system nie generuje powiadomienia e-mail do przypisanego agenta. Logi pokazują timeout na SMTP.",
+      "title": "Email notifications are not sent after escalation",
+      "description": "After automatic ticket escalation to L2, the system does not trigger an email notification to the assigned agent. SMTP timeout appears in logs.",
       "type": "bug",
       "priority": "krytyczny",
       "status": "w_toku",
@@ -60,11 +49,7 @@
       },
       "sprint": "sprint-4",
       "storyPoints": 5,
-      "labels": [
-        "email",
-        "eskalacja",
-        "produkcja"
-      ],
+      "labels": ["email", "escalation", "production"],
       "createdAt": "2026-09-16T09:22:00Z",
       "updatedAt": "2026-09-28T14:10:00Z",
       "dueDate": "2026-09-28",
@@ -73,17 +58,17 @@
       "subtasks": [
         {
           "id": "TRG-142-1",
-          "title": "Diagnoza problemu SMTP",
+          "title": "Diagnose SMTP issue",
           "status": "zamknięty"
         },
         {
           "id": "TRG-142-2",
-          "title": "Implementacja retry logic",
+          "title": "Implement retry logic",
           "status": "w_toku"
         },
         {
           "id": "TRG-142-3",
-          "title": "Testy integracyjne",
+          "title": "Integration tests",
           "status": "nowy"
         }
       ],
@@ -92,8 +77,8 @@
     },
     {
       "id": "TRG-141",
-      "title": "Dashboard — widok podsumowania SLA per zespół",
-      "description": "Dodać nowy widok na dashboardzie pokazujący procentowe spełnienie SLA w podziale na zespoły wsparcia (L1, L2, L3) z wykresem trendu za ostatnie 30 dni.",
+      "title": "Dashboard — SLA summary view per team",
+      "description": "Add a new dashboard view showing percentage SLA compliance broken down by support teams (L1, L2, L3) with a 30-day trend chart.",
       "type": "story",
       "priority": "wysoki",
       "status": "review",
@@ -111,11 +96,7 @@
       },
       "sprint": "sprint-4",
       "storyPoints": 8,
-      "labels": [
-        "dashboard",
-        "SLA",
-        "raporty"
-      ],
+      "labels": ["dashboard", "SLA", "reports"],
       "createdAt": "2026-09-15T11:00:00Z",
       "updatedAt": "2026-09-27T16:45:00Z",
       "dueDate": "2026-09-28",
@@ -127,8 +108,8 @@
     },
     {
       "id": "TRG-140",
-      "title": "Automatyczne przypisanie ticketów na podstawie kategorii",
-      "description": "Zaimplementować routing engine, który na podstawie kategorii i tagu ticketu automatycznie przypisuje go do odpowiedniego zespołu lub agenta.",
+      "title": "Automatic ticket assignment based on category",
+      "description": "Implement a routing engine that automatically assigns tickets to the appropriate team or agent based on ticket category and tags.",
       "type": "task",
       "priority": "wysoki",
       "status": "w_toku",
@@ -146,11 +127,7 @@
       },
       "sprint": "sprint-4",
       "storyPoints": 13,
-      "labels": [
-        "routing",
-        "automatyzacja",
-        "backend"
-      ],
+      "labels": ["routing", "automation", "backend"],
       "createdAt": "2026-09-14T08:30:00Z",
       "updatedAt": "2026-09-28T10:20:00Z",
       "dueDate": "2026-09-30",
@@ -159,22 +136,22 @@
       "subtasks": [
         {
           "id": "TRG-140-1",
-          "title": "Definicja reguł routingu",
+          "title": "Define routing rules",
           "status": "zamknięty"
         },
         {
           "id": "TRG-140-2",
-          "title": "Implementacja silnika reguł",
+          "title": "Implement rules engine",
           "status": "w_toku"
         },
         {
           "id": "TRG-140-3",
-          "title": "UI panel konfiguracji reguł",
+          "title": "Rules configuration UI panel",
           "status": "nowy"
         },
         {
           "id": "TRG-140-4",
-          "title": "Testy E2E routingu",
+          "title": "E2E routing tests",
           "status": "nowy"
         }
       ],
@@ -183,8 +160,8 @@
     },
     {
       "id": "TRG-139",
-      "title": "Formularz tworzenia ticketu — walidacja pól wymaganych",
-      "description": "Pola 'Kategoria' i 'Priorytet' nie są walidowane przed submitem. Użytkownik może stworzyć ticket bez tych danych, co blokuje automatyczny routing.",
+      "title": "Create ticket form — required field validation",
+      "description": "'Category' and 'Priority' fields are not validated prior to submit. Users can create tickets without this data, blocking automatic routing.",
       "type": "bug",
       "priority": "średni",
       "status": "testowanie",
@@ -202,11 +179,7 @@
       },
       "sprint": "sprint-4",
       "storyPoints": 3,
-      "labels": [
-        "formularz",
-        "walidacja",
-        "UX"
-      ],
+      "labels": ["form", "validation", "UX"],
       "createdAt": "2026-09-17T13:15:00Z",
       "updatedAt": "2026-09-26T09:30:00Z",
       "dueDate": "2026-09-27",
@@ -218,8 +191,8 @@
     },
     {
       "id": "TRG-138",
-      "title": "Eksport zgłoszeń do CSV z filtrami",
-      "description": "Umożliwić eksport listy zgłoszeń do pliku CSV z zachowaniem aktywnych filtrów (status, priorytet, zakres dat, przypisany agent).",
+      "title": "Export tickets to CSV with filters",
+      "description": "Enable exporting the ticket list to CSV format preserving active filters (status, priority, date range, assigned agent).",
       "type": "task",
       "priority": "średni",
       "status": "zamknięty",
@@ -237,11 +210,7 @@
       },
       "sprint": "sprint-4",
       "storyPoints": 5,
-      "labels": [
-        "eksport",
-        "CSV",
-        "filtrowanie"
-      ],
+      "labels": ["export", "CSV", "filtering"],
       "createdAt": "2026-09-14T10:00:00Z",
       "updatedAt": "2026-09-24T15:00:00Z",
       "dueDate": "2026-09-25",
@@ -253,8 +222,8 @@
     },
     {
       "id": "TRG-137",
-      "title": "Wewnętrzne notatki agenta przy tickecie",
-      "description": "Dodać możliwość dodawania wewnętrznych notatek (niewidocznych dla klienta) bezpośrednio w widoku ticketu. Notatki powinny mieć timestamp i autora.",
+      "title": "Internal agent notes on tickets",
+      "description": "Add ability to leave internal notes (hidden from customers) directly in the ticket view. Notes must include author and timestamp.",
       "type": "story",
       "priority": "średni",
       "status": "w_toku",
@@ -272,11 +241,7 @@
       },
       "sprint": "sprint-4",
       "storyPoints": 8,
-      "labels": [
-        "notatki",
-        "agent",
-        "UX"
-      ],
+      "labels": ["notes", "agent", "UX"],
       "createdAt": "2026-09-15T14:00:00Z",
       "updatedAt": "2026-09-28T11:20:00Z",
       "dueDate": "2026-09-29",
@@ -285,17 +250,17 @@
       "subtasks": [
         {
           "id": "TRG-137-1",
-          "title": "Model danych notatek",
+          "title": "Notes data model",
           "status": "zamknięty"
         },
         {
           "id": "TRG-137-2",
-          "title": "API CRUD notatek",
+          "title": "Notes CRUD API",
           "status": "zamknięty"
         },
         {
           "id": "TRG-137-3",
-          "title": "Komponent UI notatek",
+          "title": "Notes UI component",
           "status": "w_toku"
         }
       ],
@@ -304,8 +269,8 @@
     },
     {
       "id": "TRG-136",
-      "title": "Timeout przy ładowaniu listy zgłoszeń > 500 rekordów",
-      "description": "Endpoint GET /api/tickets timeout po 30s gdy baza zawiera więcej niż 500 ticketów. Brak paginacji po stronie serwera — wszystko ładowane na raz.",
+      "title": "Timeout loading ticket list with > 500 records",
+      "description": "GET /api/tickets times out after 30s when database exceeds 500 tickets. Missing server-side pagination — everything loads at once.",
       "type": "bug",
       "priority": "krytyczny",
       "status": "zamknięty",
@@ -323,11 +288,7 @@
       },
       "sprint": "sprint-3",
       "storyPoints": 8,
-      "labels": [
-        "performance",
-        "backend",
-        "paginacja"
-      ],
+      "labels": ["performance", "backend", "pagination"],
       "createdAt": "2026-09-02T08:00:00Z",
       "updatedAt": "2026-09-12T17:30:00Z",
       "dueDate": "2026-09-10",
@@ -339,8 +300,8 @@
     },
     {
       "id": "TRG-135",
-      "title": "Widok Kanban — drag & drop zmiana statusu",
-      "description": "Zaimplementować widok Kanban z kolumnami odpowiadającymi statusom ticketów. Drag and drop powinien aktualizować status ticketu w real-time.",
+      "title": "Kanban view — drag & drop status update",
+      "description": "Implement Kanban board view with columns matching ticket statuses. Drag and drop should update ticket status in real-time.",
       "type": "story",
       "priority": "wysoki",
       "status": "nowy",
@@ -353,11 +314,7 @@
       },
       "sprint": null,
       "storyPoints": 13,
-      "labels": [
-        "kanban",
-        "drag-drop",
-        "frontend"
-      ],
+      "labels": ["kanban", "drag-drop", "frontend"],
       "createdAt": "2026-09-20T10:00:00Z",
       "updatedAt": "2026-09-20T10:00:00Z",
       "dueDate": null,
@@ -369,8 +326,8 @@
     },
     {
       "id": "TRG-134",
-      "title": "Integracja z Slack — notyfikacje o nowych ticketach",
-      "description": "Wysyłać powiadomienia na dedykowany kanał Slack gdy wpada nowy ticket o priorytecie 'krytyczny' lub 'wysoki'. Użyć Slack Incoming Webhooks.",
+      "title": "Slack integration — new ticket notifications",
+      "description": "Send alerts to a dedicated Slack channel whenever a new 'critical' or 'high' priority ticket is created. Use Slack Incoming Webhooks.",
       "type": "task",
       "priority": "niski",
       "status": "nowy",
@@ -383,11 +340,7 @@
       },
       "sprint": null,
       "storyPoints": 5,
-      "labels": [
-        "integracja",
-        "slack",
-        "powiadomienia"
-      ],
+      "labels": ["integration", "slack", "notifications"],
       "createdAt": "2026-09-22T09:00:00Z",
       "updatedAt": "2026-09-22T09:00:00Z",
       "dueDate": null,
@@ -399,8 +352,8 @@
     },
     {
       "id": "TRG-133",
-      "title": "Metryki czasu odpowiedzi — first response time",
-      "description": "Trackować i wyświetlać metrykę 'czas pierwszej odpowiedzi' (FRT) dla każdego ticketu. Agregować w dashboardzie per agent i per zespół.",
+      "title": "Response time metrics — first response time",
+      "description": "Track and display 'First Response Time' (FRT) metric for every ticket. Aggregate on the dashboard per agent and per team.",
       "type": "story",
       "priority": "wysoki",
       "status": "zablokowany",
@@ -418,32 +371,28 @@
       },
       "sprint": "sprint-4",
       "storyPoints": 8,
-      "labels": [
-        "metryki",
-        "SLA",
-        "FRT"
-      ],
+      "labels": ["metrics", "SLA", "FRT"],
       "createdAt": "2026-09-16T15:30:00Z",
       "updatedAt": "2026-09-25T11:00:00Z",
       "dueDate": "2026-09-30",
       "timeEstimate": "13h",
       "timeSpent": "4h",
       "blockedBy": "TRG-136",
-      "blockedReason": "Wymaga paginacji API — zależność od TRG-136",
+      "blockedReason": "Requires API pagination — blocked by TRG-136",
       "subtasks": [
         {
           "id": "TRG-133-1",
-          "title": "Schema metryki FRT w DB",
+          "title": "FRT metric schema in DB",
           "status": "zamknięty"
         },
         {
           "id": "TRG-133-2",
-          "title": "Endpoint API metryki",
+          "title": "Metric API endpoint",
           "status": "zablokowany"
         },
         {
           "id": "TRG-133-3",
-          "title": "Widget dashboard FRT",
+          "title": "FRT dashboard widget",
           "status": "nowy"
         }
       ],
@@ -452,8 +401,8 @@
     },
     {
       "id": "TRG-132",
-      "title": "Poprawa responsywności widoku listy ticketów na mobile",
-      "description": "Lista ticketów na urządzeniach < 768px jest nieczytelna — kolumny się nakładają. Wprowadzić card-based layout na mobile.",
+      "title": "Improve ticket list responsiveness on mobile",
+      "description": "Ticket list is hard to read on screens < 768px with overlapping columns. Introduce a card-based layout on mobile devices.",
       "type": "improvement",
       "priority": "średni",
       "status": "nowy",
@@ -471,11 +420,7 @@
       },
       "sprint": null,
       "storyPoints": 5,
-      "labels": [
-        "responsive",
-        "mobile",
-        "UX"
-      ],
+      "labels": ["responsive", "mobile", "UX"],
       "createdAt": "2026-09-23T14:00:00Z",
       "updatedAt": "2026-09-23T14:00:00Z",
       "dueDate": null,
@@ -487,8 +432,8 @@
     },
     {
       "id": "TRG-131",
-      "title": "Szablony odpowiedzi — biblioteka canned responses",
-      "description": "Stworzyć bibliotekę gotowych szablonów odpowiedzi (canned responses), które agent może wstawiać jednym kliknięciem podczas odpowiadania na ticket.",
+      "title": "Response templates — canned responses library",
+      "description": "Create a library of pre-written canned responses that agents can insert with a single click while replying to tickets.",
       "type": "story",
       "priority": "niski",
       "status": "nowy",
@@ -501,11 +446,7 @@
       },
       "sprint": null,
       "storyPoints": 8,
-      "labels": [
-        "szablony",
-        "agent",
-        "produktywność"
-      ],
+      "labels": ["templates", "agent", "productivity"],
       "createdAt": "2026-09-25T08:30:00Z",
       "updatedAt": "2026-09-25T08:30:00Z",
       "dueDate": null,
@@ -517,8 +458,8 @@
     },
     {
       "id": "TRG-130",
-      "title": "Multi-select akcje masowe na liście zgłoszeń",
-      "description": "Dodać checkboxy do listy ticketów z możliwością masowej zmiany statusu, priorytetu lub przypisania wielu ticketów jednocześnie.",
+      "title": "Multi-select bulk actions on ticket list",
+      "description": "Add selection checkboxes to the ticket list with bulk status change, priority update, or reassigning multiple tickets at once.",
       "type": "task",
       "priority": "średni",
       "status": "review",
@@ -536,11 +477,7 @@
       },
       "sprint": "sprint-4",
       "storyPoints": 5,
-      "labels": [
-        "bulk-actions",
-        "UX",
-        "lista"
-      ],
+      "labels": ["bulk-actions", "UX", "list"],
       "createdAt": "2026-09-15T09:45:00Z",
       "updatedAt": "2026-09-27T18:00:00Z",
       "dueDate": "2026-09-28",
@@ -552,8 +489,8 @@
     },
     {
       "id": "TRG-129",
-      "title": "Historia zmian ticketu — audit log",
-      "description": "Każda zmiana statusu, priorytetu, przypisania i komentarza powinna być logowana z timestampem i autorem. Wyświetlić jako timeline w widoku ticketu.",
+      "title": "Ticket change history — audit log",
+      "description": "Every change to status, priority, assignee, or comment must be recorded with timestamp and author. Display as a timeline in ticket view.",
       "type": "story",
       "priority": "wysoki",
       "status": "w_toku",
@@ -571,11 +508,7 @@
       },
       "sprint": "sprint-4",
       "storyPoints": 13,
-      "labels": [
-        "audit-log",
-        "historia",
-        "backend"
-      ],
+      "labels": ["audit-log", "history", "backend"],
       "createdAt": "2026-09-14T12:00:00Z",
       "updatedAt": "2026-09-28T09:15:00Z",
       "dueDate": "2026-10-02",
@@ -584,22 +517,22 @@
       "subtasks": [
         {
           "id": "TRG-129-1",
-          "title": "Model audit_log w bazie",
+          "title": "audit_log DB model",
           "status": "zamknięty"
         },
         {
           "id": "TRG-129-2",
-          "title": "Middleware logowania zmian",
+          "title": "Change tracking middleware",
           "status": "w_toku"
         },
         {
           "id": "TRG-129-3",
-          "title": "API pobierania historii",
+          "title": "History retrieval API",
           "status": "nowy"
         },
         {
           "id": "TRG-129-4",
-          "title": "Komponent timeline UI",
+          "title": "Timeline UI component",
           "status": "nowy"
         }
       ],
@@ -608,8 +541,8 @@
     },
     {
       "id": "TRG-128",
-      "title": "Filtr 'Moje zgłoszenia' w nawigacji bocznej",
-      "description": "Dodać preset filtra w sidebarze który pokazuje tylko tickety przypisane do zalogowanego użytkownika, pogrupowane po statusie.",
+      "title": "'My tickets' filter in side navigation",
+      "description": "Add a preset filter in sidebar showing only tickets assigned to the logged-in user, grouped by status.",
       "type": "subtask",
       "priority": "niski",
       "status": "zamknięty",
@@ -627,11 +560,7 @@
       },
       "sprint": "sprint-3",
       "storyPoints": 3,
-      "labels": [
-        "filtr",
-        "sidebar",
-        "UX"
-      ],
+      "labels": ["filter", "sidebar", "UX"],
       "createdAt": "2026-09-01T11:30:00Z",
       "updatedAt": "2026-09-10T14:00:00Z",
       "dueDate": "2026-09-12",
