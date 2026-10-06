@@ -2,18 +2,18 @@
 
 import type { ComponentProps } from 'react';
 import {
+  Bell,
+  ChevronsUpDown,
+  Clock,
+  Command,
   LayoutDashboard,
-  Users,
+  LogOut,
+  PanelLeftClose,
+  PanelLeftOpen,
   Settings,
   Sparkles,
-  ChevronsUpDown,
-  LogOut,
   User,
-  Bell,
-  Command,
-  PanelLeftOpen,
-  PanelLeftClose,
-  Clock,
+  Users,
 } from 'lucide-react';
 
 import {
@@ -38,16 +38,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '#/components/ui/dropdown-menu.tsx';
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '#/components/ui/avatar.tsx';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '#/components/ui/tooltip.tsx';
+import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar.tsx';
+import { Tooltip, TooltipContent, TooltipTrigger } from '#/components/ui/tooltip.tsx';
 import { Button } from '#/components/ui/button.tsx';
 import { m } from '#/paraglide/messages';
 import { cn } from 'cn';
@@ -61,18 +53,12 @@ const badgeStyles: Record<BadgeType, string> = {
   subtle: 'bg-muted text-muted-foreground ring-1 ring-border',
 };
 
-export const NavBadge = ({
-  count,
-  type = 'subtle',
-}: {
-  count: number;
-  type?: BadgeType;
-}) => {
+export const NavBadge = ({ count, type = 'subtle' }: { count: number; type?: BadgeType }) => {
   return (
     <span
       className={cn(
         'ml-auto inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-md px-1.5 text-[0.6875rem] font-semibold leading-none tabular-nums transition-colors group-data-[collapsible=icon]:hidden',
-        badgeStyles[type]
+        badgeStyles[type],
       )}
     >
       {count}
@@ -135,9 +121,7 @@ export const AppSidebar = ({ ...props }: ComponentProps<typeof Sidebar>) => {
               <Command className="size-4" />
             </div>
             <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
-              <span className="truncate font-semibold tracking-tight text-foreground">
-                Triago
-              </span>
+              <span className="truncate font-semibold tracking-tight text-foreground">Triago</span>
             </div>
           </div>
           <Tooltip>
@@ -156,9 +140,7 @@ export const AppSidebar = ({ ...props }: ComponentProps<typeof Sidebar>) => {
                   <PanelLeftClose className="size-4" />
                 )}
                 <span className="sr-only">
-                  {state === 'collapsed'
-                    ? 'Expand sidebar'
-                    : 'Collapse sidebar'}
+                  {state === 'collapsed' ? 'Expand sidebar' : 'Collapse sidebar'}
                 </span>
               </Button>
             </TooltipTrigger>
@@ -175,20 +157,11 @@ export const AppSidebar = ({ ...props }: ComponentProps<typeof Sidebar>) => {
             <SidebarMenu>
               {mainNavItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={item.isActive}
-                    tooltip={item.title}
-                  >
-                    <a
-                      href={item.url}
-                      className="flex min-w-0 items-center gap-2"
-                    >
+                  <SidebarMenuButton asChild isActive={item.isActive} tooltip={item.title}>
+                    <a href={item.url} className="flex min-w-0 items-center gap-2">
                       <item.icon className="size-4 shrink-0" />
                       <span className="truncate">{item.title}</span>
-                      {item.badge !== null && (
-                        <NavBadge count={item.badge} type={item.badgeType} />
-                      )}
+                      {item.badge !== null && <NavBadge count={item.badge} type={item.badgeType} />}
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -205,10 +178,7 @@ export const AppSidebar = ({ ...props }: ComponentProps<typeof Sidebar>) => {
               {secondaryNavItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={item.title}>
-                    <a
-                      href={item.url}
-                      className="flex min-w-0 items-center gap-2"
-                    >
+                    <a href={item.url} className="flex min-w-0 items-center gap-2">
                       <item.icon className="size-4 shrink-0" />
                       <span className="truncate">{item.title}</span>
                     </a>

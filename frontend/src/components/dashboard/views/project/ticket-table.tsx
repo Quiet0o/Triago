@@ -2,11 +2,7 @@
 
 import { useState } from 'react';
 import { flexRender, useTable } from '@tanstack/react-table';
-import type {
-  ColumnVisibilityState,
-  RowSelectionState,
-  SortingState,
-} from '@tanstack/react-table';
+import type { ColumnVisibilityState, RowSelectionState, SortingState } from '@tanstack/react-table';
 import type { Ticket } from '../../tickets/types';
 import { ticketColumns, ticketTableFeatures } from './table-ticket-columns';
 import { Button } from '#/components/ui/button.tsx';
@@ -29,14 +25,10 @@ export const TicketTable = ({
 }: {
   tickets: Ticket[];
   sorting: SortingState;
-  onSortingChange: (
-    updater: SortingState | ((previous: SortingState) => SortingState)
-  ) => void;
+  onSortingChange: (updater: SortingState | ((previous: SortingState) => SortingState)) => void;
   columnVisibility: ColumnVisibilityState;
   onColumnVisibilityChange: (
-    updater:
-      | ColumnVisibilityState
-      | ((previous: ColumnVisibilityState) => ColumnVisibilityState)
+    updater: ColumnVisibilityState | ((previous: ColumnVisibilityState) => ColumnVisibilityState),
   ) => void;
   globalFilter: string;
 }) => {
@@ -68,10 +60,7 @@ export const TicketTable = ({
     <Table>
       <TableHeader>
         {table.getHeaderGroups().map((headerGroup) => (
-          <TableRow
-            key={headerGroup.id}
-            className="border-b-0 bg-muted/30 hover:bg-transparent"
-          >
+          <TableRow key={headerGroup.id} className="border-b-0 bg-muted/30 hover:bg-transparent">
             {headerGroup.headers.map((header) => (
               <TableHead
                 key={header.id}
@@ -83,19 +72,11 @@ export const TicketTable = ({
                     className="-ml-2 h-7 px-2 text-[0.6875rem] font-medium text-muted-foreground hover:text-foreground"
                     onClick={header.column.getToggleSortingHandler()}
                   >
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-                    {{ asc: ' ↑', desc: ' ↓' }[
-                      header.column.getIsSorted() as string
-                    ] ?? ''}
+                    {flexRender(header.column.columnDef.header, header.getContext())}
+                    {{ asc: ' ↑', desc: ' ↓' }[header.column.getIsSorted() as string] ?? ''}
                   </Button>
                 ) : (
-                  flexRender(
-                    header.column.columnDef.header,
-                    header.getContext()
-                  )
+                  flexRender(header.column.columnDef.header, header.getContext())
                 )}
               </TableHead>
             ))}

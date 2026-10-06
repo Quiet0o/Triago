@@ -2,11 +2,7 @@ import { Bell, Plus, Search, Settings } from 'lucide-react';
 
 import { Button } from '#/components/ui/button.tsx';
 import { Input } from '#/components/ui/input.tsx';
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '#/components/ui/avatar.tsx';
+import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar.tsx';
 import {
   DropdownMenu,
   DropdownMenuContent,

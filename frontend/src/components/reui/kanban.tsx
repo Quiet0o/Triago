@@ -17,13 +17,13 @@ import type {
   CollisionDetection,
   DragCancelEvent,
   DragEndEvent,
+  DraggableAttributes,
+  DraggableSyntheticListeners,
   DragOverEvent,
   DragStartEvent,
   DropAnimation,
   Modifiers,
   UniqueIdentifier,
-  DraggableAttributes,
-  DraggableSyntheticListeners,
 } from '@dnd-kit/core';
 import {
   closestCenter,
@@ -165,15 +165,13 @@ export interface KanbanRootProps<T> extends Omit<
   useRender.ComponentProps<'div'>,
   'children' | 'onDragStart' | 'onDragEnd'
 > {
+  id?: string;
   value: Record<string, T[]>;
   onValueChange: (value: Record<string, T[]>) => void;
   getItemValue: (item: T) => string;
   children: ReactNode;
   onMove?: (event: KanbanMoveEvent) => void;
-  onValueCommit?: (
-    value: Record<string, T[]>,
-    meta: KanbanCommitMeta<T>
-  ) => void;
+  onValueCommit?: (value: Record<string, T[]>, meta: KanbanCommitMeta<T>) => void;
   restoreOnCancel?: boolean;
   onDragStart?: (event: DragStartEvent) => void;
   onDragEnd?: (event: DragEndEvent) => void;
@@ -183,6 +181,7 @@ export interface KanbanRootProps<T> extends Omit<
 }
 
 function Kanban<T>({
+  id: idProp,
   value,
   onValueChange,
   getItemValue,
@@ -199,6 +198,8 @@ function Kanban<T>({
   modifiers,
   ...props
 }: KanbanRootProps<T>) {
+  const generatedId = React.useId();
+  const dndId = idProp ?? `kanban-${generatedId}`;
   const columns = value;
   const setColumns = onValueChange;
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
@@ -222,7 +223,7 @@ function Kanban<T>({
   const sensors = useSensors(
     useSensor(MouseSensor, MOUSE_SENSOR_OPTIONS),
     useSensor(TouchSensor, TOUCH_SENSOR_OPTIONS),
-    useSensor(KeyboardSensor, KEYBOARD_SENSOR_OPTIONS)
+    useSensor(KeyboardSensor, KEYBOARD_SENSOR_OPTIONS),
   );
 
   const columnIds = useMemo(() => {
@@ -234,7 +235,7 @@ function Kanban<T>({
           const itemId = getItemValue(item);
           if (seen.has(itemId)) {
             console.warn(
-              `[Kanban] Duplicate item id "${itemId}". Item ids must be unique across all columns, or drag and drop will misbehave.`
+              `[Kanban] Duplicate item id "${itemId}". Item ids must be unique across all columns, or drag and drop will misbehave.`,
             );
             break;
           }
@@ -247,17 +248,15 @@ function Kanban<T>({
 
   const isColumn = useCallback(
     (id: UniqueIdentifier) => columnIds.includes(id as string),
-    [columnIds]
+    [columnIds],
   );
 
   const findContainer = useCallback(
     (id: UniqueIdentifier) => {
       if (isColumn(id)) return id as string;
-      return columnIds.find((key) =>
-        columns[key].some((item) => getItemValue(item) === id)
-      );
+      return columnIds.find((key) => columns[key].some((item) => getItemValue(item) === id));
     },
-    [columns, columnIds, getItemValue, isColumn]
+    [columns, columnIds, getItemValue, isColumn],
   );
 
   // The droppable under the pointer, not the one the dragged rect overlaps
@@ -270,7 +269,7 @@ function Kanban<T>({
         return closestCenter({
           ...args,
           droppableContainers: args.droppableContainers.filter((container) =>
-            isColumn(container.id)
+            isColumn(container.id),
           ),
         });
       }
@@ -286,8 +285,8 @@ function Kanban<T>({
           overId =
             closestCenter({
               ...args,
-              droppableContainers: args.droppableContainers.filter(
-                (container) => itemIds.has(container.id as string)
+              droppableContainers: args.droppableContainers.filter((container) =>
+                itemIds.has(container.id as string),
               ),
             })[0]?.id ?? overId;
         }
@@ -300,15 +299,11 @@ function Kanban<T>({
         ? [{ id: lastOverIdRef.current }]
         : rectIntersection(args);
     },
-    [columns, getItemValue, isColumn]
+    [columns, getItemValue, isColumn],
   );
 
   const commitChange = useCallback(
-    (
-      finalValue: Record<string, T[]>,
-      event: DragEndEvent,
-      kind: 'item' | 'column'
-    ) => {
+    (finalValue: Record<string, T[]>, event: DragEndEvent, kind: 'item' | 'column') => {
       if (!onValueCommit) return;
       const origin = dragOriginRef.current;
       if (!origin) return;
@@ -356,7 +351,7 @@ function Kanban<T>({
         previousValue: origin.value,
       });
     },
-    [onValueCommit]
+    [onValueCommit],
   );
 
   const handleDragStart = useCallback(
@@ -391,7 +386,7 @@ function Kanban<T>({
         }
       }
     },
-    [onDragStart, onValueCommit, restoreOnCancel]
+    [onDragStart, onValueCommit, restoreOnCancel],
   );
 
   const handleDragOver = useCallback(
@@ -416,12 +411,8 @@ function Kanban<T>({
         const activeItems = columns[activeContainer];
         const overItems = columns[overContainer];
 
-        const activeIndex = activeItems.findIndex(
-          (item: T) => getItemValue(item) === active.id
-        );
-        let overIndex = overItems.findIndex(
-          (item: T) => getItemValue(item) === over.id
-        );
+        const activeIndex = activeItems.findIndex((item: T) => getItemValue(item) === active.id);
+        let overIndex = overItems.findIndex((item: T) => getItemValue(item) === over.id);
 
         // If dropping on the column itself, not an item
         if (isColumn(over.id)) {
@@ -441,11 +432,9 @@ function Kanban<T>({
       } else {
         const container = activeContainer;
         const activeIndex = columns[container].findIndex(
-          (item: T) => getItemValue(item) === active.id
+          (item: T) => getItemValue(item) === active.id,
         );
-        const overIndex = columns[container].findIndex(
-          (item: T) => getItemValue(item) === over.id
-        );
+        const overIndex = columns[container].findIndex((item: T) => getItemValue(item) === over.id);
 
         if (activeIndex !== overIndex) {
           setColumns({
@@ -455,7 +444,7 @@ function Kanban<T>({
         }
       }
     },
-    [findContainer, getItemValue, isColumn, setColumns, columns, onMove]
+    [findContainer, getItemValue, isColumn, setColumns, columns, onMove],
   );
 
   const handleDragCancel = useCallback(
@@ -475,14 +464,7 @@ function Kanban<T>({
       setActiveId(null);
       onDragCancel?.(event);
     },
-    [
-      restoreOnCancel,
-      onMove,
-      onValueCommit,
-      setColumns,
-      onDragCancel,
-      commitChange,
-    ]
+    [restoreOnCancel, onMove, onValueCommit, setColumns, onDragCancel, commitChange],
   );
 
   const handleDragEnd = useCallback(
@@ -507,13 +489,11 @@ function Kanban<T>({
 
         if (activeContainer && overContainer) {
           const activeIndex = columns[activeContainer].findIndex(
-            (item: T) => getItemValue(item) === active.id
+            (item: T) => getItemValue(item) === active.id,
           );
           const overIndex = isColumn(over.id)
             ? columns[overContainer].length
-            : columns[overContainer].findIndex(
-                (item: T) => getItemValue(item) === over.id
-              );
+            : columns[overContainer].findIndex((item: T) => getItemValue(item) === over.id);
 
           onMove({
             event,
@@ -534,11 +514,7 @@ function Kanban<T>({
         const activeIndex = columnIds.indexOf(active.id as string);
         const overIndex = columnIds.indexOf(over.id as string);
         if (activeIndex !== overIndex) {
-          const newOrder = arrayMove(
-            Object.keys(columns),
-            activeIndex,
-            overIndex
-          );
+          const newOrder = arrayMove(Object.keys(columns), activeIndex, overIndex);
           const newColumns: Record<string, T[]> = {};
           newOrder.forEach((key) => {
             newColumns[key] = columns[key];
@@ -560,18 +536,12 @@ function Kanban<T>({
       const overContainer = findContainer(over.id);
 
       // Handle item reordering within the same column
-      if (
-        activeContainer &&
-        overContainer &&
-        activeContainer === overContainer
-      ) {
+      if (activeContainer && overContainer && activeContainer === overContainer) {
         const container = activeContainer;
         const activeIndex = columns[container].findIndex(
-          (item: T) => getItemValue(item) === active.id
+          (item: T) => getItemValue(item) === active.id,
         );
-        const overIndex = columns[container].findIndex(
-          (item: T) => getItemValue(item) === over.id
-        );
+        const overIndex = columns[container].findIndex((item: T) => getItemValue(item) === over.id);
 
         if (activeIndex !== overIndex) {
           const newColumns = {
@@ -600,7 +570,7 @@ function Kanban<T>({
       onMove,
       onDragEnd,
       commitChange,
-    ]
+    ],
   );
 
   const contextValue = useMemo(
@@ -615,19 +585,11 @@ function Kanban<T>({
       isColumn,
       modifiers,
     }),
-    [
-      columns,
-      setColumns,
-      getItemValue,
-      columnIds,
-      activeId,
-      findContainer,
-      isColumn,
-      modifiers,
-    ]
+    [columns, setColumns, getItemValue, columnIds, activeId, findContainer, isColumn, modifiers],
   );
 
   const defaultProps = {
+    id: idProp,
     'data-slot': 'kanban',
     'data-dragging': activeId !== null,
     className: cn(activeId !== null && 'cursor-grabbing!', className),
@@ -637,6 +599,7 @@ function Kanban<T>({
   return (
     <KanbanContext.Provider value={contextValue}>
       <DndContext
+        id={dndId}
         sensors={sensors}
         modifiers={modifiers}
         accessibility={accessibility}
@@ -684,13 +647,7 @@ export interface KanbanColumnProps extends useRender.ComponentProps<'div'> {
   disabled?: boolean;
 }
 
-function KanbanColumn({
-  value,
-  className,
-  render,
-  disabled,
-  ...props
-}: KanbanColumnProps) {
+function KanbanColumn({ value, className, render, disabled, ...props }: KanbanColumnProps) {
   const isOverlay = useContext(IsOverlayContext);
 
   const {
@@ -734,7 +691,7 @@ function KanbanColumn({
           'group/kanban-column flex flex-col',
           isSortableDragging && 'opacity-50 z-50',
           disabled && 'opacity-50',
-          className
+          className,
         ),
         children: props.children,
       };
@@ -771,8 +728,7 @@ function KanbanColumnHandle({
   cursor = true,
   ...props
 }: KanbanColumnHandleProps) {
-  const { attributes, listeners, isDragging, disabled } =
-    useContext(ColumnContext);
+  const { attributes, listeners, isDragging, disabled } = useContext(ColumnContext);
 
   const defaultProps = {
     'data-slot': 'kanban-column-handle',
@@ -783,7 +739,7 @@ function KanbanColumnHandle({
     className: cn(
       'opacity-0 transition-opacity group-hover/kanban-column:opacity-100',
       cursor && (isDragging ? 'cursor-grabbing!' : 'cursor-grab!'),
-      className
+      className,
     ),
     children: props.children,
   };
@@ -800,13 +756,7 @@ export interface KanbanItemProps extends useRender.ComponentProps<'div'> {
   disabled?: boolean;
 }
 
-function KanbanItem({
-  value,
-  className,
-  render,
-  disabled,
-  ...props
-}: KanbanItemProps) {
+function KanbanItem({ value, className, render, disabled, ...props }: KanbanItemProps) {
   const isOverlay = useContext(IsOverlayContext);
 
   const {
@@ -847,11 +797,7 @@ function KanbanItem({
         ref: setNodeRef,
         style,
         ...attributes,
-        className: cn(
-          isSortableDragging && 'opacity-50 z-50',
-          disabled && 'opacity-50',
-          className
-        ),
+        className: cn(isSortableDragging && 'opacity-50 z-50', disabled && 'opacity-50', className),
         children: props.children,
       };
 
@@ -876,12 +822,7 @@ export interface KanbanItemHandleProps extends useRender.ComponentProps<'div'> {
   cursor?: boolean;
 }
 
-function KanbanItemHandle({
-  className,
-  render,
-  cursor = true,
-  ...props
-}: KanbanItemHandleProps) {
+function KanbanItemHandle({ className, render, cursor = true, ...props }: KanbanItemHandleProps) {
   const { listeners, isDragging, disabled } = useContext(ItemContext);
 
   const defaultProps = {
@@ -889,10 +830,7 @@ function KanbanItemHandle({
     'data-dragging': isDragging,
     'data-disabled': disabled,
     ...listeners,
-    className: cn(
-      cursor && (isDragging ? 'cursor-grabbing!' : 'cursor-grab!'),
-      className
-    ),
+    className: cn(cursor && (isDragging ? 'cursor-grabbing!' : 'cursor-grab!'), className),
     children: props.children,
   };
 
@@ -907,20 +845,15 @@ export interface KanbanColumnContentProps extends useRender.ComponentProps<'div'
   value: string;
 }
 
-function KanbanColumnContent({
-  value,
-  className,
-  render,
-  ...props
-}: KanbanColumnContentProps) {
+function KanbanColumnContent({ value, className, render, ...props }: KanbanColumnContentProps) {
   const { columns, getItemId } = useContext(KanbanContext);
 
   const itemIds = useMemo(() => {
-    const items = (columns as Record<string, T[] | undefined>)[value];
+    const items = (columns as Record<string, unknown[] | undefined>)[value];
     if (!items) {
       throw new Error(
         `KanbanColumnContent: column "${value}" was not found in the Kanban value. ` +
-          `Available columns: ${Object.keys(columns).join(', ') || '(none)'}.`
+          `Available columns: ${Object.keys(columns).join(', ') || '(none)'}.`,
       );
     }
     return items.map(getItemId);
@@ -948,20 +881,12 @@ export interface KanbanOverlayProps extends Omit<
   'children'
 > {
   children?:
-    | ReactNode
-    | ((params: {
-        value: UniqueIdentifier;
-        variant: 'column' | 'item';
-      }) => ReactNode);
+    ReactNode | ((params: { value: UniqueIdentifier; variant: 'column' | 'item' }) => ReactNode);
 }
 
 function KanbanOverlay({ children, className, ...props }: KanbanOverlayProps) {
   const { activeId, isColumn, modifiers } = useContext(KanbanContext);
-  const mounted = useSyncExternalStore(
-    subscribeToNothing,
-    getIsMounted,
-    getIsMountedOnServer
-  );
+  const mounted = useSyncExternalStore(subscribeToNothing, getIsMounted, getIsMountedOnServer);
 
   const variant = activeId ? (isColumn(activeId) ? 'column' : 'item') : 'item';
 
@@ -981,11 +906,9 @@ function KanbanOverlay({ children, className, ...props }: KanbanOverlayProps) {
       className={cn('z-50', activeId && 'cursor-grabbing', className)}
       {...props}
     >
-      <IsOverlayContext.Provider value={true}>
-        {content}
-      </IsOverlayContext.Provider>
+      <IsOverlayContext.Provider value={true}>{content}</IsOverlayContext.Provider>
     </DragOverlay>,
-    document.body
+    document.body,
   );
 }
 

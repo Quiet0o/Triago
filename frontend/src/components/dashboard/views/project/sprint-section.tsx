@@ -1,18 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  Calendar,
-  CheckCircle2,
-  ChevronDown,
-  ChevronRight,
-  Zap,
-} from 'lucide-react';
-import type {
-  ColumnVisibilityState,
-  SortingState,
-} from '@tanstack/react-table';
-import type { Ticket, Sprint } from '../../tickets/types';
+import { Calendar, CheckCircle2, ChevronDown, ChevronRight, Zap } from 'lucide-react';
+import type { ColumnVisibilityState, SortingState } from '@tanstack/react-table';
+import type { Sprint, Ticket } from '../../tickets/types';
 import { TicketTable } from './ticket-table';
 
 const SprintHeader = ({
@@ -56,9 +47,7 @@ const SprintHeader = ({
           ) : (
             <CheckCircle2 className="size-3.5 shrink-0 text-muted-foreground" />
           )}
-          <span className="text-sm font-semibold text-foreground">
-            {sprint.name}
-          </span>
+          <span className="text-sm font-semibold text-foreground">{sprint.name}</span>
           {sprint.status === 'active' && (
             <span className="rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[0.625rem] font-semibold text-emerald-600 ring-1 ring-emerald-500/20 dark:text-emerald-400">
               ACTIVE
@@ -94,9 +83,7 @@ export const SprintSection = ({
   defaultOpen?: boolean;
   columnVisibility: ColumnVisibilityState;
   onColumnVisibilityChange: (
-    updater:
-      | ColumnVisibilityState
-      | ((prev: ColumnVisibilityState) => ColumnVisibilityState)
+    updater: ColumnVisibilityState | ((prev: ColumnVisibilityState) => ColumnVisibilityState),
   ) => void;
   globalFilter: string;
 }) => {

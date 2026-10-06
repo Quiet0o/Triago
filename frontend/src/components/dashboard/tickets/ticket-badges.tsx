@@ -1,46 +1,30 @@
 import {
-  Bug,
-  CheckSquare,
-  BookOpen,
-  ListTree,
-  Lightbulb,
-  Circle,
-  Loader2,
-  Eye,
-  FlaskConical,
-  CheckCircle2,
   Ban,
-  MessageSquare,
-  Paperclip,
+  BookOpen,
+  Bug,
+  CheckCircle2,
+  CheckSquare,
   ChevronsUp,
   ChevronUp,
+  Circle,
+  Eye,
+  FlaskConical,
+  Lightbulb,
+  ListTree,
+  Loader2,
+  MessageSquare,
   Minus,
+  Paperclip,
 } from 'lucide-react';
 import { Badge } from '#/components/ui/badge.tsx';
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '#/components/ui/avatar.tsx';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '#/components/ui/tooltip.tsx';
+import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar.tsx';
+import { Tooltip, TooltipContent, TooltipTrigger } from '#/components/ui/tooltip.tsx';
 import { cn } from 'cn';
-import type {
-  TicketType,
-  TicketPriority,
-  TicketStatus,
-  TicketPerson,
-} from './types';
+import type { TicketPerson, TicketPriority, TicketStatus, TicketType } from './types';
 import { CriticalIcon } from '#/components/ui/icons/critical';
 
 // ── Type config ──────────────────────────────────────────────────────
-const typeConfig: Record<
-  TicketType,
-  { icon: typeof Bug; label: string; color: string }
-> = {
+const typeConfig: Record<TicketType, { icon: typeof Bug; label: string; color: string }> = {
   bug: {
     icon: Bug,
     label: 'Bug',
@@ -71,8 +55,7 @@ const typeConfig: Record<
 const priorityConfig: Record<
   TicketPriority,
   {
-    icon:
-      typeof ChevronsUp | typeof ChevronUp | typeof Minus | typeof CriticalIcon;
+    icon: typeof ChevronsUp | typeof ChevronUp | typeof Minus | typeof CriticalIcon;
     label: string;
     color: string;
     bg: string;
@@ -147,13 +130,7 @@ const statusConfig: Record<
 };
 
 // ── Render functions ─────────────────────────────────────────────────
-export function TicketTypeIcon({
-  type,
-  className,
-}: {
-  type: TicketType;
-  className?: string;
-}) {
+export function TicketTypeIcon({ type, className }: { type: TicketType; className?: string }) {
   const cfg = typeConfig[type];
   const Icon = cfg.icon;
   return (
@@ -174,11 +151,7 @@ export const PriorityBadge = ({ priority }: { priority: TicketPriority }) => {
   return (
     <Badge
       variant="outline"
-      className={cn(
-        'gap-1 px-1.5 py-0.5 text-[0.6875rem] font-medium',
-        cfg.bg,
-        cfg.color
-      )}
+      className={cn('gap-1 px-1.5 py-0.5 text-[0.6875rem] font-medium', cfg.bg, cfg.color)}
     >
       <Icon className="size-3" />
       {cfg.label}
@@ -192,11 +165,7 @@ export const StatusBadge = ({ status }: { status: TicketStatus }) => {
   return (
     <Badge
       variant="outline"
-      className={cn(
-        'gap-1 px-1.5 py-0.5 text-[0.6875rem] font-medium',
-        cfg.bg,
-        cfg.color
-      )}
+      className={cn('gap-1 px-1.5 py-0.5 text-[0.6875rem] font-medium', cfg.bg, cfg.color)}
     >
       <Icon className={cn('size-3', status === 'w_toku' && 'animate-spin')} />
       {cfg.label}
@@ -218,13 +187,13 @@ export const AssigneeAvatar = ({
           <Avatar
             className={cn(
               'border border-dashed border-muted-foreground/30',
-              size === 'sm' ? 'size-6' : 'size-7'
+              size === 'sm' ? 'size-6' : 'size-7',
             )}
           >
             <AvatarFallback
               className={cn(
                 'bg-muted text-muted-foreground',
-                size === 'sm' ? 'text-[0.6rem]' : 'text-xs'
+                size === 'sm' ? 'text-[0.6rem]' : 'text-xs',
               )}
             >
               ?
@@ -242,14 +211,11 @@ export const AssigneeAvatar = ({
     <Tooltip>
       <TooltipTrigger asChild>
         <Avatar className={cn('border', size === 'sm' ? 'size-6' : 'size-7')}>
-          <AvatarImage
-            src={`https://i.pravatar.cc/150?u=${person.email}`}
-            alt={person.name}
-          />
+          <AvatarImage src={`https://i.pravatar.cc/150?u=${person.email}`} alt={person.name} />
           <AvatarFallback
             className={cn(
               'bg-primary/10 text-primary font-medium',
-              size === 'sm' ? 'text-[0.6rem]' : 'text-xs'
+              size === 'sm' ? 'text-[0.6rem]' : 'text-xs',
             )}
           >
             {person.avatarFallback}
@@ -257,9 +223,7 @@ export const AssigneeAvatar = ({
         </Avatar>
       </TooltipTrigger>
       <TooltipContent side="top" className="px-3 py-2">
-        <p className="text-sm font-semibold leading-none mb-1 text-background">
-          {person.name}
-        </p>
+        <p className="text-sm font-semibold leading-none mb-1 text-background">{person.name}</p>
         <p className="text-xs leading-none text-background/70">{person.role}</p>
       </TooltipContent>
     </Tooltip>
@@ -274,13 +238,7 @@ export function StoryPointsBadge({ points }: { points: number }) {
   );
 }
 
-export function TicketMeta({
-  comments,
-  attachments,
-}: {
-  comments: number;
-  attachments: number;
-}) {
+export function TicketMeta({ comments, attachments }: { comments: number; attachments: number }) {
   return (
     <div className="flex items-center gap-2.5 text-muted-foreground">
       {comments > 0 && (

@@ -96,17 +96,11 @@ export const BacklogTableFilters = ({
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <Avatar>
-            <AvatarImage
-              src="https://github.com/maxleiter.png"
-              alt="@maxleiter"
-            />
+            <AvatarImage src="https://github.com/maxleiter.png" alt="@maxleiter" />
             <AvatarFallback>LR</AvatarFallback>
           </Avatar>
           <Avatar>
-            <AvatarImage
-              src="https://github.com/evilrabbit.png"
-              alt="@evilrabbit"
-            />
+            <AvatarImage src="https://github.com/evilrabbit.png" alt="@evilrabbit" />
             <AvatarFallback>ER</AvatarFallback>
           </Avatar>
           <AvatarGroupCount>+3</AvatarGroupCount>
@@ -122,9 +116,7 @@ export const BacklogTableFilters = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuLabel className="text-xs">
-              Visible columns
-            </DropdownMenuLabel>
+            <DropdownMenuLabel className="text-xs">Visible columns</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {[
               { id: 'id', label: 'Key' },

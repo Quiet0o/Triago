@@ -1,4 +1,4 @@
-import type { ComponentProps} from 'react';
+import type { ComponentProps } from 'react';
 import { useState } from 'react';
 import { Badge } from '#/components/reui/badge.tsx';
 import {
@@ -12,11 +12,7 @@ import {
   KanbanOverlay,
 } from '#/components/reui/kanban.tsx';
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '#/components/ui/avatar.tsx';
+import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar.tsx';
 import { Button } from '#/components/ui/button.tsx';
 import { Card, CardContent, CardHeader } from '#/components/ui/card.tsx';
 import { GripVerticalIcon } from 'lucide-react';
@@ -36,12 +32,10 @@ const COLUMN_TITLES: Record<string, string> = {
   inProgress: 'In Progress',
   review: 'Review',
   done: 'Done',
+  testing: 'Testing',
 };
 
-interface TaskCardProps extends Omit<
-  ComponentProps<typeof KanbanItem>,
-  'value' | 'children'
-> {
+interface TaskCardProps extends Omit<ComponentProps<typeof KanbanItem>, 'value' | 'children'> {
   task: Task;
   asHandle?: boolean;
   isOverlay?: boolean;
@@ -77,9 +71,7 @@ function TaskCard({ task, asHandle, isOverlay, ...props }: TaskCardProps) {
             </div>
           )}
           {task.dueDate && (
-            <time className="text-[10px] whitespace-nowrap tabular-nums">
-              {task.dueDate}
-            </time>
+            <time className="text-[10px] whitespace-nowrap tabular-nums">{task.dueDate}</time>
           )}
         </div>
       </CardContent>
@@ -88,19 +80,12 @@ function TaskCard({ task, asHandle, isOverlay, ...props }: TaskCardProps) {
 
   return (
     <KanbanItem value={task.id} {...props}>
-      {asHandle && !isOverlay ? (
-        <KanbanItemHandle>{cardContent}</KanbanItemHandle>
-      ) : (
-        cardContent
-      )}
+      {asHandle && !isOverlay ? <KanbanItemHandle>{cardContent}</KanbanItemHandle> : cardContent}
     </KanbanItem>
   );
 }
 
-interface TaskColumnProps extends Omit<
-  ComponentProps<typeof KanbanColumn>,
-  'children'
-> {
+interface TaskColumnProps extends Omit<ComponentProps<typeof KanbanColumn>, 'children'> {
   tasks: Task[];
   isOverlay?: boolean;
 }
@@ -111,9 +96,7 @@ function TaskColumn({ value, tasks, isOverlay, ...props }: TaskColumnProps) {
       <Card className="mb-2.5">
         <CardHeader className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <span className="text-sm font-semibold">
-              {COLUMN_TITLES[value]}
-            </span>
+            <span className="text-sm font-semibold">{COLUMN_TITLES[value]}</span>
             <Badge variant="outline">{tasks.length}</Badge>
           </div>
           <KanbanColumnHandle
@@ -127,12 +110,7 @@ function TaskColumn({ value, tasks, isOverlay, ...props }: TaskColumnProps) {
         <CardContent>
           <KanbanColumnContent value={value} className="flex flex-col gap-2.5">
             {tasks.map((task) => (
-              <TaskCard
-                key={task.id}
-                task={task}
-                asHandle={!isOverlay}
-                isOverlay={isOverlay}
-              />
+              <TaskCard key={task.id} task={task} asHandle={!isOverlay} isOverlay={isOverlay} />
             ))}
           </KanbanColumnContent>
         </CardContent>
@@ -212,15 +190,27 @@ export function Pattern() {
         dueDate: 'Sep 20, 2025',
       },
     ],
+    testing: [
+      {
+        id: '9',
+        title: 'Testing',
+        priority: 'medium',
+        assignee: 'James Brown',
+        assigneeAvatar:
+          'https://images.unsplash.com/photo-1543299750-19d1d6297053?w=96&h=96&dpr=2&q=80',
+        dueDate: 'Sep 20, 2025',
+      },
+    ],
   });
 
   return (
     <Kanban
+      id="project-kanban"
       value={columns}
       onValueChange={setColumns}
       getItemValue={(item) => item.id}
     >
-      <KanbanBoard className="grid auto-rows-fr grid-cols-3">
+      <KanbanBoard className="grid auto-rows-fr grid-cols-4">
         {Object.entries(columns).map(([columnValue, tasks]) => (
           <TaskColumn key={columnValue} value={columnValue} tasks={tasks} />
         ))}

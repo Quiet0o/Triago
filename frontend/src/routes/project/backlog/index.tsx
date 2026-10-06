@@ -13,11 +13,5 @@ export const Route = createFileRoute('/project/backlog/')({
 function BacklogPage() {
   const search = useProjectSearch();
 
-  return (
-    <BacklogView
-      tickets={data.tickets}
-      sprints={data.sprints}
-      externalSearch={search}
-    />
-  );
+  return <BacklogView tickets={data.tickets} sprints={data.sprints} externalSearch={search} />;
 }

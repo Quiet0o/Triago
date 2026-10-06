@@ -1,14 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import {
-  LayoutGrid,
-  List,
-  Columns3,
-  Code2,
-  Clock,
-  FileText,
-} from 'lucide-react';
+import { Clock, Code2, Columns3, FileText, LayoutGrid, List } from 'lucide-react';
 import { Link, Outlet, useRouterState } from '@tanstack/react-router';
 import { Tabs, TabsList, TabsTrigger } from '#/components/ui/tabs.tsx';
 
@@ -38,8 +31,7 @@ export function ProjectView({
   });
 
   const activeTab =
-    projectTabs.find((tab) => pathname.includes(`/project/${tab.id}`))?.id ??
-    'backlog';
+    projectTabs.find((tab) => pathname.includes(`/project/${tab.id}`))?.id ?? 'backlog';
 
   return (
     <ProjectSearchContext.Provider value={externalSearch}>
@@ -56,7 +48,7 @@ export function ProjectView({
                   asChild
                   className="cursor-pointer gap-1.5 rounded-none px-3 text-[0.8125rem] data-[state=active]:shadow-none"
                 >
-                  <Link to={`/project/${tab.id}/`}>
+                  <Link to={`/project/${tab.id}`}>
                     <Icon className="size-3.5" />
                     {tab.label}
                   </Link>

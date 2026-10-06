@@ -39,9 +39,7 @@ export const ColumnVisibilityMenu = ({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-40">
-        <DropdownMenuLabel className="text-xs">
-          Visible columns
-        </DropdownMenuLabel>
+        <DropdownMenuLabel className="text-xs">Visible columns</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {columns.map((column) => (
           <DropdownMenuCheckboxItem

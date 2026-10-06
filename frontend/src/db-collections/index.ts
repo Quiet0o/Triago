@@ -1,7 +1,4 @@
-import {
-  createCollection,
-  localOnlyCollectionOptions,
-} from '@tanstack/react-db';
+import { createCollection, localOnlyCollectionOptions } from '@tanstack/react-db';
 import { z } from 'zod';
 
 const MessageSchema = z.object({
@@ -16,5 +13,5 @@ export const messagesCollection = createCollection(
   localOnlyCollectionOptions({
     getKey: (message) => message.id,
     schema: MessageSchema,
-  })
+  }),
 );

@@ -18,14 +18,7 @@
     }
   ],
   "priorities": ["krytyczny", "wysoki", "średni", "niski"],
-  "statuses": [
-    "nowy",
-    "w_toku",
-    "review",
-    "testowanie",
-    "zamknięty",
-    "zablokowany"
-  ],
+  "statuses": ["nowy", "w_toku", "review", "testowanie", "zamknięty", "zablokowany"],
   "types": ["bug", "task", "story", "subtask", "improvement"],
   "tickets": [
     {

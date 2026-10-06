@@ -1,13 +1,6 @@
 'use client';
 
-import {
-  LayoutGrid,
-  Columns3,
-  Code2,
-  Clock,
-  FileText,
-  ClipboardList,
-} from 'lucide-react';
+import { Clock, Code2, Columns3, FileText, LayoutGrid } from 'lucide-react';
 
 const placeholderContent: Record<
   string,
@@ -27,20 +20,17 @@ const placeholderContent: Record<
   development: {
     icon: Code2,
     title: 'Development',
-    description:
-      'Repository integration — commits, pull requests, and branches linked to tickets.',
+    description: 'Repository integration — commits, pull requests, and branches linked to tickets.',
   },
   timeline: {
     icon: Clock,
     title: 'Timeline',
-    description:
-      'Gantt view — timeline with deadlines, dependencies, and work progress.',
+    description: 'Gantt view — timeline with deadlines, dependencies, and work progress.',
   },
   documents: {
     icon: FileText,
     title: 'Documents',
-    description:
-      'Knowledge base — documentation, procedures, and FAQ related to the project.',
+    description: 'Knowledge base — documentation, procedures, and FAQ related to the project.',
   },
 };
 
@@ -59,12 +49,8 @@ export const PlaceholderTab = ({ tabId }: { tabId: string }) => {
         <Icon className="size-7 text-muted-foreground" />
       </div>
       <div className="text-center max-w-md">
-        <h3 className="text-sm font-semibold text-foreground capitalize">
-          {config.title}
-        </h3>
-        <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
-          {config.description}
-        </p>
+        <h3 className="text-sm font-semibold text-foreground capitalize">{config.title}</h3>
+        <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">{config.description}</p>
         <p className="mt-3 text-xs text-muted-foreground/60">Coming soon</p>
       </div>
     </div>

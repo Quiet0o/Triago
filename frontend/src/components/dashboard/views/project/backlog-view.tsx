@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import type { ColumnVisibilityState } from '@tanstack/react-table';
-import type { Ticket, Sprint } from '../../tickets/types';
+import type { Sprint, Ticket } from '../../tickets/types';
 import { BacklogTableFilters } from './backlog-table-filters';
 import { SprintSection } from './sprint-section';
 
@@ -15,8 +15,7 @@ export const BacklogView = ({
   sprints: Sprint[];
   externalSearch?: string;
 }) => {
-  const [columnVisibility, setColumnVisibility] =
-    useState<ColumnVisibilityState>({});
+  const [columnVisibility, setColumnVisibility] = useState<ColumnVisibilityState>({});
   const [localSearch, setLocalSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
@@ -87,7 +86,7 @@ export const BacklogView = ({
               onColumnVisibilityChange={setColumnVisibility}
               globalFilter={globalFilter}
             />
-          )
+          ),
       )}
 
       {/* Backlog (no sprint) */}
@@ -109,11 +108,9 @@ export const BacklogView = ({
           {filteredTickets.reduce((s, t) => s + t.storyPoints, 0)} story points
         </span>
         <span>
-          {filteredTickets.filter((t) => t.status === 'zamknięty').length} done
-          · {filteredTickets.filter((t) => t.status === 'w_toku').length} in
-          progress ·{' '}
-          {filteredTickets.filter((t) => t.status === 'zablokowany').length}{' '}
-          blocked
+          {filteredTickets.filter((t) => t.status === 'zamknięty').length} done ·{' '}
+          {filteredTickets.filter((t) => t.status === 'w_toku').length} in progress ·{' '}
+          {filteredTickets.filter((t) => t.status === 'zablokowany').length} blocked
         </span>
       </div>
     </div>

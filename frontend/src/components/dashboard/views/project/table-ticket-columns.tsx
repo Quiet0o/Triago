@@ -1,24 +1,24 @@
 import {
-  tableFeatures,
-  rowSortingFeature,
-  rowSelectionFeature,
-  columnVisibilityFeature,
   columnFilteringFeature,
-  globalFilteringFeature,
+  columnVisibilityFeature,
   createColumnHelper,
   createCoreRowModel,
-  createSortedRowModel,
   createFilteredRowModel,
+  createSortedRowModel,
+  globalFilteringFeature,
+  rowSelectionFeature,
+  rowSortingFeature,
+  tableFeatures,
 } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { Ticket } from '../../tickets/types';
 import {
-  TicketTypeIcon,
+  AssigneeAvatar,
   PriorityBadge,
   StatusBadge,
-  AssigneeAvatar,
   StoryPointsBadge,
   TicketMeta,
+  TicketTypeIcon,
 } from '../../tickets/ticket-badges';
 import { Checkbox } from '#/components/ui/checkbox.tsx';
 import { Badge } from '#/components/ui/badge.tsx';
@@ -49,8 +49,7 @@ export const ticketColumns: ColumnDef<TicketTableFeatures, Ticket, any>[] = [
     header: ({ table }) => (
       <Checkbox
         checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && 'indeterminate')
+          table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
@@ -86,9 +85,7 @@ export const ticketColumns: ColumnDef<TicketTableFeatures, Ticket, any>[] = [
   col.accessor('title', {
     header: 'Title',
     cell: (info) => (
-      <span className="text-sm font-medium text-foreground line-clamp-1">
-        {info.getValue()}
-      </span>
+      <span className="text-sm font-medium text-foreground line-clamp-1">{info.getValue()}</span>
     ),
     enableHiding: false,
   }),
@@ -154,10 +151,7 @@ export const ticketColumns: ColumnDef<TicketTableFeatures, Ticket, any>[] = [
     id: 'meta',
     header: '',
     cell: ({ row }) => (
-      <TicketMeta
-        comments={row.original.comments}
-        attachments={row.original.attachments}
-      />
+      <TicketMeta comments={row.original.comments} attachments={row.original.attachments} />
     ),
     enableSorting: false,
   }),
