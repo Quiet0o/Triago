@@ -2,6 +2,7 @@
   "name": "frontend",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@12.9.1",
   "imports": {
     "#/*": "./src/*"
   },
@@ -15,6 +16,7 @@
     "check": "prettier --check ."
   },
   "dependencies": {
+    "@base-ui/react": "^1.8.0",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/modifiers": "^9.0.0",
     "@dnd-kit/sortable": "^10.0.0",
@@ -67,12 +69,6 @@
     "prettier": "^3.8.1",
     "typescript": "^6.0.2",
     "vite": "^8.0.0"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "lightningcss"
-    ]
   },
   "intent": {
     "skills": [

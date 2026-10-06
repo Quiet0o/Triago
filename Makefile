@@ -25,8 +25,8 @@ init: ## Complete project initialization (build, start, composer, npm, migration
 	@$(MAKE) up-build
 	@echo "$(COLOR_INFO)Installing backend dependencies (Composer)...$(COLOR_RESET)"
 	@$(MAKE) composer-install
-	@echo "$(COLOR_INFO)Installing frontend dependencies (npm)...$(COLOR_RESET)"
-	@$(MAKE) npm-install
+	@echo "$(COLOR_INFO)Installing frontend dependencies (pnpm)...$(COLOR_RESET)"
+	@$(MAKE) pnpm-install
 	@echo "$(COLOR_INFO)Running database migrations...$(COLOR_RESET)"
 	@$(MAKE) migrate
 	@echo "$(COLOR_INFO)Loading database fixtures...$(COLOR_RESET)"
@@ -114,12 +114,16 @@ console: ## Run Symfony console command (usage: make console cmd="about")
 # Frontend
 # ==============================================================================
 
-.PHONY: npm-install npm-build
-npm-install: ## Install frontend npm packages
-	@$(EXEC_FRONTEND) npm install
+.PHONY: pnpm-install pnpm-build npm-install npm-build
+pnpm-install: ## Install frontend pnpm packages
+	@$(EXEC_FRONTEND) pnpm install
 
-npm-build: ## Build frontend assets for production
-	@$(EXEC_FRONTEND) npm run build
+pnpm-build: ## Build frontend assets for production
+	@$(EXEC_FRONTEND) pnpm run build
+
+# Backwards compatibility aliases
+npm-install: pnpm-install
+npm-build: pnpm-build
 
 # ==============================================================================
 # Shell Access

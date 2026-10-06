@@ -10,11 +10,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { Link, Outlet, useRouterState } from '@tanstack/react-router';
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-} from '#/components/ui/tabs.tsx';
+import { Tabs, TabsList, TabsTrigger } from '#/components/ui/tabs.tsx';
 
 export const projectTabs = [
   { id: 'summary', label: 'Summary', icon: LayoutGrid },

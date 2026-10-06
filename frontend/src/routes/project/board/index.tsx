@@ -1,10 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { PlaceholderTab } from '#/components/dashboard/views/project/placeholder-tab';
+import { Pattern } from '#/components/dashboard/views/project/kanban/kanban';
 
 export const Route = createFileRoute('/project/board/')({
   component: BoardPage,
 });
 
 function BoardPage() {
-  return <PlaceholderTab tabId="board" />;
+  return <Pattern />;
 }
