@@ -28,9 +28,9 @@ const SprintHeader = ({
       className="group flex w-full items-center gap-2 px-3 py-2.5 text-left transition-colors hover:bg-muted/40"
     >
       {isOpen ? (
-        <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform" />
+        <ChevronDown className="size-4 cursor-pointer shrink-0 text-muted-foreground transition-transform" />
       ) : (
-        <ChevronRight className="size-4 shrink-0 text-muted-foreground transition-transform" />
+        <ChevronRight className="size-4 cursor-pointer shrink-0 text-muted-foreground transition-transform" />
       )}
 
       {isBacklog ? (
