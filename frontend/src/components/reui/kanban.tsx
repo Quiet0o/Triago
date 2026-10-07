@@ -669,7 +669,7 @@ function KanbanColumn({ value, className, render, disabled, ...props }: KanbanCo
 
   const style = {
     transition,
-    transform: CSS.Transform.toString(transform),
+    transform: CSS.Translate.toString(transform),
   } as CSSProperties;
 
   const defaultProps = isOverlay
@@ -778,7 +778,7 @@ function KanbanItem({ value, className, render, disabled, ...props }: KanbanItem
 
   const style = {
     transition,
-    transform: CSS.Transform.toString(transform),
+    transform: CSS.Translate.toString(transform),
   } as CSSProperties;
 
   const defaultProps = isOverlay
