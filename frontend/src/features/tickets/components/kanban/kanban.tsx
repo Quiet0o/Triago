@@ -14,15 +14,15 @@ import {
   KanbanItemHandle,
   KanbanOverlay,
 } from '#/components/reui/kanban.tsx';
-import type { MockData, Ticket, TicketStatus } from '#/components/dashboard/tickets/types';
+import type { MockData, Ticket, TicketStatus } from '#/types/tickets';
 import {
   AssigneeAvatar,
   PriorityBadge,
   StoryPointsBadge,
   TicketMeta,
   TicketTypeIcon,
-} from '#/components/dashboard/tickets/ticket-badges.tsx';
-import mockData from '#/components/dashboard/data/mock-tickets.json';
+} from '../ticket-badges.tsx';
+import mockData from '#/data/mock-tickets.json';
 
 export type Task = Ticket;
 
@@ -108,7 +108,7 @@ export function TaskCard({ task, asHandle, isOverlay, isDone = false, ...props }
               </span>
             )}
           </div>
-          <AssigneeAvatar person={task.assignee} size="lg" className="size-9" />
+          <AssigneeAvatar person={task.assignee} size="md" />
         </div>
       </CardContent>
     </Card>
@@ -246,7 +246,11 @@ export function TaskColumn({
   );
 }
 
-export function Pattern({ tickets = (mockData as MockData).tickets }: { tickets?: Ticket[] }) {
+export function ProjectKanbanBoard({
+  tickets = (mockData as MockData).tickets,
+}: {
+  tickets?: Ticket[];
+}) {
   const [collapsedColumns, setCollapsedColumns] = useState<Record<string, boolean>>({});
 
   const [columns, setColumns] = useState<Record<string, Ticket[]>>(() => {
@@ -315,3 +319,6 @@ export function Pattern({ tickets = (mockData as MockData).tickets }: { tickets?
     </Kanban>
   );
 }
+
+export const Pattern = ProjectKanbanBoard;
+export const KanbanBoardView = ProjectKanbanBoard;

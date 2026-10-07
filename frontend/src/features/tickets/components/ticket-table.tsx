@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { flexRender, useTable } from '@tanstack/react-table';
 import type { ColumnVisibilityState, RowSelectionState, SortingState } from '@tanstack/react-table';
-import type { Ticket } from '../../tickets/types';
+import type { Ticket } from '#/types/tickets';
 import { ticketColumns, ticketTableFeatures } from './table-ticket-columns';
 import { Button } from '#/components/ui/button.tsx';
 import {

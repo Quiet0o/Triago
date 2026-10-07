@@ -12,9 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProjectRouteRouteImport } from './routes/project/route'
 import { Route as ProjectIndexRouteImport } from './routes/project/index'
-import { Route as ProjectAppRouteImport } from './routes/project/app'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiTrpcSplatRouteImport } from './routes/api.trpc.$'
+import { Route as AuthLoginIndexRouteImport } from './routes/auth/login/index'
+import { Route as AuthRegisterIndexRouteImport } from './routes/auth/register/index'
 import { Route as ProjectBacklogIndexRouteImport } from './routes/project/backlog/index'
 import { Route as ProjectBoardIndexRouteImport } from './routes/project/board/index'
 import { Route as ProjectDevelopmentIndexRouteImport } from './routes/project/development/index'
@@ -37,11 +38,6 @@ const ProjectIndexRoute = ProjectIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ProjectRouteRoute,
 } as any)
-const ProjectAppRoute = ProjectAppRouteImport.update({
-  id: '/app',
-  path: '/app',
-  getParentRoute: () => ProjectRouteRoute,
-} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -50,6 +46,16 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 const ApiTrpcSplatRoute = ApiTrpcSplatRouteImport.update({
   id: '/api/trpc/$',
   path: '/api/trpc/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthLoginIndexRoute = AuthLoginIndexRouteImport.update({
+  id: '/auth/login/',
+  path: '/auth/login/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRegisterIndexRoute = AuthRegisterIndexRouteImport.update({
+  id: '/auth/register/',
+  path: '/auth/register/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProjectBacklogIndexRoute = ProjectBacklogIndexRouteImport.update({
@@ -86,10 +92,11 @@ const ProjectTimelineIndexRoute = ProjectTimelineIndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/project': typeof ProjectRouteRouteWithChildren
-  '/project/app': typeof ProjectAppRoute
   '/project/': typeof ProjectIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/auth/login/': typeof AuthLoginIndexRoute
+  '/auth/register/': typeof AuthRegisterIndexRoute
   '/project/backlog/': typeof ProjectBacklogIndexRoute
   '/project/board/': typeof ProjectBoardIndexRoute
   '/project/development/': typeof ProjectDevelopmentIndexRoute
@@ -99,10 +106,11 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/project/app': typeof ProjectAppRoute
   '/project': typeof ProjectIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/auth/login': typeof AuthLoginIndexRoute
+  '/auth/register': typeof AuthRegisterIndexRoute
   '/project/backlog': typeof ProjectBacklogIndexRoute
   '/project/board': typeof ProjectBoardIndexRoute
   '/project/development': typeof ProjectDevelopmentIndexRoute
@@ -114,10 +122,11 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/project': typeof ProjectRouteRouteWithChildren
-  '/project/app': typeof ProjectAppRoute
   '/project/': typeof ProjectIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/auth/login/': typeof AuthLoginIndexRoute
+  '/auth/register/': typeof AuthRegisterIndexRoute
   '/project/backlog/': typeof ProjectBacklogIndexRoute
   '/project/board/': typeof ProjectBoardIndexRoute
   '/project/development/': typeof ProjectDevelopmentIndexRoute
@@ -130,10 +139,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/project'
-    | '/project/app'
     | '/project/'
     | '/api/auth/$'
     | '/api/trpc/$'
+    | '/auth/login/'
+    | '/auth/register/'
     | '/project/backlog/'
     | '/project/board/'
     | '/project/development/'
@@ -143,10 +153,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/project/app'
     | '/project'
     | '/api/auth/$'
     | '/api/trpc/$'
+    | '/auth/login'
+    | '/auth/register'
     | '/project/backlog'
     | '/project/board'
     | '/project/development'
@@ -157,10 +168,11 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/project'
-    | '/project/app'
     | '/project/'
     | '/api/auth/$'
     | '/api/trpc/$'
+    | '/auth/login/'
+    | '/auth/register/'
     | '/project/backlog/'
     | '/project/board/'
     | '/project/development/'
@@ -174,6 +186,8 @@ export interface RootRouteChildren {
   ProjectRouteRoute: typeof ProjectRouteRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiTrpcSplatRoute: typeof ApiTrpcSplatRoute
+  AuthLoginIndexRoute: typeof AuthLoginIndexRoute
+  AuthRegisterIndexRoute: typeof AuthRegisterIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -199,13 +213,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectIndexRouteImport
       parentRoute: typeof ProjectRouteRoute
     }
-    '/project/app': {
-      id: '/project/app'
-      path: '/app'
-      fullPath: '/project/app'
-      preLoaderRoute: typeof ProjectAppRouteImport
-      parentRoute: typeof ProjectRouteRoute
-    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -218,6 +225,20 @@ declare module '@tanstack/react-router' {
       path: '/api/trpc/$'
       fullPath: '/api/trpc/$'
       preLoaderRoute: typeof ApiTrpcSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/login/': {
+      id: '/auth/login/'
+      path: '/auth/login'
+      fullPath: '/auth/login/'
+      preLoaderRoute: typeof AuthLoginIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/register/': {
+      id: '/auth/register/'
+      path: '/auth/register'
+      fullPath: '/auth/register/'
+      preLoaderRoute: typeof AuthRegisterIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/project/backlog/': {
@@ -266,7 +287,6 @@ declare module '@tanstack/react-router' {
 }
 
 interface ProjectRouteRouteChildren {
-  ProjectAppRoute: typeof ProjectAppRoute
   ProjectIndexRoute: typeof ProjectIndexRoute
   ProjectBacklogIndexRoute: typeof ProjectBacklogIndexRoute
   ProjectBoardIndexRoute: typeof ProjectBoardIndexRoute
@@ -277,7 +297,6 @@ interface ProjectRouteRouteChildren {
 }
 
 const ProjectRouteRouteChildren: ProjectRouteRouteChildren = {
-  ProjectAppRoute: ProjectAppRoute,
   ProjectIndexRoute: ProjectIndexRoute,
   ProjectBacklogIndexRoute: ProjectBacklogIndexRoute,
   ProjectBoardIndexRoute: ProjectBoardIndexRoute,
@@ -296,6 +315,8 @@ const rootRouteChildren: RootRouteChildren = {
   ProjectRouteRoute: ProjectRouteRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiTrpcSplatRoute: ApiTrpcSplatRoute,
+  AuthLoginIndexRoute: AuthLoginIndexRoute,
+  AuthRegisterIndexRoute: AuthRegisterIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

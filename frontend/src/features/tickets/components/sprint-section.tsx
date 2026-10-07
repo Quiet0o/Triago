@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Calendar, CheckCircle2, ChevronDown, ChevronRight, Zap } from 'lucide-react';
 import type { ColumnVisibilityState, SortingState } from '@tanstack/react-table';
-import type { Sprint, Ticket } from '../../tickets/types';
+import type { Sprint, Ticket } from '#/types/tickets';
 import { TicketTable } from './ticket-table';
 
 const SprintHeader = ({

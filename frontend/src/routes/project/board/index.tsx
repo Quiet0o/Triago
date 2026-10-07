@@ -1,10 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { Pattern } from '#/components/dashboard/views/project/kanban/kanban';
+import { ProjectKanbanBoard } from '#/features/tickets/components/kanban/kanban';
 
 export const Route = createFileRoute('/project/board/')({
   component: BoardPage,
 });
 
 function BoardPage() {
-  return <Pattern />;
+  return <ProjectKanbanBoard />;
 }

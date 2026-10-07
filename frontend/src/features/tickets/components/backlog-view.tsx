@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import type { ColumnVisibilityState } from '@tanstack/react-table';
-import type { Sprint, Ticket } from '../../tickets/types';
+import type { Sprint, Ticket } from '#/types/tickets';
 import { BacklogTableFilters } from './backlog-table-filters';
 import { SprintSection } from './sprint-section';
 

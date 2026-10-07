@@ -11,7 +11,7 @@ import {
   tableFeatures,
 } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
-import type { Ticket } from '../../tickets/types';
+import type { Ticket } from '#/types/tickets';
 import {
   AssigneeAvatar,
   PriorityBadge,
@@ -19,7 +19,7 @@ import {
   StoryPointsBadge,
   TicketMeta,
   TicketTypeIcon,
-} from '../../tickets/ticket-badges';
+} from './ticket-badges';
 import { Checkbox } from '#/components/ui/checkbox.tsx';
 import { Badge } from '#/components/ui/badge.tsx';
 import { Ellipsis } from 'lucide-react';

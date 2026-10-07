@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { PlaceholderTab } from '#/components/dashboard/views/project/placeholder-tab';
+import { PlaceholderTab } from '#/features/project/components/placeholder-tab';
 
 export const Route = createFileRoute('/project/development/')({
   component: DevelopmentPage,

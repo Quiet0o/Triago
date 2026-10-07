@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { BacklogView } from '#/components/dashboard/views/project/backlog-view';
-import { useProjectSearch } from '#/components/dashboard/views/project/project-view';
-import type { MockData } from '#/components/dashboard/tickets/types';
-import mockData from '#/components/dashboard/data/mock-tickets.json';
+import { BacklogView } from '#/features/tickets/components/backlog-view';
+import { useProjectSearch } from '#/features/project/components/project-view';
+import type { MockData } from '#/types/tickets';
+import mockData from '#/data/mock-tickets.json';
 
 const data = mockData as MockData;
 
