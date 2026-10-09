@@ -29,12 +29,15 @@ services:
     environment:
       APP_ENV: dev
       DATABASE_URL: postgresql://triago:triago@database:5432/triago?serverVersion=17&charset=utf8
+      PHP_IDE_CONFIG: "serverName=localhost"
     volumes:
       - ./backend:/var/www/backend
       - backend_var:/var/www/backend/var
     depends_on:
       database:
         condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - triago-network
 

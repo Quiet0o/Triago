@@ -14,7 +14,8 @@ RUN apk add --no-cache \
     pdo \
     pdo_pgsql \
     pdo_mysql \
-    zip
+    zip \
+    xdebug
 
 # Copy Composer binary from official composer image
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer

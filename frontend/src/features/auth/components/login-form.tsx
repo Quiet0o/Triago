@@ -11,7 +11,7 @@ import {
 } from '#/components/ui/card.tsx';
 import { Field, FieldDescription, FieldGroup, FieldLabel } from '#/components/ui/field.tsx';
 import { Input } from '#/components/ui/input.tsx';
-import { Link } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router';
 
 export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
   return (
