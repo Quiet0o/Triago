@@ -22,6 +22,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180)]
     private ?string $username = null;
 
+    #[ORM\Column]
+    private string $name;
+
+    #[ORM\Column]
+    private string $fullName;
+
+    #[ORM\Column(type: 'email', length: 255)]
+    private string $email;
+
     /**
      * @var list<string> The user roles
      */
@@ -104,7 +113,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __serialize(): array
     {
         $data = (array) $this;
-        $data["\0" . self::class . "\0password"] = hash('crc32c', $this->password);
+        $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
 
         return $data;
     }

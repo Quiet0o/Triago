@@ -10,26 +10,38 @@
         "doctrine/doctrine-bundle": "^3.3",
         "doctrine/doctrine-migrations-bundle": "^4.0",
         "doctrine/orm": "^3.7",
+        "nelmio/cors-bundle": "^2.6",
         "symfony/console": "8.1.*",
         "symfony/dotenv": "8.1.*",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "8.1.*",
+        "symfony/object-mapper": "8.1.*",
+        "symfony/rate-limiter": "8.1.*",
         "symfony/runtime": "8.1.*",
         "symfony/security-bundle": "8.1.*",
+        "symfony/serializer": "8.1.*",
         "symfony/uid": "8.1.*",
+        "symfony/validator": "8.1.*",
         "symfony/yaml": "8.1.*"
     },
     "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.95",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.3",
+        "phpstan/phpstan-doctrine": "^2.0",
+        "phpstan/phpstan-symfony": "^2.1",
         "phpunit/phpunit": "^13.4",
         "symfony/browser-kit": "8.1.*",
         "symfony/css-selector": "8.1.*",
-        "symfony/maker-bundle": "^1.68"
+        "symfony/maker-bundle": "^1.68",
+        "zenstruck/foundry": "^2.14"
     },
     "config": {
         "allow-plugins": {
             "php-http/discovery": true,
             "symfony/flex": true,
-            "symfony/runtime": true
+            "symfony/runtime": true,
+            "phpstan/extension-installer": true
         },
         "bump-after-update": true,
         "sort-packages": true
@@ -66,6 +78,17 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
+        ],
+        "cs:check": "vendor/bin/php-cs-fixer check --diff",
+        "cs:fix": "vendor/bin/php-cs-fixer fix",
+        "phpstan": "vendor/bin/phpstan analyse",
+        "lint:yaml": "bin/console lint:yaml config --parse-tags",
+        "lint:container": "bin/console lint:container",
+        "lint": [
+            "@cs:check",
+            "@phpstan",
+            "@lint:yaml",
+            "@lint:container"
         ]
     },
     "conflict": {

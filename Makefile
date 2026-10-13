@@ -126,6 +126,35 @@ npm-install: pnpm-install
 npm-build: pnpm-build
 
 # ==============================================================================
+# Quality Assurance & Linters
+# ==============================================================================
+
+.PHONY: lint cs-check cs-fix phpstan lint-yaml lint-container
+lint: ## Run all backend linters (CS-Fixer check, PHPStan, YAML, Container)
+	@echo "$(COLOR_INFO)Running all backend linters...$(COLOR_RESET)"
+	@$(EXEC_BACKEND) composer lint
+
+cs-check: ## Check backend code style (PHP-CS-Fixer)
+	@echo "$(COLOR_INFO)Checking PHP code style...$(COLOR_RESET)"
+	@$(EXEC_BACKEND) composer cs:check
+
+cs-fix: ## Fix backend code style (PHP-CS-Fixer)
+	@echo "$(COLOR_INFO)Fixing PHP code style...$(COLOR_RESET)"
+	@$(EXEC_BACKEND) composer cs:fix
+
+phpstan: ## Run PHPStan static analysis
+	@echo "$(COLOR_INFO)Running PHPStan static analysis...$(COLOR_RESET)"
+	@$(EXEC_BACKEND) composer phpstan
+
+lint-yaml: ## Lint Symfony YAML configuration files
+	@echo "$(COLOR_INFO)Linting YAML configurations...$(COLOR_RESET)"
+	@$(CONSOLE) lint:yaml config --parse-tags
+
+lint-container: ## Lint Symfony dependency injection container
+	@echo "$(COLOR_INFO)Linting Symfony container...$(COLOR_RESET)"
+	@$(CONSOLE) lint:container
+
+# ==============================================================================
 # Shell Access
 # ==============================================================================
 
