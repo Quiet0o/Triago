@@ -82,8 +82,8 @@
         "cs:check": "vendor/bin/php-cs-fixer check --diff",
         "cs:fix": "vendor/bin/php-cs-fixer fix",
         "phpstan": "vendor/bin/phpstan analyse",
-        "lint:yaml": "bin/console lint:yaml config --parse-tags",
-        "lint:container": "bin/console lint:container",
+        "lint:yaml": "php bin/console lint:yaml config --parse-tags",
+        "lint:container": "php bin/console lint:container",
         "lint": [
             "@cs:check",
             "@phpstan",

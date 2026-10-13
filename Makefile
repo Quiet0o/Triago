@@ -105,7 +105,7 @@ migration: ## Generate a new Doctrine migration
 	@$(CONSOLE) make:migration
 
 fixtures: ## Load database fixtures
-	@$(EXEC_BACKEND) bash -c "if php bin/console list | grep -q 'doctrine:fixtures:load'; then php bin/console doctrine:fixtures:load --no-interaction; else echo 'Doctrine Fixtures Bundle is not yet installed in Symfony.'; fi"
+	@$(EXEC_BACKEND) bash -c "if php bin/console list | grep -q 'foundry:load-fixtures'; then php bin/console foundry:load-fixtures --no-interaction; elif php bin/console list | grep -q 'doctrine:fixtures:load'; then php bin/console doctrine:fixtures:load --no-interaction; else echo 'No fixtures tool installed (neither Foundry nor DoctrineFixturesBundle).'; fi"
 
 console: ## Run Symfony console command (usage: make console cmd="about")
 	@$(CONSOLE) $(cmd)
@@ -129,7 +129,11 @@ npm-build: pnpm-build
 # Quality Assurance & Linters
 # ==============================================================================
 
-.PHONY: lint cs-check cs-fix phpstan lint-yaml lint-container
+.PHONY: test lint cs-check cs-fix phpstan lint-yaml lint-container
+test: ## Run backend tests (PHPUnit)
+	@echo "$(COLOR_INFO)Running backend tests...$(COLOR_RESET)"
+	@$(DOCKER_COMPOSE) exec -e APP_ENV=test backend php bin/phpunit
+
 lint: ## Run all backend linters (CS-Fixer check, PHPStan, YAML, Container)
 	@echo "$(COLOR_INFO)Running all backend linters...$(COLOR_RESET)"
 	@$(EXEC_BACKEND) composer lint
