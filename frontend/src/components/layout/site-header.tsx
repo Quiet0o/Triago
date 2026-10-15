@@ -1,8 +1,9 @@
 import { Bell, Plus, Search, Settings } from 'lucide-react';
+import { useNavigate } from '@tanstack/react-router';
 
 import { Button } from '#/components/ui/button.tsx';
 import { Input } from '#/components/ui/input.tsx';
-import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar.tsx';
+import { Avatar, AvatarFallback } from '#/components/ui/avatar.tsx';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '#/components/ui/dropdown-menu.tsx';
+import { useAuth } from '#/features/auth/queries';
 
 export const SiteHeader = ({
   searchQuery,
@@ -19,6 +21,26 @@ export const SiteHeader = ({
   searchQuery?: string;
   onSearchChange?: (val: string) => void;
 }) => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    await navigate({ to: '/auth/login' });
+  };
+
+  const initials = user?.fullName
+    ? user.fullName
+        .split(' ')
+        .filter(Boolean)
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
+    : user?.email
+      ? user.email.slice(0, 2).toUpperCase()
+      : 'U';
+
   return (
     <header className="sticky top-0 z-10 grid h-16 grid-cols-[1fr_auto_1fr] items-center border-b bg-background/95 px-4 backdrop-blur-sm transition-[width,height] ease-linear lg:px-6">
       <div className="col-start-2 flex items-center gap-2">
@@ -72,19 +94,25 @@ export const SiteHeader = ({
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
               <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" alt="shadcn" />
-                <AvatarFallback>CN</AvatarFallback>
+                <AvatarFallback>{initials}</AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-32" align="end">
+          <DropdownMenuContent className="w-56" align="end">
+            <div className="flex flex-col space-y-1 p-2">
+              <p className="text-sm font-medium leading-none">{user?.fullName ?? 'User'}</p>
+              <p className="text-xs leading-none text-muted-foreground truncate">{user?.email}</p>
+            </div>
+            <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>Profile</DropdownMenuItem>
               <DropdownMenuItem>Billing</DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem variant="destructive">Log out</DropdownMenuItem>
+              <DropdownMenuItem variant="destructive" onClick={handleLogout}>
+                Log out
+              </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>

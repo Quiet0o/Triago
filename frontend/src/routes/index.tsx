@@ -20,6 +20,7 @@ import {
   CardTitle,
 } from '#/components/ui/card';
 import { useEffect } from 'react';
+import { useAuth } from '#/features/auth/queries';
 
 interface BackendResponse {
   message: string;
@@ -55,6 +56,7 @@ export const Route = createFileRoute('/')({
 });
 
 function IndexPage() {
+  const { user: currentUser } = useAuth();
   const { data, error, isError, isFetching, isLoading, refetch } =
     useQuery(backendCheckQueryOptions);
 
@@ -199,7 +201,7 @@ function IndexPage() {
             </div>
           </CardContent>
 
-          <CardFooter className="flex flex-col justify-between gap-2 sm:flex-row">
+          <CardFooter className="flex flex-col justify-between gap-3 sm:flex-row">
             <Button
               variant="outline"
               size="sm"
@@ -211,12 +213,25 @@ function IndexPage() {
               {isFetching ? 'Loading...' : 'Retry request (refetch)'}
             </Button>
 
-            <Button asChild size="sm" className="w-full sm:w-auto">
-              <Link to="/project/backlog">
-                Go to application (Backlog)
-                <ArrowRight className="size-3.5" />
-              </Link>
-            </Button>
+            <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
+              {currentUser ? (
+                <Button asChild size="sm" className="w-full sm:w-auto">
+                  <Link to="/project/backlog">
+                    Dashboard ({currentUser.fullName || currentUser.email})
+                    <ArrowRight className="size-3.5" />
+                  </Link>
+                </Button>
+              ) : (
+                <>
+                  <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
+                    <Link to="/auth/login">Sign in</Link>
+                  </Button>
+                  <Button asChild size="sm" className="w-full sm:w-auto">
+                    <Link to="/auth/register">Sign up</Link>
+                  </Button>
+                </>
+              )}
+            </div>
           </CardFooter>
         </Card>
       </div>

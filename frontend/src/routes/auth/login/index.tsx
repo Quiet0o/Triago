@@ -1,7 +1,19 @@
 import { LoginForm } from '#/features/auth/components/login-form';
-import { createFileRoute } from '@tanstack/react-router';
+import { authQueryOptions } from '#/features/auth/queries';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/auth/login/')({
+  beforeLoad: async ({ context }) => {
+    const user = await context.queryClient.query({
+      ...authQueryOptions,
+      staleTime: 'static',
+    });
+    if (user) {
+      throw redirect({
+        to: '/project',
+      });
+    }
+  },
   component: RouteComponent,
 });
 

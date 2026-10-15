@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 final class AuthController extends AbstractController
@@ -38,17 +39,25 @@ final class AuthController extends AbstractController
     }
 
     #[Route('/api/login', name: 'api_login', methods: ['POST'])]
-    public function login(): void
+    public function login(#[CurrentUser] ?User $user): JsonResponse
     {
-        // Intercepted by Symfony Security json_login firewall
-        throw new \LogicException('This method should not be reached. Check security.yaml firewall configuration.');
+        if (null === $user) {
+            return $this->json([
+                'title' => 'Unauthorized',
+                'detail' => 'Invalid email or password.',
+                'status' => Response::HTTP_UNAUTHORIZED,
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        return $this->json(UserResponse::fromEntity($user));
     }
 
     #[Route('/api/logout', name: 'api_logout', methods: ['POST', 'GET'])]
-    public function logout(): void
+    public function logout(): JsonResponse
     {
-        // Intercepted by Symfony Security logout firewall
-        throw new \LogicException('This method should not be reached. Check security.yaml firewall configuration.');
+        return $this->json([
+            'message' => 'Logged out successfully.',
+        ]);
     }
 
     #[Route('/api/me', name: 'api_me', methods: ['GET'])]

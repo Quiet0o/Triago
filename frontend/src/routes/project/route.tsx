@@ -1,12 +1,29 @@
 import * as React from 'react';
-import { createFileRoute, Outlet } from '@tanstack/react-router';
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
 import { AppSidebar } from '#/components/layout/app-sidebar.tsx';
 import { SiteHeader } from '#/components/layout/site-header.tsx';
 import { ProjectView } from '#/features/project/components/project-view';
 import { SidebarInset, SidebarProvider } from '#/components/ui/sidebar.tsx';
 import { TooltipProvider } from '#/components/ui/tooltip.tsx';
+import { authQueryOptions } from '#/features/auth/queries';
 
 export const Route = createFileRoute('/project')({
+  beforeLoad: async ({ context, location }) => {
+    const user = await context.queryClient.query({
+      ...authQueryOptions,
+      staleTime: 'static',
+    });
+    if (!user) {
+      throw redirect({
+        to: '/auth/login',
+        search: {
+          redirect: location.href,
+        },
+      });
+    }
+
+    return { user };
+  },
   component: ProjectLayout,
 });
 

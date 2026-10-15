@@ -129,15 +129,27 @@ npm-build: pnpm-build
 # Quality Assurance & Linters
 # ==============================================================================
 
-.PHONY: test lint cs-check cs-fix phpstan lint-yaml lint-container
+.PHONY: test lint lint-backend lint-frontend cs-check cs-fix phpstan lint-yaml lint-container lint-js lint-format typecheck format
 test: ## Run backend tests (PHPUnit)
 	@echo "$(COLOR_INFO)Running backend tests...$(COLOR_RESET)"
 	@$(DOCKER_COMPOSE) exec -e APP_ENV=test backend php bin/phpunit
 
-lint: ## Run all backend linters (CS-Fixer check, PHPStan, YAML, Container)
+lint: ## Run all linters (backend + frontend)
+	@echo "$(COLOR_INFO)Running full project linting (backend + frontend)...$(COLOR_RESET)"
+	@$(MAKE) lint-backend
+	@$(MAKE) lint-frontend
+
+lint-backend: ## Run all backend linters (CS-Fixer check, PHPStan, YAML, Container)
 	@echo "$(COLOR_INFO)Running all backend linters...$(COLOR_RESET)"
 	@$(EXEC_BACKEND) composer lint
 
+lint-frontend: ## Run all frontend checks (ESLint, Prettier check, TypeScript typecheck)
+	@echo "$(COLOR_INFO)Running frontend checks (ESLint, Prettier, TypeScript)...$(COLOR_RESET)"
+	@$(EXEC_FRONTEND) pnpm run lint
+	@$(EXEC_FRONTEND) pnpm run check
+	@$(EXEC_FRONTEND) pnpm run typecheck
+
+# Backend specific linters
 cs-check: ## Check backend code style (PHP-CS-Fixer)
 	@echo "$(COLOR_INFO)Checking PHP code style...$(COLOR_RESET)"
 	@$(EXEC_BACKEND) composer cs:check
@@ -157,6 +169,23 @@ lint-yaml: ## Lint Symfony YAML configuration files
 lint-container: ## Lint Symfony dependency injection container
 	@echo "$(COLOR_INFO)Linting Symfony container...$(COLOR_RESET)"
 	@$(CONSOLE) lint:container
+
+# Frontend specific linters & checkers
+lint-js: ## Run frontend ESLint
+	@echo "$(COLOR_INFO)Running ESLint...$(COLOR_RESET)"
+	@$(EXEC_FRONTEND) pnpm run lint
+
+lint-format: ## Check frontend code formatting (Prettier)
+	@echo "$(COLOR_INFO)Checking Prettier formatting...$(COLOR_RESET)"
+	@$(EXEC_FRONTEND) pnpm run check
+
+typecheck: ## Run frontend TypeScript type checking (tsc --noEmit)
+	@echo "$(COLOR_INFO)Running TypeScript typecheck...$(COLOR_RESET)"
+	@$(EXEC_FRONTEND) pnpm run typecheck
+
+format: ## Format frontend code (Prettier write + ESLint fix)
+	@echo "$(COLOR_INFO)Formatting frontend code (Prettier + ESLint fix)...$(COLOR_RESET)"
+	@$(EXEC_FRONTEND) pnpm run format
 
 # ==============================================================================
 # Shell Access
