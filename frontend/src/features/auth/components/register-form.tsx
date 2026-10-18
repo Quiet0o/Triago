@@ -22,7 +22,15 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<typeo
       redirect: typeof s.redirect === 'string' ? s.redirect : undefined,
     }),
   });
-  const { register, login, isRegistering, isLoggingIn } = useAuth();
+  const { user, register, login, isRegistering, isLoggingIn } = useAuth();
+
+  React.useEffect(() => {
+    if (user) {
+      const targetPath =
+        search.redirect && search.redirect.startsWith('/') ? search.redirect : '/project';
+      void navigate({ to: targetPath });
+    }
+  }, [user, navigate, search.redirect]);
 
   const [fullName, setFullName] = React.useState('');
   const [email, setEmail] = React.useState('');

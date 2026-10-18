@@ -1,10 +1,19 @@
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getCurrentUser, loginUser, logoutUser, registerUser } from './api';
+import {
+  getCurrentUser,
+  getStoredUser,
+  loginUser,
+  logoutUser,
+  registerUser,
+  setStoredUser,
+} from './api';
 import type { LoginCredentials, RegisterCredentials, User } from './types';
 
 export const authQueryOptions = queryOptions<User | null>({
   queryKey: ['auth', 'me'],
   queryFn: getCurrentUser,
+  initialData: () => getStoredUser(),
+  initialDataUpdatedAt: () => (getStoredUser() ? Date.now() : 0),
   staleTime: 1000 * 60 * 5, // 5 minutes
   retry: false,
 });
@@ -16,6 +25,7 @@ export function useAuth() {
   const loginMutation = useMutation({
     mutationFn: (credentials: LoginCredentials) => loginUser(credentials),
     onSuccess: (newUser) => {
+      setStoredUser(newUser);
       queryClient.setQueryData(authQueryOptions.queryKey, newUser);
       void queryClient.invalidateQueries({ queryKey: authQueryOptions.queryKey });
     },
@@ -31,6 +41,7 @@ export function useAuth() {
   const logoutMutation = useMutation({
     mutationFn: logoutUser,
     onSuccess: () => {
+      setStoredUser(null);
       queryClient.setQueryData(authQueryOptions.queryKey, null);
       void queryClient.invalidateQueries({ queryKey: authQueryOptions.queryKey });
     },

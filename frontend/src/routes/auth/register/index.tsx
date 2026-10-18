@@ -4,10 +4,11 @@ import { createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/auth/register/')({
   beforeLoad: async ({ context }) => {
-    const user = await context.queryClient.query({
-      ...authQueryOptions,
-      staleTime: 'static',
-    });
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const user = await context.queryClient.ensureQueryData(authQueryOptions);
     if (user) {
       throw redirect({
         to: '/project',

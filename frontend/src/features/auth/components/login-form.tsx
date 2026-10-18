@@ -23,7 +23,15 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
       redirect: typeof s.redirect === 'string' ? s.redirect : undefined,
     }),
   });
-  const { login, isLoggingIn } = useAuth();
+  const { user, login, isLoggingIn } = useAuth();
+
+  React.useEffect(() => {
+    if (user) {
+      const targetPath =
+        search.redirect && search.redirect.startsWith('/') ? search.redirect : '/project';
+      void navigate({ to: targetPath });
+    }
+  }, [user, navigate, search.redirect]);
 
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');

@@ -1,6 +1,34 @@
 import type { ApiErrorResponse, LoginCredentials, RegisterCredentials, User } from './types';
 
 const BACKEND_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:8000').replace(/\/+$/, '');
+const AUTH_STORAGE_KEY = 'triago_auth_user';
+
+export function getStoredUser(): User | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+  try {
+    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as User) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function setStoredUser(user: User | null): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  try {
+    if (user) {
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+    } else {
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+    }
+  } catch {
+    // Ignore storage quota errors
+  }
+}
 
 export class AuthApiError extends Error {
   public status: number;
@@ -67,6 +95,7 @@ export async function loginUser(credentials: LoginCredentials): Promise<User> {
     throw new AuthApiError('Failed to retrieve user session after login.', 401);
   }
 
+  setStoredUser(user);
   return user;
 }
 
@@ -89,6 +118,7 @@ export async function registerUser(credentials: RegisterCredentials): Promise<Us
 }
 
 export async function logoutUser(): Promise<void> {
+  setStoredUser(null);
   try {
     await fetch(`${BACKEND_URL}/api/logout`, {
       method: 'POST',
@@ -100,6 +130,10 @@ export async function logoutUser(): Promise<void> {
 }
 
 export async function getCurrentUser(): Promise<User | null> {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
   try {
     const res = await fetch(`${BACKEND_URL}/api/me`, {
       method: 'GET',
@@ -109,16 +143,15 @@ export async function getCurrentUser(): Promise<User | null> {
       credentials: 'include',
     });
 
-    if (res.status === 401 || res.status === 403) {
+    if (res.status === 401 || res.status === 403 || !res.ok) {
+      setStoredUser(null);
       return null;
     }
 
-    if (!res.ok) {
-      return null;
-    }
-
-    return (await res.json()) as User;
+    const user = (await res.json()) as User;
+    setStoredUser(user);
+    return user;
   } catch {
-    return null;
+    return getStoredUser();
   }
 }

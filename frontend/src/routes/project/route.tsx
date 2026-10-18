@@ -1,18 +1,28 @@
 import * as React from 'react';
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  Outlet,
+  redirect,
+  useLocation,
+  useNavigate,
+} from '@tanstack/react-router';
+import { Loader2 } from 'lucide-react';
 import { AppSidebar } from '#/components/layout/app-sidebar.tsx';
 import { SiteHeader } from '#/components/layout/site-header.tsx';
 import { ProjectView } from '#/features/project/components/project-view';
 import { SidebarInset, SidebarProvider } from '#/components/ui/sidebar.tsx';
 import { TooltipProvider } from '#/components/ui/tooltip.tsx';
-import { authQueryOptions } from '#/features/auth/queries';
+import { authQueryOptions, useAuth } from '#/features/auth/queries';
 
 export const Route = createFileRoute('/project')({
   beforeLoad: async ({ context, location }) => {
-    const user = await context.queryClient.query({
-      ...authQueryOptions,
-      staleTime: 'static',
-    });
+    // During server-side rendering, cookies and browser storage are not available.
+    // We allow initial render on server and enforce client-side auth validation.
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const user = await context.queryClient.ensureQueryData(authQueryOptions);
     if (!user) {
       throw redirect({
         to: '/auth/login',
@@ -28,7 +38,29 @@ export const Route = createFileRoute('/project')({
 });
 
 function ProjectLayout() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [globalSearch, setGlobalSearch] = React.useState('');
+
+  React.useEffect(() => {
+    if (!user) {
+      void navigate({
+        to: '/auth/login',
+        search: {
+          redirect: location.href,
+        },
+      });
+    }
+  }, [user, navigate, location.href]);
+
+  if (!user) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader2 className="size-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <TooltipProvider>
