@@ -144,11 +144,11 @@ export function TaskColumn({
     return (
       <KanbanColumn
         value={value}
-        className="flex flex-col w-12 min-w-12 max-w-12 shrink-0 select-none max-h-[calc(100vh-210px)]"
+        className="flex flex-col w-12 min-w-12 max-w-12 shrink-0 select-none h-[calc(100vh-210px)]"
         {...props}
       >
         <Card
-          className="gap-0 py-0 border bg-muted/20 hover:bg-muted/40 shadow-2xs flex flex-col h-full max-h-[calc(100vh-210px)] items-center justify-between p-2 transition-colors"
+          className="gap-0 py-0 border bg-muted/20 hover:bg-muted/40 shadow-2xs flex flex-col h-full items-center justify-between p-2 transition-colors"
           title={`Rozwiń lub przeciągnij kolumnę ${COLUMN_TITLES[value]}`}
         >
           <Button
@@ -181,10 +181,13 @@ export function TaskColumn({
   return (
     <KanbanColumn
       value={value}
-      className="flex flex-col w-[300px] min-w-[300px] shrink-0 max-h-[calc(100vh-210px)]"
+      className={cn(
+        'flex flex-col flex-1 min-w-[280px] max-w-[460px] shrink-0 h-[calc(100vh-210px)]',
+        isOverlay && 'w-[340px] max-w-[340px] flex-none',
+      )}
       {...props}
     >
-      <Card className="gap-0 py-0 border bg-muted/20 shadow-2xs flex flex-col h-full max-h-[calc(100vh-210px)] overflow-hidden">
+      <Card className="gap-0 py-0 border bg-muted/20 shadow-2xs flex flex-col h-full overflow-hidden">
         {/* Fixed Header */}
         <CardHeader className="flex flex-row items-center justify-between px-3.5 py-3 shrink-0 border-b border-border/40 bg-muted/30">
           <KanbanColumnHandle className="flex items-center gap-2 cursor-grab active:cursor-grabbing flex-1 opacity-100 select-none">
@@ -228,8 +231,8 @@ export function TaskColumn({
         </CardHeader>
 
         {/* Scrollable Content inside column */}
-        <CardContent className="p-2.5 overflow-y-auto flex-1 min-h-0">
-          <KanbanColumnContent value={value} className="flex flex-col gap-2.5 min-h-[140px] pb-2">
+        <CardContent className="p-2.5 overflow-y-auto flex-1 min-h-0 flex flex-col">
+          <KanbanColumnContent value={value} className="flex flex-col gap-2.5 flex-1 min-h-[140px] pb-2">
             {tasks.map((task) => (
               <TaskCard
                 key={task.id}
@@ -284,7 +287,7 @@ export function ProjectKanbanBoard({
       onValueChange={setColumns}
       getItemValue={(item) => item.id}
     >
-      <KanbanBoard className="flex gap-4 overflow-x-auto pb-4 items-start min-w-full">
+      <KanbanBoard className="flex gap-4 overflow-x-auto pb-4 items-stretch min-w-full">
         {(Object.keys(columns) as ColumnId[]).map((columnId) => (
           <TaskColumn
             key={columnId}
@@ -300,7 +303,7 @@ export function ProjectKanbanBoard({
           if (variant === 'column') {
             const colId = value as ColumnId;
             return (
-              <div className="w-[300px] pointer-events-none opacity-90 shadow-2xl rotate-1">
+              <div className="w-[340px] pointer-events-none opacity-90 shadow-2xl rotate-1">
                 <TaskColumn value={colId} tasks={columns[colId] ?? []} isOverlay />
               </div>
             );
@@ -310,7 +313,7 @@ export function ProjectKanbanBoard({
             .find((t) => t.id === value);
           if (!task) return null;
           return (
-            <div className="w-[280px] pointer-events-none opacity-90 shadow-xl rotate-1">
+            <div className="w-[320px] pointer-events-none opacity-90 shadow-xl rotate-1">
               <TaskCard task={task} isOverlay />
             </div>
           );
