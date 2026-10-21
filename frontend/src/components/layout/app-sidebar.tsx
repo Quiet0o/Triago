@@ -1,18 +1,15 @@
 'use client';
 
 import type { ComponentProps } from 'react';
+import { Link } from '@tanstack/react-router';
 import {
-  Bell,
-  ChevronsUpDown,
   Clock,
   Command,
   LayoutDashboard,
-  LogOut,
   PanelLeftClose,
   PanelLeftOpen,
   Settings,
   Sparkles,
-  User,
   Users,
 } from 'lucide-react';
 
@@ -29,18 +26,6 @@ import {
   SidebarSeparator,
   useSidebar,
 } from '#/components/ui/sidebar.tsx';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '#/components/ui/dropdown-menu.tsx';
-import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar.tsx';
-import { Tooltip, TooltipContent, TooltipTrigger } from '#/components/ui/tooltip.tsx';
-import { Button } from '#/components/ui/button.tsx';
 import { m } from '#/paraglide/messages';
 import { cn } from 'cn';
 
@@ -115,40 +100,25 @@ export const AppSidebar = ({ ...props }: ComponentProps<typeof Sidebar>) => {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <div className="flex items-center justify-between p-1 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:gap-2">
-          <div className="flex items-center gap-2 overflow-hidden px-1">
-            <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
-              <Command className="size-4" />
-            </div>
-            <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
-              <span className="truncate font-semibold tracking-tight text-foreground">Triago</span>
-            </div>
-          </div>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleSidebar}
-                data-sidebar="trigger"
-                data-slot="sidebar-trigger"
-                className="size-8 rounded-lg hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
-              >
-                {state === 'collapsed' ? (
-                  <PanelLeftOpen className="size-4" />
-                ) : (
-                  <PanelLeftClose className="size-4" />
-                )}
-                <span className="sr-only">
-                  {state === 'collapsed' ? 'Expand sidebar' : 'Collapse sidebar'}
-                </span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side={state === 'collapsed' ? 'right' : 'bottom'}>
-              {state === 'collapsed' ? 'Expand sidebar' : 'Collapse sidebar'}
-            </TooltipContent>
-          </Tooltip>
-        </div>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              size="lg"
+              asChild
+              tooltip="Triago"
+              className="group-data-[collapsible=icon]:p-0! hover:bg-sidebar-accent/50 cursor-pointer"
+            >
+              <Link to="/project" className="flex items-center gap-2">
+                <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-xs">
+                  <Command className="size-4" />
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
+                  <span className="truncate font-semibold tracking-tight text-foreground">Triago</span>
+                </div>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarHeader>
 
       <SidebarContent>
@@ -193,78 +163,20 @@ export const AppSidebar = ({ ...props }: ComponentProps<typeof Sidebar>) => {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton
-                  size="lg"
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                >
-                  <Avatar className="size-8 rounded-lg shrink-0">
-                    <AvatarImage src="" alt="John Doe" />
-                    <AvatarFallback className="rounded-lg bg-primary/10 text-primary font-medium">
-                      JD
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
-                    <span className="truncate font-semibold">John Doe</span>
-                    <span className="truncate text-xs text-muted-foreground">
-                      john.doe@triago.com
-                    </span>
-                  </div>
-                  <ChevronsUpDown className="ml-auto size-4 shrink-0 group-data-[collapsible=icon]:hidden" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-                side="bottom"
-                align="end"
-                sideOffset={4}
-              >
-                <DropdownMenuLabel className="p-0 font-normal">
-                  <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                    <Avatar className="size-8 rounded-lg">
-                      <AvatarImage src="" alt="John Doe" />
-                      <AvatarFallback className="rounded-lg bg-primary/10 text-primary font-medium">
-                        JD
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">John Doe</span>
-                      <span className="truncate text-xs text-muted-foreground">
-                        john.doe@triago.com
-                      </span>
-                    </div>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem>
-                    <Sparkles className="mr-2 size-4" />
-                    Upgrade to Pro
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem>
-                    <User className="mr-2 size-4" />
-                    Account
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Bell className="mr-2 size-4" />
-                    Notifications
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Settings className="mr-2 size-4" />
-                    Settings
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive focus:text-destructive">
-                  <LogOut className="mr-2 size-4" />
-                  Log out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <SidebarMenuButton
+              onClick={toggleSidebar}
+              tooltip={state === 'collapsed' ? 'Rozwiń pasek boczny' : 'Zwiń pasek boczny'}
+              className="text-muted-foreground hover:text-foreground cursor-pointer"
+            >
+              {state === 'collapsed' ? (
+                <PanelLeftOpen className="size-4 shrink-0" />
+              ) : (
+                <PanelLeftClose className="size-4 shrink-0" />
+              )}
+              <span className="truncate group-data-[collapsible=icon]:hidden">
+                {state === 'collapsed' ? 'Rozwiń pasek boczny' : 'Zwiń pasek boczny'}
+              </span>
+            </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
