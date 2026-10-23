@@ -3,24 +3,18 @@
 import * as React from 'react';
 import {
   AlertCircle,
-  Bold,
   BookOpen,
   Bug,
   Calendar,
   Check,
   CheckSquare,
   Clock,
-  Code,
   FileUp,
   FolderGit2,
-  Italic,
   Lightbulb,
-  List,
-  ListOrdered,
   ListTree,
   Paperclip,
   Plus,
-  Quote,
   Sparkles,
   Tag,
   Trash2,
@@ -39,7 +33,6 @@ import {
 } from '#/components/ui/dialog.tsx';
 import { Button } from '#/components/ui/button.tsx';
 import { Input } from '#/components/ui/input.tsx';
-import { Textarea } from '#/components/ui/textarea.tsx';
 import { Badge } from '#/components/ui/badge.tsx';
 import { Avatar, AvatarFallback } from '#/components/ui/avatar.tsx';
 import { Checkbox } from '#/components/ui/checkbox.tsx';
@@ -50,11 +43,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '#/components/ui/select.tsx';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '#/components/ui/tooltip.tsx';
 import { useAuth } from '#/features/auth/queries';
 import type {
   TicketPerson,
@@ -64,6 +52,7 @@ import type {
 } from '#/types/tickets';
 import { PriorityBadge, StatusBadge, TicketTypeIcon } from './ticket-badges';
 import { useCreateTicketModal } from '../context/create-ticket-context';
+import { BasicTaskEditor } from '#/components/editor/basic-editor';
 
 export const TEAM_MEMBERS: TicketPerson[] = [
   {
@@ -117,7 +106,6 @@ export function CreateTicketModal() {
   const [type, setType] = React.useState<TicketType>('task');
   const [title, setTitle] = React.useState('');
   const [description, setDescription] = React.useState('');
-  const [descTab, setDescTab] = React.useState<'write' | 'preview'>('write');
   const [status, setStatus] = React.useState<TicketStatus>('nowy');
   const [priority, setPriority] = React.useState<TicketPriority>('średni');
   const [assigneeEmail, setAssigneeEmail] = React.useState<string>('unassigned');
@@ -222,11 +210,6 @@ export function CreateTicketModal() {
 
   const removeSubtask = (id: string) => {
     setSubtasks(subtasks.filter((s) => s.id !== id));
-  };
-
-  // Quick formatting insert helper
-  const insertFormatting = (prefix: string, suffix: string = '') => {
-    setDescription((prev) => `${prev}${prefix}tekst${suffix}`);
   };
 
   // Handle file select simulation
@@ -375,156 +358,17 @@ export function CreateTicketModal() {
               />
             </div>
 
-            {/* Description with Markdown Toolbar */}
+            {/* Description with Basic ProseKit Editor */}
             <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-foreground">
-                  Opis
-                </label>
-                <div className="flex items-center rounded-md border bg-muted/40 p-0.5 text-xs font-medium">
-                  <button
-                    type="button"
-                    onClick={() => setDescTab('write')}
-                    className={cn(
-                      'px-2.5 py-0.5 rounded cursor-pointer transition-colors',
-                      descTab === 'write'
-                        ? 'bg-background text-foreground shadow-xs'
-                        : 'text-muted-foreground hover:text-foreground',
-                    )}
-                  >
-                    Edycja
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setDescTab('preview')}
-                    className={cn(
-                      'px-2.5 py-0.5 rounded cursor-pointer transition-colors',
-                      descTab === 'preview'
-                        ? 'bg-background text-foreground shadow-xs'
-                        : 'text-muted-foreground hover:text-foreground',
-                    )}
-                  >
-                    Podgląd
-                  </button>
-                </div>
-              </div>
-
-              {descTab === 'write' ? (
-                <div className="rounded-lg border border-border focus-within:ring-1 focus-within:ring-primary/40 focus-within:border-primary overflow-hidden transition-all bg-background">
-                  {/* Markdown Toolbar */}
-                  <div className="flex items-center gap-1 border-b bg-muted/30 px-2 py-1 text-muted-foreground">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          type="button"
-                          onClick={() => insertFormatting('**', '**')}
-                          className="rounded p-1 hover:bg-muted hover:text-foreground cursor-pointer"
-                        >
-                          <Bold className="size-3.5" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent>Pogrubienie (Bold)</TooltipContent>
-                    </Tooltip>
-
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          type="button"
-                          onClick={() => insertFormatting('*', '*')}
-                          className="rounded p-1 hover:bg-muted hover:text-foreground cursor-pointer"
-                        >
-                          <Italic className="size-3.5" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent>Kursywa (Italic)</TooltipContent>
-                    </Tooltip>
-
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          type="button"
-                          onClick={() => insertFormatting('`', '`')}
-                          className="rounded p-1 hover:bg-muted hover:text-foreground cursor-pointer"
-                        >
-                          <Code className="size-3.5" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent>Kod liniowy</TooltipContent>
-                    </Tooltip>
-
-                    <div className="h-3.5 w-px bg-border/60 mx-1" />
-
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          type="button"
-                          onClick={() => insertFormatting('\n- ')}
-                          className="rounded p-1 hover:bg-muted hover:text-foreground cursor-pointer"
-                        >
-                          <List className="size-3.5" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent>Lista punktowana</TooltipContent>
-                    </Tooltip>
-
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          type="button"
-                          onClick={() => insertFormatting('\n1. ')}
-                          className="rounded p-1 hover:bg-muted hover:text-foreground cursor-pointer"
-                        >
-                          <ListOrdered className="size-3.5" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent>Lista numerowana</TooltipContent>
-                    </Tooltip>
-
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          type="button"
-                          onClick={() => insertFormatting('\n> ')}
-                          className="rounded p-1 hover:bg-muted hover:text-foreground cursor-pointer"
-                        >
-                          <Quote className="size-3.5" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent>Cytat</TooltipContent>
-                    </Tooltip>
-
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          type="button"
-                          onClick={() => insertFormatting('\n- [ ] ')}
-                          className="rounded p-1 hover:bg-muted hover:text-foreground cursor-pointer"
-                        >
-                          <CheckSquare className="size-3.5" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent>Pole wyboru</TooltipContent>
-                    </Tooltip>
-                  </div>
-
-                  <Textarea
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Opisz szczegóły zadania, kroki do odtworzenia problemu lub pożądany rezultat..."
-                    className="min-h-[120px] resize-y border-0 focus-visible:ring-0 text-sm p-3 shadow-none bg-transparent"
-                  />
-                </div>
-              ) : (
-                <div className="min-h-[148px] rounded-lg border bg-muted/10 p-3 text-sm text-foreground space-y-2 whitespace-pre-wrap">
-                  {description.trim() ? (
-                    description
-                  ) : (
-                    <span className="text-muted-foreground italic">
-                      Brak treści opisu do wyświetlenia.
-                    </span>
-                  )}
-                </div>
-              )}
+              <label className="text-xs font-semibold text-foreground">
+                Opis zadania
+              </label>
+              <BasicTaskEditor
+                initialContent={description}
+                onChange={(text) => setDescription(text)}
+                placeholder="Opisz szczegóły zadania, kroki do odtworzenia problemu lub pożądany rezultat..."
+                minHeight="min-h-[140px]"
+              />
             </div>
 
             {/* Subtasks / Acceptance Criteria */}

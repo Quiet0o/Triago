@@ -62,6 +62,7 @@ import {
   TicketTypeIcon,
 } from './ticket-badges';
 import { TEAM_MEMBERS } from './create-ticket-modal';
+import { BasicTaskEditor } from '#/components/editor/basic-editor';
 import mockData from '#/data/mock-tickets.json';
 
 interface Comment {
@@ -384,12 +385,12 @@ export function TicketDetailView({ ticketId }: { ticketId: string }) {
             </div>
 
             {isEditingDesc ? (
-              <div className="space-y-2">
-                <Textarea
-                  value={descDraft}
-                  onChange={(e) => setDescDraft(e.target.value)}
-                  className="min-h-[140px] text-sm"
-                  autoFocus
+              <div className="space-y-3">
+                <BasicTaskEditor
+                  initialContent={descDraft}
+                  onChange={(text) => setDescDraft(text)}
+                  placeholder="Wpisz szczegółowy opis zadania..."
+                  minHeight="min-h-[160px]"
                 />
                 <div className="flex items-center gap-2 justify-end">
                   <Button
