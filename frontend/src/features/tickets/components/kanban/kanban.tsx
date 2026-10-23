@@ -1,8 +1,10 @@
 import type { ComponentProps } from 'react';
 import { useState } from 'react';
-import { Calendar, ChevronsLeft, ChevronsRight, GripVerticalIcon } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
+import { Calendar, ChevronsLeft, ChevronsRight, GripVerticalIcon, Plus } from 'lucide-react';
 import { cn } from 'cn';
 import { Button } from '#/components/ui/button.tsx';
+import { useCreateTicketModal } from '#/features/tickets/context/create-ticket-context';
 import { Card, CardContent, CardHeader } from '#/components/ui/card.tsx';
 import {
   Kanban,
@@ -79,22 +81,28 @@ export function TaskCard({ task, asHandle, isOverlay, isDone = false, ...props }
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-1.5 min-w-0">
             <TicketTypeIcon type={task.type} />
-            <span className="font-mono text-xs font-semibold text-muted-foreground whitespace-nowrap">
+            <Link
+              to="/project/tickets/$ticketId"
+              params={{ ticketId: task.id }}
+              className="font-mono text-xs font-semibold text-muted-foreground hover:text-primary hover:underline whitespace-nowrap cursor-pointer"
+            >
               {task.id}
-            </span>
+            </Link>
           </div>
           <PriorityBadge priority={task.priority} />
         </div>
 
         {/* Title: struck through when done */}
-        <p
+        <Link
+          to="/project/tickets/$ticketId"
+          params={{ ticketId: task.id }}
           className={cn(
-            'line-clamp-2 text-sm font-medium leading-snug',
+            'line-clamp-2 text-sm font-medium leading-snug hover:text-primary transition-colors cursor-pointer block',
             isDone ? 'line-through text-muted-foreground/75' : 'text-foreground',
           )}
         >
           {task.title}
-        </p>
+        </Link>
 
         {/* Bottom meta row: Story points, comments & attachments, due date, AssigneeAvatar */}
         <div className="flex items-center justify-between pt-1 border-t border-border/40 text-xs text-muted-foreground">
@@ -137,6 +145,7 @@ export function TaskColumn({
   onToggleCollapse,
   ...props
 }: TaskColumnProps) {
+  const { openCreateModal } = useCreateTicketModal();
   const columnTotalPoints = tasks.reduce((sum, t) => sum + t.storyPoints, 0);
   const isDoneColumn = value === 'done';
 
@@ -242,6 +251,24 @@ export function TaskColumn({
                 isOverlay={isOverlay}
               />
             ))}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                const statusMap: Record<ColumnId, TicketStatus> = {
+                  backlog: 'nowy',
+                  inProgress: 'w_toku',
+                  review: 'review',
+                  testing: 'testowanie',
+                  done: 'zamknięty',
+                };
+                openCreateModal({ status: statusMap[value] });
+              }}
+              className="w-full justify-start text-xs text-muted-foreground hover:text-foreground h-7 px-2 gap-1.5 cursor-pointer mt-1"
+            >
+              <Plus className="size-3" />
+              Dodaj zadanie
+            </Button>
           </KanbanColumnContent>
         </CardContent>
       </Card>

@@ -23,6 +23,7 @@ import {
 import { Checkbox } from '#/components/ui/checkbox.tsx';
 import { Badge } from '#/components/ui/badge.tsx';
 import { Ellipsis } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
 
 // ── Features used by the ticket table ────────────────────────────────
 export const ticketTableFeatures = tableFeatures({
@@ -75,17 +76,29 @@ export const ticketColumns: ColumnDef<TicketTableFeatures, Ticket, any>[] = [
 
   col.accessor('id', {
     header: 'Key',
-    cell: (info) => (
-      <span className="font-mono text-xs font-semibold text-muted-foreground whitespace-nowrap">
-        {info.getValue()}
-      </span>
+    cell: ({ row }) => (
+      <Link
+        to="/project/tickets/$ticketId"
+        params={{ ticketId: row.original.id }}
+        onClick={(e) => e.stopPropagation()}
+        className="font-mono text-xs font-semibold text-muted-foreground hover:text-primary hover:underline whitespace-nowrap cursor-pointer"
+      >
+        {row.original.id}
+      </Link>
     ),
   }),
 
   col.accessor('title', {
     header: 'Title',
-    cell: (info) => (
-      <span className="text-sm font-medium text-foreground line-clamp-1">{info.getValue()}</span>
+    cell: ({ row }) => (
+      <Link
+        to="/project/tickets/$ticketId"
+        params={{ ticketId: row.original.id }}
+        onClick={(e) => e.stopPropagation()}
+        className="text-sm font-medium text-foreground hover:text-primary hover:underline line-clamp-1 cursor-pointer"
+      >
+        {row.original.title}
+      </Link>
     ),
     enableHiding: false,
   }),

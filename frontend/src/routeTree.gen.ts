@@ -21,6 +21,7 @@ import { Route as ProjectBoardIndexRouteImport } from './routes/project/board/in
 import { Route as ProjectDevelopmentIndexRouteImport } from './routes/project/development/index'
 import { Route as ProjectDocumentsIndexRouteImport } from './routes/project/documents/index'
 import { Route as ProjectSummaryIndexRouteImport } from './routes/project/summary/index'
+import { Route as ProjectTicketsTicketIdRouteImport } from './routes/project/tickets/$ticketId'
 import { Route as ProjectTimelineIndexRouteImport } from './routes/project/timeline/index'
 
 const IndexRoute = IndexRouteImport.update({
@@ -83,6 +84,11 @@ const ProjectSummaryIndexRoute = ProjectSummaryIndexRouteImport.update({
   path: '/summary/',
   getParentRoute: () => ProjectRouteRoute,
 } as any)
+const ProjectTicketsTicketIdRoute = ProjectTicketsTicketIdRouteImport.update({
+  id: '/tickets/$ticketId',
+  path: '/tickets/$ticketId',
+  getParentRoute: () => ProjectRouteRoute,
+} as any)
 const ProjectTimelineIndexRoute = ProjectTimelineIndexRouteImport.update({
   id: '/timeline/',
   path: '/timeline/',
@@ -95,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/project/': typeof ProjectIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/project/tickets/$ticketId': typeof ProjectTicketsTicketIdRoute
   '/auth/login/': typeof AuthLoginIndexRoute
   '/auth/register/': typeof AuthRegisterIndexRoute
   '/project/backlog/': typeof ProjectBacklogIndexRoute
@@ -109,6 +116,7 @@ export interface FileRoutesByTo {
   '/project': typeof ProjectIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/project/tickets/$ticketId': typeof ProjectTicketsTicketIdRoute
   '/auth/login': typeof AuthLoginIndexRoute
   '/auth/register': typeof AuthRegisterIndexRoute
   '/project/backlog': typeof ProjectBacklogIndexRoute
@@ -125,6 +133,7 @@ export interface FileRoutesById {
   '/project/': typeof ProjectIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/project/tickets/$ticketId': typeof ProjectTicketsTicketIdRoute
   '/auth/login/': typeof AuthLoginIndexRoute
   '/auth/register/': typeof AuthRegisterIndexRoute
   '/project/backlog/': typeof ProjectBacklogIndexRoute
@@ -142,6 +151,7 @@ export interface FileRouteTypes {
     | '/project/'
     | '/api/auth/$'
     | '/api/trpc/$'
+    | '/project/tickets/$ticketId'
     | '/auth/login/'
     | '/auth/register/'
     | '/project/backlog/'
@@ -156,6 +166,7 @@ export interface FileRouteTypes {
     | '/project'
     | '/api/auth/$'
     | '/api/trpc/$'
+    | '/project/tickets/$ticketId'
     | '/auth/login'
     | '/auth/register'
     | '/project/backlog'
@@ -171,6 +182,7 @@ export interface FileRouteTypes {
     | '/project/'
     | '/api/auth/$'
     | '/api/trpc/$'
+    | '/project/tickets/$ticketId'
     | '/auth/login/'
     | '/auth/register/'
     | '/project/backlog/'
@@ -276,6 +288,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectSummaryIndexRouteImport
       parentRoute: typeof ProjectRouteRoute
     }
+    '/project/tickets/$ticketId': {
+      id: '/project/tickets/$ticketId'
+      path: '/tickets/$ticketId'
+      fullPath: '/project/tickets/$ticketId'
+      preLoaderRoute: typeof ProjectTicketsTicketIdRouteImport
+      parentRoute: typeof ProjectRouteRoute
+    }
     '/project/timeline/': {
       id: '/project/timeline/'
       path: '/timeline'
@@ -288,6 +307,7 @@ declare module '@tanstack/react-router' {
 
 interface ProjectRouteRouteChildren {
   ProjectIndexRoute: typeof ProjectIndexRoute
+  ProjectTicketsTicketIdRoute: typeof ProjectTicketsTicketIdRoute
   ProjectBacklogIndexRoute: typeof ProjectBacklogIndexRoute
   ProjectBoardIndexRoute: typeof ProjectBoardIndexRoute
   ProjectDevelopmentIndexRoute: typeof ProjectDevelopmentIndexRoute
@@ -298,6 +318,7 @@ interface ProjectRouteRouteChildren {
 
 const ProjectRouteRouteChildren: ProjectRouteRouteChildren = {
   ProjectIndexRoute: ProjectIndexRoute,
+  ProjectTicketsTicketIdRoute: ProjectTicketsTicketIdRoute,
   ProjectBacklogIndexRoute: ProjectBacklogIndexRoute,
   ProjectBoardIndexRoute: ProjectBoardIndexRoute,
   ProjectDevelopmentIndexRoute: ProjectDevelopmentIndexRoute,

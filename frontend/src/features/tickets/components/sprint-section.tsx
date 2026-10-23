@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Calendar, CheckCircle2, ChevronDown, ChevronRight, Zap } from 'lucide-react';
+import { Calendar, CheckCircle2, ChevronDown, ChevronRight, Plus, Zap } from 'lucide-react';
 import type { ColumnVisibilityState, SortingState } from '@tanstack/react-table';
 import type { Sprint, Ticket } from '#/types/tickets';
 import { TicketTable } from './ticket-table';
+import { Button } from '#/components/ui/button.tsx';
+import { useCreateTicketModal } from '#/features/tickets/context/create-ticket-context';
 
 const SprintHeader = ({
   sprint,
@@ -89,6 +91,7 @@ export const SprintSection = ({
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const [sorting, setSorting] = useState<SortingState>([]);
+  const { openCreateModal } = useCreateTicketModal();
   const totalPoints = tickets.reduce((sum, t) => sum + t.storyPoints, 0);
 
   return (
@@ -110,6 +113,17 @@ export const SprintSection = ({
             onColumnVisibilityChange={onColumnVisibilityChange}
             globalFilter={globalFilter}
           />
+          <div className="p-2 border-t bg-muted/10 flex items-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => openCreateModal({ sprint: sprint?.id ?? null })}
+              className="h-7 text-xs text-muted-foreground hover:text-foreground gap-1.5 cursor-pointer"
+            >
+              <Plus className="size-3.5" />
+              {!sprint ? 'Utwórz zadanie w backlogu' : `Utwórz zadanie w ${sprint.name}`}
+            </Button>
+          </div>
         </div>
       )}
     </div>

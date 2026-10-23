@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '#/components/ui/dropdown-menu.tsx';
 import { useAuth } from '#/features/auth/queries';
+import { useCreateTicketModal } from '#/features/tickets/context/create-ticket-context';
 
 export const SiteHeader = ({
   searchQuery,
@@ -22,6 +23,7 @@ export const SiteHeader = ({
   onSearchChange?: (val: string) => void;
 }) => {
   const { user, logout } = useAuth();
+  const { openCreateModal } = useCreateTicketModal();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -54,7 +56,7 @@ export const SiteHeader = ({
             className="h-9 w-[min(50vw,28rem)] bg-muted/40 pl-9 pr-4 text-sm focus-visible:bg-background"
           />
         </div>
-        <Button>
+        <Button onClick={() => openCreateModal()} className="cursor-pointer">
           <Plus className="size-4" />
           Create
         </Button>

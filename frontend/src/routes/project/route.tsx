@@ -13,6 +13,8 @@ import { ProjectView } from '#/features/project/components/project-view';
 import { SidebarInset, SidebarProvider } from '#/components/ui/sidebar.tsx';
 import { TooltipProvider } from '#/components/ui/tooltip.tsx';
 import { authQueryOptions, useAuth } from '#/features/auth/queries';
+import { CreateTicketProvider } from '#/features/tickets/context/create-ticket-context';
+import { CreateTicketModal } from '#/features/tickets/components/create-ticket-modal';
 
 export const Route = createFileRoute('/project')({
   beforeLoad: async ({ context, location }) => {
@@ -64,17 +66,20 @@ function ProjectLayout() {
 
   return (
     <TooltipProvider>
-      <SidebarProvider>
-        <AppSidebar variant="inset" />
-        <SidebarInset>
-          <SiteHeader searchQuery={globalSearch} onSearchChange={setGlobalSearch} />
-          <main className="flex flex-1 flex-col p-4 md:p-6 lg:p-8">
-            <ProjectView externalSearch={globalSearch}>
-              <Outlet />
-            </ProjectView>
-          </main>
-        </SidebarInset>
-      </SidebarProvider>
+      <CreateTicketProvider>
+        <SidebarProvider>
+          <AppSidebar variant="inset" />
+          <SidebarInset>
+            <SiteHeader searchQuery={globalSearch} onSearchChange={setGlobalSearch} />
+            <main className="flex flex-1 flex-col p-4 md:p-6 lg:p-8">
+              <ProjectView externalSearch={globalSearch}>
+                <Outlet />
+              </ProjectView>
+            </main>
+          </SidebarInset>
+          <CreateTicketModal />
+        </SidebarProvider>
+      </CreateTicketProvider>
     </TooltipProvider>
   );
 }
