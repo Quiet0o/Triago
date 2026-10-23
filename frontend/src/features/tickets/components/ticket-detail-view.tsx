@@ -3,7 +3,10 @@
 import * as React from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import {
+  Activity,
   ArrowLeft,
+  ArrowRight,
+  ArrowUpDown,
   Calendar,
   Check,
   CheckSquare,
@@ -27,7 +30,6 @@ import { Button } from '#/components/ui/button.tsx';
 import { Badge } from '#/components/ui/badge.tsx';
 import { Avatar, AvatarFallback } from '#/components/ui/avatar.tsx';
 import { Input } from '#/components/ui/input.tsx';
-import { Textarea } from '#/components/ui/textarea.tsx';
 import { Checkbox } from '#/components/ui/checkbox.tsx';
 import {
   Select,
@@ -69,9 +71,26 @@ interface Comment {
   id: string;
   author: TicketPerson;
   content: string;
+  contentHtml?: string;
   createdAt: string;
+  timestamp: number;
   reactions: { emoji: string; count: number; reacted: boolean }[];
 }
+
+interface ActivityEvent {
+  id: string;
+  user: string;
+  userAvatarFallback?: string;
+  action: string;
+  target: string;
+  time: string;
+  timestamp: number;
+  type?: 'status' | 'assignee' | 'created' | 'priority' | 'comment';
+}
+
+type FeedItem =
+  | { kind: 'comment'; id: string; timestamp: number; data: Comment }
+  | { kind: 'activity'; id: string; timestamp: number; data: ActivityEvent };
 
 const INITIAL_COMMENTS: Comment[] = [
   {
@@ -84,7 +103,10 @@ const INITIAL_COMMENTS: Comment[] = [
     },
     content:
       'Sprawdziłem logi na środowisku staging. Problem pojawia się w momencie próby nawiązania połączenia TLS z serwerem pocztowym po 30 sekundach braku odpowiedzi.',
+    contentHtml:
+      '<p>Sprawdziłem logi na środowisku <code>staging</code>. Problem pojawia się w momencie próby nawiązania połączenia <strong>TLS</strong> z serwerem pocztowym po <code>30 sekundach</code> braku odpowiedzi.</p>',
     createdAt: 'Wczoraj o 14:10',
+    timestamp: new Date('2026-09-17T14:10:00').getTime(),
     reactions: [
       { emoji: '👍', count: 2, reacted: false },
       { emoji: '👀', count: 1, reacted: true },
@@ -100,7 +122,10 @@ const INITIAL_COMMENTS: Comment[] = [
     },
     content:
       'Dodałam mechanizm ponawiania (exponential backoff) oraz podniosłam timeout do 45s. Przygotowuję PR do review.',
+    contentHtml:
+      '<p>Dodałam mechanizm ponawiania (<em>exponential backoff</em>) oraz podniosłam timeout do <code>45s</code>. Przygotowuję PR do review.</p>',
     createdAt: 'Dzisiaj o 09:25',
+    timestamp: new Date('2026-09-18T09:25:00').getTime(),
     reactions: [
       { emoji: '🚀', count: 3, reacted: true },
       { emoji: '🎉', count: 2, reacted: false },
@@ -108,29 +133,219 @@ const INITIAL_COMMENTS: Comment[] = [
   },
 ];
 
-const INITIAL_ACTIVITY = [
+const INITIAL_ACTIVITY: ActivityEvent[] = [
   {
-    id: 'a1',
-    user: 'Aleksandra Nowak',
-    action: 'zmieniła status na',
-    target: 'W toku',
-    time: 'Dzisiaj o 09:15',
+    id: 'a3',
+    user: 'Tomasz Zieliński',
+    userAvatarFallback: 'TZ',
+    action: 'utworzył zadanie w sprincie',
+    target: 'Sprint 4 — September',
+    time: '16 wrz 2026, 09:22',
+    timestamp: new Date('2026-09-16T09:22:00').getTime(),
+    type: 'created',
   },
   {
     id: 'a2',
     user: 'Aleksandra Nowak',
+    userAvatarFallback: 'AN',
     action: 'przypisała zadanie do',
     target: 'Aleksandra Nowak',
     time: 'Wczoraj o 16:30',
+    timestamp: new Date('2026-09-17T16:30:00').getTime(),
+    type: 'assignee',
   },
   {
-    id: 'a3',
-    user: 'Tomasz Zieliński',
-    action: 'utworzył zadanie w sprincie',
-    target: 'Sprint 4 — September',
-    time: '16 wrz 2026, 09:22',
+    id: 'a1',
+    user: 'Aleksandra Nowak',
+    userAvatarFallback: 'AN',
+    action: 'zmieniła status na',
+    target: 'W toku',
+    time: 'Dzisiaj o 09:15',
+    timestamp: new Date('2026-09-18T09:15:00').getTime(),
+    type: 'status',
   },
 ];
+
+function CommentCard({
+  comment,
+  onToggleReaction,
+}: {
+  comment: Comment;
+  onToggleReaction: (commentId: string, emoji: string) => void;
+}) {
+  return (
+    <div className="flex gap-3 text-sm group">
+      <Avatar className="size-8 shrink-0">
+        <AvatarFallback className="text-xs font-semibold bg-primary/10 text-primary">
+          {comment.author.avatarFallback}
+        </AvatarFallback>
+      </Avatar>
+      <div className="flex-1 space-y-1.5 min-w-0">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="font-semibold text-xs text-foreground">
+            {comment.author.name}
+          </span>
+          <span className="text-[10px] text-muted-foreground">•</span>
+          <span className="text-[11px] text-muted-foreground">{comment.createdAt}</span>
+          <Badge variant="outline" className="text-[9px] h-4 px-1.5 py-0 font-normal">
+            {comment.author.role}
+          </Badge>
+        </div>
+        {comment.contentHtml ? (
+          <div
+            className="rounded-lg border bg-muted/10 p-3 text-xs leading-relaxed text-foreground break-words space-y-1.5 [&>p]:leading-relaxed [&>ul]:list-disc [&>ul]:pl-4 [&>ol]:list-decimal [&>ol]:pl-4 [&>blockquote]:border-l-2 [&>blockquote]:border-primary/50 [&>blockquote]:pl-2.5 [&>blockquote]:italic [&>pre]:bg-muted [&>pre]:p-2 [&>pre]:rounded [&>pre]:overflow-x-auto [&>code]:bg-muted/80 [&>code]:px-1 [&>code]:py-0.5 [&>code]:rounded [&>code]:font-mono [&>code]:text-[11px] [&_img]:rounded-md [&_img]:my-2 [&_img]:max-h-72 [&_img]:border [&_img]:border-border/60 [&_img]:object-contain"
+            dangerouslySetInnerHTML={{ __html: comment.contentHtml }}
+          />
+        ) : (
+          <div className="rounded-lg border bg-muted/10 p-3 text-xs leading-relaxed text-foreground whitespace-pre-wrap">
+            {comment.content}
+          </div>
+        )}
+        {comment.reactions.length > 0 && (
+          <div className="flex items-center gap-1.5 pt-1">
+            {comment.reactions.map((r, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => onToggleReaction(comment.id, r.emoji)}
+                className={cn(
+                  'flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium transition-colors cursor-pointer',
+                  r.reacted
+                    ? 'bg-primary/10 border-primary/30 text-primary font-semibold'
+                    : 'bg-muted/30 border-border text-muted-foreground hover:bg-muted',
+                )}
+              >
+                <span>{r.emoji}</span>
+                <span>{r.count}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ActivityRow({ activity }: { activity: ActivityEvent }) {
+  const renderIcon = () => {
+    switch (activity.type) {
+      case 'created':
+        return (
+          <div className="flex size-6 items-center justify-center rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400">
+            <Plus className="size-3" />
+          </div>
+        );
+      case 'status':
+        return (
+          <div className="flex size-6 items-center justify-center rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400">
+            <ArrowRight className="size-3" />
+          </div>
+        );
+      case 'assignee':
+        return (
+          <div className="flex size-6 items-center justify-center rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-600 dark:text-purple-400">
+            <User className="size-3" />
+          </div>
+        );
+      default:
+        return (
+          <div className="flex size-6 items-center justify-center rounded-full bg-muted border border-border text-muted-foreground">
+            <History className="size-3" />
+          </div>
+        );
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-3 text-xs text-muted-foreground py-0.5">
+      <div className="size-8 flex items-center justify-center shrink-0">
+        {renderIcon()}
+      </div>
+      <div className="flex-1 flex flex-wrap items-center gap-1.5 min-w-0">
+        <span className="font-semibold text-foreground">{activity.user}</span>
+        <span>{activity.action}</span>
+        <span className="font-semibold text-foreground px-2 py-0.5 rounded bg-muted/60 border border-border/60 text-[11px]">
+          {activity.target}
+        </span>
+      </div>
+      <span className="text-[10px] text-muted-foreground shrink-0">{activity.time}</span>
+    </div>
+  );
+}
+
+function CommentComposer({
+  onSubmit,
+}: {
+  onSubmit: (text: string, html: string) => void;
+}) {
+  const [textDraft, setTextDraft] = React.useState('');
+  const [htmlDraft, setHtmlDraft] = React.useState('');
+  const [editorKey, setEditorKey] = React.useState(0);
+
+  const hasContent = Boolean(textDraft.trim() || htmlDraft.includes('<img'));
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!hasContent) return;
+    onSubmit(textDraft, htmlDraft);
+    setTextDraft('');
+    setHtmlDraft('');
+    setEditorKey((k) => k + 1);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="flex gap-3 pt-3 border-t">
+      <Avatar className="size-8 shrink-0">
+        <AvatarFallback className="text-xs bg-primary/10 text-primary font-semibold">
+          ZU
+        </AvatarFallback>
+      </Avatar>
+      <div className="flex-1 space-y-2.5 min-w-0">
+        <BasicTaskEditor
+          key={editorKey}
+          placeholder="Napisz komentarz... (obsługuje formatowanie ProseKit, listy, kod oraz zdjęcia)"
+          onChange={(text, html) => {
+            setTextDraft(text);
+            setHtmlDraft(html);
+          }}
+          minHeight="min-h-[80px]"
+          className="border-border/80 focus-within:border-primary/60"
+        />
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <span className="text-[11px] text-muted-foreground">
+            Wspiera formatowanie tekstu ProseKit, kod, listy oraz dodawanie zdjęć.
+          </span>
+          <div className="flex items-center gap-2">
+            {hasContent && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setTextDraft('');
+                  setHtmlDraft('');
+                  setEditorKey((k) => k + 1);
+                }}
+                className="h-8 px-2.5 text-xs text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                Anuluj
+              </Button>
+            )}
+            <Button
+              type="submit"
+              size="sm"
+              disabled={!hasContent}
+              className="gap-1.5 text-xs h-8 px-3 cursor-pointer shadow-xs"
+            >
+              <Send className="size-3" />
+              Opublikuj komentarz
+            </Button>
+          </div>
+        </div>
+      </div>
+    </form>
+  );
+}
 
 export function TicketDetailView({ ticketId }: { ticketId: string }) {
   const navigate = useNavigate();
@@ -143,9 +358,10 @@ export function TicketDetailView({ ticketId }: { ticketId: string }) {
 
   // Local state for interactive editing
   const [ticket, setTicket] = React.useState<Ticket>(initialTicket);
-  const [activeTab, setActiveTab] = React.useState<'comments' | 'history' | 'time'>('comments');
+  const [activeTab, setActiveTab] = React.useState<'all' | 'comments' | 'history'>('all');
+  const [sortOrder, setSortOrder] = React.useState<'asc' | 'desc'>('desc');
   const [comments, setComments] = React.useState<Comment[]>(INITIAL_COMMENTS);
-  const [newCommentText, setNewCommentText] = React.useState('');
+  const [activities, setActivities] = React.useState<ActivityEvent[]>(INITIAL_ACTIVITY);
   const [copiedKey, setCopiedKey] = React.useState(false);
   const [copiedLink, setCopiedLink] = React.useState(false);
 
@@ -154,16 +370,19 @@ export function TicketDetailView({ ticketId }: { ticketId: string }) {
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);
   };
+
   const [isEditingTitle, setIsEditingTitle] = React.useState(false);
   const [titleDraft, setTitleDraft] = React.useState(ticket.title);
   const [isEditingDesc, setIsEditingDesc] = React.useState(false);
   const [descDraft, setDescDraft] = React.useState(ticket.description);
+  const [descHtmlDraft, setDescHtmlDraft] = React.useState(ticket.descriptionHtml ?? '');
   const [newSubtaskTitle, setNewSubtaskTitle] = React.useState('');
 
   React.useEffect(() => {
     setTicket(initialTicket);
     setTitleDraft(initialTicket.title);
     setDescDraft(initialTicket.description);
+    setDescHtmlDraft(initialTicket.descriptionHtml ?? '');
   }, [initialTicket]);
 
   const handleCopyKey = () => {
@@ -180,30 +399,100 @@ export function TicketDetailView({ ticketId }: { ticketId: string }) {
   };
 
   const handleSaveDesc = () => {
-    setTicket((prev) => ({ ...prev, description: descDraft.trim() }));
+    setTicket((prev) => ({
+      ...prev,
+      description: descDraft.trim() || (descHtmlDraft.includes('<img') ? 'Załączono zdjęcie w opisie' : ''),
+      descriptionHtml: descHtmlDraft.trim() || undefined,
+    }));
     setIsEditingDesc(false);
   };
 
-  const handleAddComment = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newCommentText.trim()) return;
+  const handleAddComment = (text: string, html: string) => {
+    if (!text.trim() && !html.includes('<img')) return;
 
+    const now = Date.now();
     const newComment: Comment = {
-      id: `c-${Date.now()}`,
+      id: `c-${now}`,
       author: {
         name: 'Zalogowany użytkownik',
         email: 'user@triago.pl',
         avatarFallback: 'ZU',
         role: 'Current User',
       },
-      content: newCommentText.trim(),
+      content: text.trim() || 'Załączono zdjęcie',
+      contentHtml: html.trim() || undefined,
       createdAt: 'Przed chwilą',
+      timestamp: now,
       reactions: [],
     };
 
     setComments((prev) => [...prev, newComment]);
-    setNewCommentText('');
   };
+
+  const handleToggleReaction = (commentId: string, emoji: string) => {
+    setComments((prev) =>
+      prev.map((c) => {
+        if (c.id !== commentId) return c;
+        const existing = c.reactions.find((r) => r.emoji === emoji);
+        if (existing) {
+          if (existing.reacted) {
+            return {
+              ...c,
+              reactions: c.reactions
+                .map((r) =>
+                  r.emoji === emoji ? { ...r, count: r.count - 1, reacted: false } : r,
+                )
+                .filter((r) => r.count > 0),
+            };
+          }
+          return {
+            ...c,
+            reactions: c.reactions.map((r) =>
+              r.emoji === emoji ? { ...r, count: r.count + 1, reacted: true } : r,
+            ),
+          };
+        }
+        return {
+          ...c,
+          reactions: [...c.reactions, { emoji, count: 1, reacted: true }],
+        };
+      }),
+    );
+  };
+
+  const unifiedFeed = React.useMemo<FeedItem[]>(() => {
+    const commentItems: FeedItem[] = comments.map((c) => ({
+      kind: 'comment',
+      id: c.id,
+      timestamp: c.timestamp,
+      data: c,
+    }));
+
+    const activityItems: FeedItem[] = activities.map((a) => ({
+      kind: 'activity',
+      id: a.id,
+      timestamp: a.timestamp,
+      data: a,
+    }));
+
+    const merged = [...commentItems, ...activityItems];
+    merged.sort((a, b) =>
+      sortOrder === 'asc' ? a.timestamp - b.timestamp : b.timestamp - a.timestamp,
+    );
+    return merged;
+  }, [comments, activities, sortOrder]);
+
+  const sortedComments = React.useMemo(() => {
+    return [...comments].sort((a, b) =>
+      sortOrder === 'asc' ? a.timestamp - b.timestamp : b.timestamp - a.timestamp,
+    );
+  }, [comments, sortOrder]);
+
+  const sortedActivities = React.useMemo(() => {
+    return [...activities].sort((a, b) =>
+      sortOrder === 'asc' ? a.timestamp - b.timestamp : b.timestamp - a.timestamp,
+    );
+  }, [activities, sortOrder]);
 
   const toggleSubtask = (subtaskId: string) => {
     setTicket((prev) => ({
@@ -387,8 +676,11 @@ export function TicketDetailView({ ticketId }: { ticketId: string }) {
             {isEditingDesc ? (
               <div className="space-y-3">
                 <BasicTaskEditor
-                  initialContent={descDraft}
-                  onChange={(text) => setDescDraft(text)}
+                  initialContent={ticket.descriptionHtml || descDraft}
+                  onChange={(text, html) => {
+                    setDescDraft(text);
+                    setDescHtmlDraft(html);
+                  }}
                   placeholder="Wpisz szczegółowy opis zadania..."
                   minHeight="min-h-[160px]"
                 />
@@ -411,8 +703,15 @@ export function TicketDetailView({ ticketId }: { ticketId: string }) {
                 </div>
               </div>
             ) : (
-              <div className="text-sm leading-relaxed text-foreground/90 whitespace-pre-wrap">
-                {ticket.description || (
+              <div className="text-sm leading-relaxed text-foreground/90">
+                {ticket.descriptionHtml ? (
+                  <div
+                    className="prose prose-sm dark:prose-invert max-w-none break-words [&>p]:leading-relaxed [&_img]:rounded-lg [&_img]:my-3 [&_img]:max-h-96 [&_img]:border [&_img]:border-border/60 [&_img]:object-contain [&>ul]:list-disc [&>ul]:pl-4 [&>ol]:list-decimal [&>ol]:pl-4"
+                    dangerouslySetInnerHTML={{ __html: ticket.descriptionHtml }}
+                  />
+                ) : ticket.description ? (
+                  <div className="whitespace-pre-wrap">{ticket.description}</div>
+                ) : (
                   <span className="italic text-muted-foreground">Brak opisu zadania.</span>
                 )}
               </div>
@@ -521,19 +820,23 @@ export function TicketDetailView({ ticketId }: { ticketId: string }) {
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="flex items-center gap-3 p-3 rounded-lg border bg-muted/20 hover:bg-muted/40 transition-colors">
-                <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary border border-primary/20 shrink-0">
-                  <FileText className="size-5" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+              <div className="group flex items-center gap-2.5 px-3 py-2 rounded-lg border bg-muted/20 hover:bg-muted/40 transition-colors">
+                <div className="flex size-7 items-center justify-center rounded-md bg-primary/10 text-primary border border-primary/20 shrink-0">
+                  <FileText className="size-3.5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-semibold text-foreground truncate">
+                  <p className="text-xs font-medium text-foreground truncate group-hover:text-primary transition-colors">
                     smtp_timeout_stacktrace.log
                   </p>
                   <p className="text-[10px] text-muted-foreground">1.4 MB • Wczoraj, 14:05</p>
                 </div>
-                <Button variant="ghost" size="sm" className="size-8 p-0 cursor-pointer">
-                  <ExternalLink className="size-3.5 text-muted-foreground" />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="size-6 p-0 shrink-0 text-muted-foreground hover:text-foreground cursor-pointer"
+                >
+                  <ExternalLink className="size-3" />
                 </Button>
               </div>
             </div>
@@ -541,8 +844,21 @@ export function TicketDetailView({ ticketId }: { ticketId: string }) {
 
           {/* Activity & Comments Section */}
           <div className="rounded-xl border bg-card p-5 space-y-5 shadow-xs">
-            <div className="flex items-center justify-between border-b pb-3">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between border-b pb-3 gap-2 flex-wrap">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('all')}
+                  className={cn(
+                    'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer',
+                    activeTab === 'all'
+                      ? 'bg-primary text-primary-foreground shadow-xs'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
+                  )}
+                >
+                  <Activity className="size-3.5" />
+                  <span>Wszystko</span>
+                </button>
                 <button
                   type="button"
                   onClick={() => setActiveTab('comments')}
@@ -554,7 +870,7 @@ export function TicketDetailView({ ticketId }: { ticketId: string }) {
                   )}
                 >
                   <MessageSquare className="size-3.5" />
-                  Komentarze ({comments.length})
+                  <span>Komentarze ({comments.length})</span>
                 </button>
                 <button
                   type="button"
@@ -567,103 +883,96 @@ export function TicketDetailView({ ticketId }: { ticketId: string }) {
                   )}
                 >
                   <History className="size-3.5" />
-                  Historia zmian
+                  <span>Historia zmian</span>
                 </button>
               </div>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'))}
+                    className="h-7 px-2 text-[11px] text-muted-foreground hover:text-foreground gap-1.5 cursor-pointer"
+                  >
+                    <ArrowUpDown className="size-3" />
+                    <span className="hidden sm:inline">
+                      {sortOrder === 'desc' ? 'Od najnowszych' : 'Od najstarszych'}
+                    </span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {sortOrder === 'desc'
+                    ? 'Kolejność: od najnowszych wpisów'
+                    : 'Kolejność: od najstarszych wpisów'}
+                </TooltipContent>
+              </Tooltip>
             </div>
 
-            {activeTab === 'comments' ? (
+            {/* TAB: Wszystko (Połączenie chronologiczne komentarzy i historii zmian) */}
+            {activeTab === 'all' && (
               <div className="space-y-6">
-                {/* Existing comments */}
-                <div className="space-y-4">
-                  {comments.map((c) => (
-                    <div key={c.id} className="flex gap-3 text-sm">
-                      <Avatar className="size-8 shrink-0">
-                        <AvatarFallback className="text-xs font-semibold">
-                          {c.author.avatarFallback}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 space-y-1.5">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-xs text-foreground">
-                            {c.author.name}
-                          </span>
-                          <span className="text-[10px] text-muted-foreground">•</span>
-                          <span className="text-[11px] text-muted-foreground">{c.createdAt}</span>
-                          <Badge variant="outline" className="text-[9px] h-4 px-1 py-0 font-normal">
-                            {c.author.role}
-                          </Badge>
-                        </div>
-                        <div className="rounded-lg border bg-muted/10 p-3 text-xs leading-relaxed text-foreground">
-                          {c.content}
-                        </div>
-                        {c.reactions.length > 0 && (
-                          <div className="flex items-center gap-1.5 pt-1">
-                            {c.reactions.map((r, i) => (
-                              <button
-                                key={i}
-                                type="button"
-                                className={cn(
-                                  'flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium transition-colors cursor-pointer',
-                                  r.reacted
-                                    ? 'bg-primary/10 border-primary/30 text-primary'
-                                    : 'bg-muted/30 border-border text-muted-foreground hover:bg-muted',
-                                )}
-                              >
-                                <span>{r.emoji}</span>
-                                <span>{r.count}</span>
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                {unifiedFeed.length === 0 ? (
+                  <div className="text-center py-8 text-xs text-muted-foreground">
+                    Brak aktywności dla tego zadania.
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {unifiedFeed.map((item) =>
+                      item.kind === 'comment' ? (
+                        <CommentCard
+                          key={item.id}
+                          comment={item.data}
+                          onToggleReaction={handleToggleReaction}
+                        />
+                      ) : (
+                        <ActivityRow key={item.id} activity={item.data} />
+                      ),
+                    )}
+                  </div>
+                )}
 
-                {/* New Comment Composer */}
-                <form onSubmit={handleAddComment} className="flex gap-3 pt-2">
-                  <Avatar className="size-8 shrink-0">
-                    <AvatarFallback className="text-xs">U</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 space-y-2">
-                    <Textarea
-                      value={newCommentText}
-                      onChange={(e) => setNewCommentText(e.target.value)}
-                      placeholder="Dodaj komentarz do zadania..."
-                      className="min-h-[90px] text-xs"
-                    />
-                    <div className="flex items-center justify-end">
-                      <Button
-                        type="submit"
-                        size="sm"
-                        disabled={!newCommentText.trim()}
-                        className="gap-1.5 text-xs h-8 px-3 cursor-pointer"
-                      >
-                        <Send className="size-3" />
-                        Opublikuj komentarz
-                      </Button>
-                    </div>
-                  </div>
-                </form>
+                {/* Comment Composer */}
+                <CommentComposer onSubmit={handleAddComment} />
               </div>
-            ) : (
-              <div className="space-y-4">
-                {INITIAL_ACTIVITY.map((a) => (
-                  <div key={a.id} className="flex items-start gap-3 text-xs text-muted-foreground">
-                    <div className="flex size-6 items-center justify-center rounded-full bg-muted shrink-0 mt-0.5">
-                      <History className="size-3 text-muted-foreground" />
-                    </div>
-                    <div>
-                      <p>
-                        <span className="font-semibold text-foreground">{a.user}</span>{' '}
-                        {a.action}{' '}
-                        <span className="font-semibold text-foreground">{a.target}</span>
-                      </p>
-                      <span className="text-[10px] text-muted-foreground">{a.time}</span>
-                    </div>
+            )}
+
+            {/* TAB: Tylko Komentarze */}
+            {activeTab === 'comments' && (
+              <div className="space-y-6">
+                {sortedComments.length === 0 ? (
+                  <div className="text-center py-8 text-xs text-muted-foreground">
+                    Brak komentarzy. Bądź pierwszą osobą, która doda komentarz!
                   </div>
-                ))}
+                ) : (
+                  <div className="space-y-4">
+                    {sortedComments.map((c) => (
+                      <CommentCard
+                        key={c.id}
+                        comment={c}
+                        onToggleReaction={handleToggleReaction}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {/* Comment Composer */}
+                <CommentComposer onSubmit={handleAddComment} />
+              </div>
+            )}
+
+            {/* TAB: Tylko Historia zmian */}
+            {activeTab === 'history' && (
+              <div className="space-y-4">
+                {sortedActivities.length === 0 ? (
+                  <div className="text-center py-8 text-xs text-muted-foreground">
+                    Brak historii zmian dla tego zadania.
+                  </div>
+                ) : (
+                  sortedActivities.map((a) => (
+                    <ActivityRow key={a.id} activity={a} />
+                  ))
+                )}
               </div>
             )}
           </div>
@@ -725,7 +1034,31 @@ export function TicketDetailView({ ticketId }: { ticketId: string }) {
             <label className="text-xs font-medium text-muted-foreground">Status</label>
             <Select
               value={ticket.status}
-              onValueChange={(val) => setTicket((prev) => ({ ...prev, status: val as TicketStatus }))}
+              onValueChange={(val) => {
+                const newStatus = val as TicketStatus;
+                setTicket((prev) => ({ ...prev, status: newStatus }));
+                const statusNames: Record<TicketStatus, string> = {
+                  nowy: 'Nowy',
+                  w_toku: 'W toku',
+                  review: 'W recenzji',
+                  testowanie: 'Testowanie',
+                  zamknięty: 'Zamknięty',
+                  zablokowany: 'Zablokowany',
+                };
+                setActivities((prev) => [
+                  ...prev,
+                  {
+                    id: `a-${Date.now()}`,
+                    user: 'Zalogowany użytkownik',
+                    userAvatarFallback: 'ZU',
+                    action: 'zmienił status na',
+                    target: statusNames[newStatus],
+                    time: 'Przed chwilą',
+                    timestamp: Date.now(),
+                    type: 'status',
+                  },
+                ]);
+              }}
             >
               <SelectTrigger className="w-full bg-background h-9 text-xs cursor-pointer">
                 <SelectValue />
@@ -790,6 +1123,19 @@ export function TicketDetailView({ ticketId }: { ticketId: string }) {
               onValueChange={(val) => {
                 const found = TEAM_MEMBERS.find((m) => m.email === val) ?? null;
                 setTicket((prev) => ({ ...prev, assignee: found }));
+                setActivities((prev) => [
+                  ...prev,
+                  {
+                    id: `a-${Date.now()}`,
+                    user: 'Zalogowany użytkownik',
+                    userAvatarFallback: 'ZU',
+                    action: 'przypisał zadanie do',
+                    target: found ? found.name : 'Nieprzypisane',
+                    time: 'Przed chwilą',
+                    timestamp: Date.now(),
+                    type: 'assignee',
+                  },
+                ]);
               }}
             >
               <SelectTrigger className="w-full bg-background h-9 text-xs cursor-pointer">

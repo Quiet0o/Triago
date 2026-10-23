@@ -106,6 +106,8 @@ export function CreateTicketModal() {
   const [type, setType] = React.useState<TicketType>('task');
   const [title, setTitle] = React.useState('');
   const [description, setDescription] = React.useState('');
+  const [descriptionHtml, setDescriptionHtml] = React.useState('');
+  const [editorKey, setEditorKey] = React.useState(0);
   const [status, setStatus] = React.useState<TicketStatus>('nowy');
   const [priority, setPriority] = React.useState<TicketPriority>('średni');
   const [assigneeEmail, setAssigneeEmail] = React.useState<string>('unassigned');
@@ -156,6 +158,8 @@ export function CreateTicketModal() {
       setSprint(initialValues.sprint !== undefined ? (initialValues.sprint ?? 'none') : 'sprint-4');
       setTitle(initialValues.title ?? '');
       setDescription(initialValues.description ?? '');
+      setDescriptionHtml('');
+      setEditorKey((k) => k + 1);
       setErrorMessage(null);
       setSuccessToast(null);
     }
@@ -251,6 +255,8 @@ export function CreateTicketModal() {
       if (createAnother) {
         setTitle('');
         setDescription('');
+        setDescriptionHtml('');
+        setEditorKey((k) => k + 1);
         setSubtasks([]);
         setAttachments([]);
       } else {
@@ -364,8 +370,12 @@ export function CreateTicketModal() {
                 Opis zadania
               </label>
               <BasicTaskEditor
-                initialContent={description}
-                onChange={(text) => setDescription(text)}
+                key={editorKey}
+                initialContent={descriptionHtml || description}
+                onChange={(text, html) => {
+                  setDescription(text);
+                  setDescriptionHtml(html);
+                }}
                 placeholder="Opisz szczegóły zadania, kroki do odtworzenia problemu lub pożądany rezultat..."
                 minHeight="min-h-[140px]"
               />

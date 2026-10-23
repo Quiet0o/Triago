@@ -12,15 +12,20 @@ import {
   defineDocChangeHandler,
   union,
 } from 'prosekit/core';
+import type { Uploader } from 'prosekit/extensions/file';
+import type { ImageExtension } from 'prosekit/extensions/image';
+import { defineImageUploadHandler } from 'prosekit/extensions/image';
 import { definePlaceholder } from 'prosekit/extensions/placeholder';
-import { ProseKit, useEditorDerivedValue } from 'prosekit/react';
+import { ProseKit, useEditor, useEditorDerivedValue } from 'prosekit/react';
 import {
   Bold,
+  Check,
   CheckSquare,
   Code,
   FileCode,
   Heading1,
   Heading2,
+  Image as ImageIcon,
   Italic,
   List,
   ListOrdered,
@@ -29,14 +34,46 @@ import {
   Strikethrough,
   Underline as UnderlineIcon,
   Undo2,
+  UploadCloud,
 } from 'lucide-react';
 import { cn } from '#/lib/utils';
+import { Button } from '#/components/ui/button.tsx';
+import { Input } from '#/components/ui/input.tsx';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '#/components/ui/dialog.tsx';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '#/components/ui/tooltip.tsx';
+import { defineImageView } from './ui/image-view/index.ts';
 import { InlineMenu } from './ui/inline-menu/index.ts';
+
+export const localBase64Uploader: Uploader<string> = ({ file, onProgress }): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onprogress = (event) => {
+      if (event.lengthComputable) {
+        onProgress({ loaded: event.loaded, total: event.total });
+      }
+    };
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result);
+      } else {
+        reject(new Error('Nie udało się odczytać pliku'));
+      }
+    };
+    reader.onerror = () => reject(reader.error ?? new Error('Błąd odczytu pliku'));
+    reader.readAsDataURL(file);
+  });
+};
 
 export function textToNodeJSON(text: string): NodeJSON {
   if (!text || !text.trim()) {
@@ -60,6 +97,191 @@ export function textToNodeJSON(text: string): NodeJSON {
       };
     }),
   };
+}
+
+function InsertImageDialog({
+  open,
+  onOpenChange,
+  onInsert,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onInsert: (url: string) => void;
+}) {
+  const [tab, setTab] = React.useState<'upload' | 'url'>('upload');
+  const [url, setUrl] = React.useState('');
+  const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setPreviewUrl(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleConfirm = () => {
+    if (tab === 'upload' && previewUrl) {
+      onInsert(previewUrl);
+      handleClose();
+    } else if (tab === 'url' && url.trim()) {
+      onInsert(url.trim());
+      handleClose();
+    }
+  };
+
+  const handleClose = () => {
+    setUrl('');
+    setPreviewUrl(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    onOpenChange(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(val) => (!val ? handleClose() : onOpenChange(val))}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-base font-semibold">
+            <ImageIcon className="size-4 text-primary" />
+            Wstaw zdjęcie
+          </DialogTitle>
+          <DialogDescription className="text-xs text-muted-foreground">
+            Wybierz plik ze swojego urządzenia lub podaj bezpośredni link URL.
+          </DialogDescription>
+        </DialogHeader>
+
+        {/* Tab switcher */}
+        <div className="flex border-b border-border gap-4 text-xs font-medium">
+          <button
+            type="button"
+            onClick={() => setTab('upload')}
+            className={cn(
+              'pb-2 -mb-px transition-colors cursor-pointer border-b-2',
+              tab === 'upload'
+                ? 'border-primary text-foreground font-semibold'
+                : 'border-transparent text-muted-foreground hover:text-foreground',
+            )}
+          >
+            Z pliku (Dysk)
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab('url')}
+            className={cn(
+              'pb-2 -mb-px transition-colors cursor-pointer border-b-2',
+              tab === 'url'
+                ? 'border-primary text-foreground font-semibold'
+                : 'border-transparent text-muted-foreground hover:text-foreground',
+            )}
+          >
+            Z linku (URL)
+          </button>
+        </div>
+
+        {tab === 'upload' ? (
+          <div className="space-y-3 py-2">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            {previewUrl ? (
+              <div className="relative rounded-lg border bg-muted/20 p-2 flex flex-col items-center gap-2">
+                <img
+                  src={previewUrl}
+                  alt="Podgląd"
+                  className="max-h-48 rounded object-contain"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="h-7 text-xs cursor-pointer"
+                >
+                  Zmień plik
+                </Button>
+              </div>
+            ) : (
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-border hover:border-primary/60 rounded-xl p-8 cursor-pointer transition-colors bg-muted/10 hover:bg-muted/20"
+              >
+                <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <UploadCloud className="size-5" />
+                </div>
+                <div className="text-center">
+                  <p className="text-xs font-semibold text-foreground">
+                    Kliknij, aby wybrać zdjęcie
+                  </p>
+                  <p className="text-[11px] text-muted-foreground">
+                    PNG, JPG, GIF, WebP lub SVG
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-3 py-2">
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">
+                Adres URL zdjęcia
+              </label>
+              <Input
+                placeholder="https://example.com/zdjecie.png"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                className="h-9 text-xs"
+                autoFocus
+              />
+            </div>
+            {url.trim() && (
+              <div className="rounded-lg border bg-muted/20 p-2 flex justify-center">
+                <img
+                  src={url}
+                  alt="Podgląd URL"
+                  className="max-h-44 rounded object-contain"
+                  onError={(e) => {
+                    (e.target as HTMLElement).style.display = 'none';
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        <DialogFooter className="flex items-center justify-end gap-2 pt-2 border-t">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleClose}
+            className="h-8 text-xs cursor-pointer"
+          >
+            Anuluj
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            onClick={handleConfirm}
+            disabled={tab === 'upload' ? !previewUrl : !url.trim()}
+            className="h-8 px-4 text-xs cursor-pointer gap-1.5"
+          >
+            <Check className="size-3.5" />
+            Wstaw zdjęcie
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 function getToolbarItems(editor: Editor<BasicExtension>) {
@@ -139,6 +361,8 @@ function getToolbarItems(editor: Editor<BasicExtension>) {
 
 function BasicToolbar() {
   const items = useEditorDerivedValue(getToolbarItems);
+  const editor = useEditor<BasicExtension & ImageExtension>();
+  const [imageDialogOpen, setImageDialogOpen] = React.useState(false);
 
   const renderBtn = (
     item: { isActive: boolean; canExec: boolean; command: () => void },
@@ -200,6 +424,31 @@ function BasicToolbar() {
 
       {renderBtn(items.blockquote, 'Cytat', <Quote className="size-3.5" />)}
       {renderBtn(items.codeBlock, 'Blok kodu', <FileCode className="size-3.5" />)}
+
+      <div className="mx-1 h-3.5 w-px bg-border/60" />
+
+      {/* Image button */}
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            onClick={() => setImageDialogOpen(true)}
+            className="flex size-7 items-center justify-center rounded p-1 transition-colors cursor-pointer text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+            aria-label="Wstaw zdjęcie"
+          >
+            <ImageIcon className="size-3.5" />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent className="text-[11px] py-1 px-2">Wstaw zdjęcie</TooltipContent>
+      </Tooltip>
+
+      <InsertImageDialog
+        open={imageDialogOpen}
+        onOpenChange={setImageDialogOpen}
+        onInsert={(src) => {
+          editor.commands.insertImage({ src });
+        }}
+      />
     </div>
   );
 }
@@ -224,8 +473,11 @@ export function BasicTaskEditor({
   const onChangeRef = React.useRef(onChange);
   onChangeRef.current = onChange;
 
-  const defaultContent = React.useMemo(() => {
+  const [defaultContent] = React.useState(() => {
     if (typeof initialContent === 'string') {
+      if (initialContent.trim().startsWith('<') || initialContent.includes('<img')) {
+        return initialContent;
+      }
       return textToNodeJSON(initialContent);
     }
     if (initialContent) {
@@ -235,11 +487,13 @@ export function BasicTaskEditor({
       type: 'doc',
       content: [{ type: 'paragraph' }],
     };
-  }, [initialContent]);
+  });
 
   const editor = React.useMemo(() => {
     const extension = union(
       defineBasicExtension(),
+      defineImageView(),
+      defineImageUploadHandler({ uploader: localBase64Uploader }),
       definePlaceholder({ placeholder }),
       defineDocChangeHandler((view) => {
         if (onChangeRef.current) {

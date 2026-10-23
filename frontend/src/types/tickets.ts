@@ -29,6 +29,7 @@ export type Ticket = {
   id: string;
   title: string;
   description: string;
+  descriptionHtml?: string;
   type: TicketType;
   priority: TicketPriority;
   status: TicketStatus;
