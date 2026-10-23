@@ -44,7 +44,7 @@ const nameCollator = new Intl.Collator('en-US', {
   sensitivity: 'base',
 });
 
-export const ticketColumns: ColumnDef<TicketTableFeatures, Ticket, any>[] = [
+export const ticketColumns: ColumnDef<TicketTableFeatures, Ticket, unknown>[] = [
   col.display({
     id: 'select',
     header: ({ table }) => (

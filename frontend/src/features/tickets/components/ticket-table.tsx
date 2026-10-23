@@ -15,14 +15,7 @@ import {
   TableRow,
 } from '#/components/ui/table.tsx';
 
-export const TicketTable = ({
-  tickets,
-  sorting,
-  onSortingChange,
-  columnVisibility,
-  onColumnVisibilityChange,
-  globalFilter,
-}: {
+export interface TicketTableProps {
   tickets: Ticket[];
   sorting: SortingState;
   onSortingChange: (updater: SortingState | ((previous: SortingState) => SortingState)) => void;
@@ -31,7 +24,16 @@ export const TicketTable = ({
     updater: ColumnVisibilityState | ((previous: ColumnVisibilityState) => ColumnVisibilityState),
   ) => void;
   globalFilter: string;
-}) => {
+}
+
+export const TicketTable = ({
+  tickets,
+  sorting,
+  onSortingChange,
+  columnVisibility,
+  onColumnVisibilityChange,
+  globalFilter,
+}: TicketTableProps) => {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   const table = useTable({

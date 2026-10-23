@@ -19,7 +19,7 @@ import {
 import { Badge } from '#/components/ui/badge.tsx';
 import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar.tsx';
 import { Tooltip, TooltipContent, TooltipTrigger } from '#/components/ui/tooltip.tsx';
-import { cn } from 'cn';
+import { cn } from '#/lib/utils';
 import type { TicketPerson, TicketPriority, TicketStatus, TicketType } from '#/types/tickets';
 import { CriticalIcon } from '#/components/ui/icons/critical';
 

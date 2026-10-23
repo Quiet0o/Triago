@@ -1,7 +1,7 @@
 'use client';
 
 import type { Dispatch, SetStateAction } from 'react';
-import { Filter, Plus, Search, SlidersHorizontal } from 'lucide-react';
+import { Filter, Plus, Search } from 'lucide-react';
 import type { ColumnVisibilityState } from '@tanstack/react-table';
 import {
   Avatar,
@@ -13,20 +13,25 @@ import {
 import { Button } from '#/components/ui/button.tsx';
 import { Input } from '#/components/ui/input.tsx';
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '#/components/ui/dropdown-menu.tsx';
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from '#/components/ui/select.tsx';
+import { ColumnVisibilityMenu } from './column-visibility-menu';
+import { useCreateTicketModal } from '#/features/tickets/context/create-ticket-context';
+
+export interface BacklogTableFiltersProps {
+  search: string;
+  onSearchChange: (value: string) => void;
+  statusFilter: string;
+  onStatusFilterChange: (value: string) => void;
+  priorityFilter: string;
+  onPriorityFilterChange: (value: string) => void;
+  columnVisibility: ColumnVisibilityState;
+  onColumnVisibilityChange: Dispatch<SetStateAction<ColumnVisibilityState>>;
+}
 
 export const BacklogTableFilters = ({
   search,
@@ -37,16 +42,9 @@ export const BacklogTableFilters = ({
   onPriorityFilterChange,
   columnVisibility,
   onColumnVisibilityChange,
-}: {
-  search: string;
-  onSearchChange: (value: string) => void;
-  statusFilter: string;
-  onStatusFilterChange: (value: string) => void;
-  priorityFilter: string;
-  onPriorityFilterChange: (value: string) => void;
-  columnVisibility: ColumnVisibilityState;
-  onColumnVisibilityChange: Dispatch<SetStateAction<ColumnVisibilityState>>;
-}) => {
+}: BacklogTableFiltersProps) => {
+  const { openCreateModal } = useCreateTicketModal();
+
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex flex-wrap items-center gap-2">
@@ -108,42 +106,15 @@ export const BacklogTableFilters = ({
       </div>
 
       <div className="flex items-center gap-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
-              <SlidersHorizontal className="size-3.5" />
-              Columns
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuLabel className="text-xs">Visible columns</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {[
-              { id: 'id', label: 'Key' },
-              { id: 'status', label: 'Status' },
-              { id: 'priority', label: 'Priority' },
-              { id: 'assignee', label: 'Assignee' },
-              { id: 'storyPoints', label: 'Story Points' },
-              { id: 'labels', label: 'Labels' },
-              { id: 'meta', label: 'Activity' },
-            ].map((column) => (
-              <DropdownMenuCheckboxItem
-                key={column.id}
-                className="text-xs"
-                checked={columnVisibility[column.id] !== false}
-                onCheckedChange={(checked) =>
-                  onColumnVisibilityChange((previous) => ({
-                    ...previous,
-                    [column.id]: !!checked,
-                  }))
-                }
-              >
-                {column.label}
-              </DropdownMenuCheckboxItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <Button size="sm" className="h-8 gap-1.5 text-xs">
+        <ColumnVisibilityMenu
+          columnVisibility={columnVisibility}
+          onColumnVisibilityChange={onColumnVisibilityChange}
+        />
+        <Button
+          size="sm"
+          onClick={() => openCreateModal()}
+          className="h-8 gap-1.5 text-xs cursor-pointer"
+        >
           <Plus className="size-3.5" />
           New ticket
         </Button>

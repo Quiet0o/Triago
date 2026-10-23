@@ -1,20 +1,38 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import type { ColumnVisibilityState } from '@tanstack/react-table';
 import type { Sprint, Ticket } from '#/types/tickets';
+import { ticketQueries } from '../queries';
 import { BacklogTableFilters } from './backlog-table-filters';
 import { SprintSection } from './sprint-section';
 
-export const BacklogView = ({
-  tickets,
-  sprints,
-  externalSearch = '',
-}: {
-  tickets: Ticket[];
-  sprints: Sprint[];
+export interface BacklogViewProps {
+  tickets?: Ticket[];
+  sprints?: Sprint[];
   externalSearch?: string;
-}) => {
+}
+
+export const BacklogView = ({
+  tickets: propTickets,
+  sprints: propSprints,
+  externalSearch = '',
+}: BacklogViewProps) => {
+  // TanStack Query v5 integration with fallback to passed props
+  const { data: fetchedTickets = [] } = useQuery({
+    ...ticketQueries.list(),
+    enabled: !propTickets,
+  });
+
+  const { data: fetchedSprints = [] } = useQuery({
+    ...ticketQueries.sprints(),
+    enabled: !propSprints,
+  });
+
+  const tickets = propTickets ?? fetchedTickets;
+  const sprints = propSprints ?? fetchedSprints;
+
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibilityState>({});
   const [localSearch, setLocalSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');

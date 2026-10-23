@@ -71,15 +71,7 @@ const SprintHeader = ({
   );
 };
 
-export const SprintSection = ({
-  sprint,
-  tickets,
-  defaultOpen = true,
-
-  columnVisibility,
-  onColumnVisibilityChange,
-  globalFilter,
-}: {
+export interface SprintSectionProps {
   sprint: Sprint | null;
   tickets: Ticket[];
   defaultOpen?: boolean;
@@ -88,7 +80,16 @@ export const SprintSection = ({
     updater: ColumnVisibilityState | ((prev: ColumnVisibilityState) => ColumnVisibilityState),
   ) => void;
   globalFilter: string;
-}) => {
+}
+
+export const SprintSection = ({
+  sprint,
+  tickets,
+  defaultOpen = true,
+  columnVisibility,
+  onColumnVisibilityChange,
+  globalFilter,
+}: SprintSectionProps) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const [sorting, setSorting] = useState<SortingState>([]);
   const { openCreateModal } = useCreateTicketModal();

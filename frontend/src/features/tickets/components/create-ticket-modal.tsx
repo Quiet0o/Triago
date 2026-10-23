@@ -5,37 +5,21 @@ import {
   AlertCircle,
   BookOpen,
   Bug,
-  Calendar,
   Check,
   CheckSquare,
-  Clock,
-  FileUp,
   FolderGit2,
   Lightbulb,
   ListTree,
-  Paperclip,
-  Plus,
-  Sparkles,
-  Tag,
-  Trash2,
-  User,
-  UserCheck,
-  X,
 } from 'lucide-react';
-import { cn } from '#/lib/utils';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '#/components/ui/dialog.tsx';
-import { Button } from '#/components/ui/button.tsx';
 import { Input } from '#/components/ui/input.tsx';
 import { Badge } from '#/components/ui/badge.tsx';
-import { Avatar, AvatarFallback } from '#/components/ui/avatar.tsx';
-import { Checkbox } from '#/components/ui/checkbox.tsx';
 import {
   Select,
   SelectContent,
@@ -50,52 +34,59 @@ import type {
   TicketStatus,
   TicketType,
 } from '#/types/tickets';
-import { PriorityBadge, StatusBadge, TicketTypeIcon } from './ticket-badges';
+import { TicketTypeIcon } from './ticket-badges';
 import { useCreateTicketModal } from '../context/create-ticket-context';
 import { BasicTaskEditor } from '#/components/editor/basic-editor';
+import { TEAM_MEMBERS } from '../api';
+import type { CreateSubtaskItem } from './create-ticket/create-ticket-subtasks';
+import { CreateTicketSubtasks } from './create-ticket/create-ticket-subtasks';
+import type { AttachmentItem } from './create-ticket/create-ticket-attachments';
+import { CreateTicketAttachments } from './create-ticket/create-ticket-attachments';
+import { CreateTicketSidebar } from './create-ticket/create-ticket-sidebar';
+import { CreateTicketFooter } from './create-ticket/create-ticket-footer';
 
-export const TEAM_MEMBERS: TicketPerson[] = [
+export const TICKET_TYPES: {
+  type: TicketType;
+  label: string;
+  icon: typeof Bug;
+  desc: string;
+  color: string;
+}[] = [
   {
-    name: 'Aleksandra Nowak',
-    email: 'a.nowak@triago.pl',
-    avatarFallback: 'AN',
-    role: 'Senior Developer',
+    type: 'task',
+    label: 'Zadanie (Task)',
+    icon: CheckSquare,
+    desc: 'Standardowe zadanie programistyczne lub projektowe',
+    color: 'text-blue-500',
   },
   {
-    name: 'Tomasz Zieliński',
-    email: 't.zielinski@triago.pl',
-    avatarFallback: 'TZ',
-    role: 'QA Engineer',
+    type: 'bug',
+    label: 'Błąd (Bug)',
+    icon: Bug,
+    desc: 'Problem lub usterka wymagająca naprawy',
+    color: 'text-rose-500',
   },
   {
-    name: 'Michał Wiśniewski',
-    email: 'm.wisniewski@triago.pl',
-    avatarFallback: 'MW',
-    role: 'Fullstack Developer',
+    type: 'story',
+    label: 'Historyjka (Story)',
+    icon: BookOpen,
+    desc: 'Wymaganie użytkownika lub nowa funkcjonalność',
+    color: 'text-emerald-500',
   },
   {
-    name: 'Karolina Kowalska',
-    email: 'k.kowalska@triago.pl',
-    avatarFallback: 'KK',
-    role: 'Product Owner',
+    type: 'improvement',
+    label: 'Usprawnienie (Improvement)',
+    icon: Lightbulb,
+    desc: 'Optymalizacja lub ulepszenie obecnego rozwiązania',
+    color: 'text-amber-500',
   },
   {
-    name: 'Piotr Lewandowski',
-    email: 'p.lewandowski@triago.pl',
-    avatarFallback: 'PL',
-    role: 'DevOps Engineer',
+    type: 'subtask',
+    label: 'Podzadanie (Subtask)',
+    icon: ListTree,
+    desc: 'Mniejszy element większego zadania',
+    color: 'text-sky-500',
   },
-];
-
-const PRESET_LABELS = ['frontend', 'backend', 'api', 'ui/ux', 'bug', 'auth', 'database', 'security'];
-const STORY_POINTS_OPTIONS = [1, 2, 3, 5, 8, 13];
-
-const TICKET_TYPES: { type: TicketType; label: string; icon: typeof Bug; desc: string; color: string }[] = [
-  { type: 'task', label: 'Zadanie (Task)', icon: CheckSquare, desc: 'Standardowe zadanie programistyczne lub projektowe', color: 'text-blue-500' },
-  { type: 'bug', label: 'Błąd (Bug)', icon: Bug, desc: 'Problem lub usterka wymagająca naprawy', color: 'text-rose-500' },
-  { type: 'story', label: 'Historyjka (Story)', icon: BookOpen, desc: 'Wymaganie użytkownika lub nowa funkcjonalność', color: 'text-emerald-500' },
-  { type: 'improvement', label: 'Usprawnienie (Improvement)', icon: Lightbulb, desc: 'Optymalizacja lub ulepszenie obecnego rozwiązania', color: 'text-amber-500' },
-  { type: 'subtask', label: 'Podzadanie (Subtask)', icon: ListTree, desc: 'Mniejszy element większego zadania', color: 'text-sky-500' },
 ];
 
 export function CreateTicketModal() {
@@ -114,16 +105,11 @@ export function CreateTicketModal() {
   const [sprint, setSprint] = React.useState<string>('sprint-4');
   const [storyPoints, setStoryPoints] = React.useState<number | ''>(3);
   const [dueDate, setDueDate] = React.useState<string>('');
-  const [timeEstimate, setTimeEstimate] = React.useState<string>('');
   const [selectedLabels, setSelectedLabels] = React.useState<string[]>(['frontend']);
-  const [customLabelInput, setCustomLabelInput] = React.useState('');
-  
-  // Subtasks / Acceptance criteria
-  const [subtasks, setSubtasks] = React.useState<{ id: string; title: string; done: boolean }[]>([]);
-  const [newSubtaskTitle, setNewSubtaskTitle] = React.useState('');
 
-  // Attachments
-  const [attachments, setAttachments] = React.useState<{ name: string; size: string }[]>([]);
+  // Subtasks & Attachments
+  const [subtasks, setSubtasks] = React.useState<CreateSubtaskItem[]>([]);
+  const [attachments, setAttachments] = React.useState<AttachmentItem[]>([]);
 
   // Other options
   const [createAnother, setCreateAnother] = React.useState(false);
@@ -174,19 +160,8 @@ export function CreateTicketModal() {
     }
   };
 
-  // Add label
-  const handleAddCustomLabel = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && customLabelInput.trim()) {
-      e.preventDefault();
-      const trimmed = customLabelInput.trim().toLowerCase();
-      if (!selectedLabels.includes(trimmed)) {
-        setSelectedLabels([...selectedLabels, trimmed]);
-      }
-      setCustomLabelInput('');
-    }
-  };
-
-  const toggleLabel = (label: string) => {
+  // Label handlers
+  const handleToggleLabel = (label: string) => {
     if (selectedLabels.includes(label)) {
       setSelectedLabels(selectedLabels.filter((l) => l !== label));
     } else {
@@ -194,45 +169,48 @@ export function CreateTicketModal() {
     }
   };
 
-  // Add subtask
-  const handleAddSubtask = () => {
-    if (!newSubtaskTitle.trim()) return;
-    setSubtasks([
-      ...subtasks,
-      {
-        id: `sub-${Date.now()}`,
-        title: newSubtaskTitle.trim(),
-        done: false,
-      },
-    ]);
-    setNewSubtaskTitle('');
-  };
-
-  const toggleSubtask = (id: string) => {
-    setSubtasks(subtasks.map((s) => (s.id === id ? { ...s, done: !s.done } : s)));
-  };
-
-  const removeSubtask = (id: string) => {
-    setSubtasks(subtasks.filter((s) => s.id !== id));
-  };
-
-  // Handle file select simulation
-  const handleAddAttachment = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      const sizeKb = Math.round(file.size / 1024);
-      setAttachments((prev) => [
-        ...prev,
-        {
-          name: file.name,
-          size: sizeKb > 1024 ? `${(sizeKb / 1024).toFixed(1)} MB` : `${sizeKb} KB`,
-        },
-      ]);
+  const handleAddCustomLabel = (trimmed: string) => {
+    if (!selectedLabels.includes(trimmed)) {
+      setSelectedLabels([...selectedLabels, trimmed]);
     }
   };
 
-  const removeAttachment = (index: number) => {
-    setAttachments(attachments.filter((_, i) => i !== index));
+  // Subtasks handlers
+  const handleAddSubtask = (subtaskTitle: string) => {
+    setSubtasks((prev) => [
+      ...prev,
+      {
+        id: `sub-${Date.now()}`,
+        title: subtaskTitle,
+        done: false,
+      },
+    ]);
+  };
+
+  const handleToggleSubtask = (id: string) => {
+    setSubtasks((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, done: !s.done } : s)),
+    );
+  };
+
+  const handleRemoveSubtask = (id: string) => {
+    setSubtasks((prev) => prev.filter((s) => s.id !== id));
+  };
+
+  // Attachment handlers
+  const handleAddAttachment = (file: File) => {
+    const sizeKb = Math.round(file.size / 1024);
+    setAttachments((prev) => [
+      ...prev,
+      {
+        name: file.name,
+        size: sizeKb > 1024 ? `${(sizeKb / 1024).toFixed(1)} MB` : `${sizeKb} KB`,
+      },
+    ]);
+  };
+
+  const handleRemoveAttachment = (index: number) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
   };
 
   // Submit handler
@@ -349,26 +327,49 @@ export function CreateTicketModal() {
                 >
                   Tytuł zadania <span className="text-destructive">*</span>
                 </label>
-                <span className="text-[11px] text-muted-foreground">
-                  {title.length}/120
-                </span>
+                <span className="text-[11px] text-muted-foreground">Krótki i zwięzły opis</span>
               </div>
               <Input
                 id="ticket-title"
+                placeholder="np. Błąd uwierzytelniania dwuskładnikowego przy logowaniu z Safari"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                maxLength={120}
                 autoFocus
-                placeholder="np. Zaimplementować walidację formularza lub naprawić błąd..."
-                className="h-10 text-sm font-medium border-border focus-visible:ring-primary/30"
+                className="h-10 text-sm font-medium focus-visible:ring-1"
               />
+            </div>
+
+            {/* Ticket Type Selector */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-foreground">Typ zgłoszenia</label>
+              <Select value={type} onValueChange={(val) => setType(val as TicketType)}>
+                <SelectTrigger className="w-full bg-background h-10 text-xs cursor-pointer">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {TICKET_TYPES.map((t) => {
+                    const Icon = t.icon;
+                    return (
+                      <SelectItem key={t.type} value={t.type}>
+                        <div className="flex items-center gap-2 py-0.5">
+                          <Icon className={`size-4 shrink-0 ${t.color}`} />
+                          <div className="text-left">
+                            <span className="font-semibold text-xs block">{t.label}</span>
+                            <span className="text-[10px] text-muted-foreground block">
+                              {t.desc}
+                            </span>
+                          </div>
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Description with Basic ProseKit Editor */}
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground">
-                Opis zadania
-              </label>
+              <label className="text-xs font-semibold text-foreground">Opis zadania</label>
               <BasicTaskEditor
                 key={editorKey}
                 initialContent={descriptionHtml || description}
@@ -382,429 +383,55 @@ export function CreateTicketModal() {
             </div>
 
             {/* Subtasks / Acceptance Criteria */}
-            <div className="space-y-2.5">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                  <CheckSquare className="size-3.5 text-primary" />
-                  Kryteria akceptacji / Podzadania
-                </label>
-                {subtasks.length > 0 && (
-                  <span className="text-[11px] text-muted-foreground font-mono">
-                    {subtasks.filter((s) => s.done).length}/{subtasks.length} ukończono
-                  </span>
-                )}
-              </div>
+            <CreateTicketSubtasks
+              subtasks={subtasks}
+              onAddSubtask={handleAddSubtask}
+              onToggleSubtask={handleToggleSubtask}
+              onRemoveSubtask={handleRemoveSubtask}
+            />
 
-              {subtasks.length > 0 && (
-                <div className="space-y-1.5 rounded-lg border bg-muted/10 p-2">
-                  {subtasks.map((st) => (
-                    <div
-                      key={st.id}
-                      className="group flex items-center justify-between gap-2 rounded-md bg-background px-2.5 py-1.5 border border-border/60 text-xs"
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <Checkbox
-                          checked={st.done}
-                          onCheckedChange={() => toggleSubtask(st.id)}
-                        />
-                        <span
-                          className={cn(
-                            'truncate',
-                            st.done && 'line-through text-muted-foreground',
-                          )}
-                        >
-                          {st.title}
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => removeSubtask(st.id)}
-                        className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity cursor-pointer p-0.5"
-                      >
-                        <Trash2 className="size-3.5" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <div className="flex items-center gap-2">
-                <Input
-                  value={newSubtaskTitle}
-                  onChange={(e) => setNewSubtaskTitle(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleAddSubtask();
-                    }
-                  }}
-                  placeholder="Dodaj kryterium lub podzadanie..."
-                  className="h-8 text-xs bg-muted/20"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleAddSubtask}
-                  className="h-8 px-2.5 text-xs shrink-0 cursor-pointer"
-                >
-                  <Plus className="size-3.5 mr-1" />
-                  Dodaj
-                </Button>
-              </div>
-            </div>
-
-            {/* Attachments Section */}
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                <Paperclip className="size-3.5 text-primary" />
-                Załączniki
-              </label>
-
-              {attachments.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {attachments.map((att, i) => (
-                    <Badge
-                      key={i}
-                      variant="secondary"
-                      className="flex items-center gap-1.5 py-1 px-2.5 text-xs"
-                    >
-                      <Paperclip className="size-3 text-muted-foreground" />
-                      <span className="font-medium truncate max-w-[150px]">{att.name}</span>
-                      <span className="text-[10px] text-muted-foreground">({att.size})</span>
-                      <button
-                        type="button"
-                        onClick={() => removeAttachment(i)}
-                        className="text-muted-foreground hover:text-destructive cursor-pointer ml-1"
-                      >
-                        <X className="size-3" />
-                      </button>
-                    </Badge>
-                  ))}
-                </div>
-              )}
-
-              <label className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border/80 bg-muted/10 hover:bg-muted/30 p-4 transition-colors cursor-pointer group">
-                <input
-                  type="file"
-                  onChange={handleAddAttachment}
-                  className="hidden"
-                />
-                <div className="flex items-center gap-2 text-xs text-muted-foreground group-hover:text-foreground">
-                  <FileUp className="size-4 text-primary" />
-                  <span>Przeciągnij pliki lub <span className="text-primary font-medium underline">wybierz z dysku</span></span>
-                </div>
-                <span className="text-[10px] text-muted-foreground/75 mt-0.5">PNG, JPG, PDF, ZIP do 25MB</span>
-              </label>
-            </div>
+            {/* Attachments Dropzone */}
+            <CreateTicketAttachments
+              attachments={attachments}
+              onAddAttachment={handleAddAttachment}
+              onRemoveAttachment={handleRemoveAttachment}
+            />
           </div>
 
-          {/* ──── Right Column: Properties & Metadata ───────────── */}
-          <div className="border-t md:border-t-0 md:border-l bg-muted/20 p-6 space-y-5 overflow-y-auto overflow-x-hidden">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              Właściwości zadania
-            </h4>
-
-            {/* Typ zadania */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Typ zadania</label>
-              <Select value={type} onValueChange={(val) => setType(val as TicketType)}>
-                <SelectTrigger className="w-full bg-background h-8 text-xs cursor-pointer">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {TICKET_TYPES.map((t) => {
-                    const Icon = t.icon;
-                    return (
-                      <SelectItem key={t.type} value={t.type}>
-                        <div className="flex items-center gap-2">
-                          <Icon className={cn('size-3.5', t.color)} />
-                          <span>{t.label}</span>
-                        </div>
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Status */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Status</label>
-              <Select value={status} onValueChange={(val) => setStatus(val as TicketStatus)}>
-                <SelectTrigger className="w-full bg-background h-8 text-xs cursor-pointer">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="nowy">
-                    <StatusBadge status="nowy" />
-                  </SelectItem>
-                  <SelectItem value="w_toku">
-                    <StatusBadge status="w_toku" />
-                  </SelectItem>
-                  <SelectItem value="review">
-                    <StatusBadge status="review" />
-                  </SelectItem>
-                  <SelectItem value="testowanie">
-                    <StatusBadge status="testowanie" />
-                  </SelectItem>
-                  <SelectItem value="zamknięty">
-                    <StatusBadge status="zamknięty" />
-                  </SelectItem>
-                  <SelectItem value="zablokowany">
-                    <StatusBadge status="zablokowany" />
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Priority */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Priorytet</label>
-              <Select value={priority} onValueChange={(val) => setPriority(val as TicketPriority)}>
-                <SelectTrigger className="w-full bg-background h-8 text-xs cursor-pointer">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="krytyczny">
-                    <PriorityBadge priority="krytyczny" />
-                  </SelectItem>
-                  <SelectItem value="wysoki">
-                    <PriorityBadge priority="wysoki" />
-                  </SelectItem>
-                  <SelectItem value="średni">
-                    <PriorityBadge priority="średni" />
-                  </SelectItem>
-                  <SelectItem value="niski">
-                    <PriorityBadge priority="niski" />
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Assignee */}
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-medium text-muted-foreground">Przypisana osoba</label>
-                <button
-                  type="button"
-                  onClick={handleAssignToMe}
-                  className="text-[11px] font-medium text-primary hover:underline cursor-pointer flex items-center gap-1"
-                >
-                  <UserCheck className="size-3" />
-                  Do mnie
-                </button>
-              </div>
-
-              <Select value={assigneeEmail} onValueChange={setAssigneeEmail}>
-                <SelectTrigger className="w-full bg-background h-9 text-xs cursor-pointer">
-                  <SelectValue placeholder="Wybierz osobę..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="unassigned">
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <div className="flex size-5 items-center justify-center rounded-full bg-muted border">
-                        <User className="size-3" />
-                      </div>
-                      <span>Nieprzypisane</span>
-                    </div>
-                  </SelectItem>
-                  {TEAM_MEMBERS.map((member) => (
-                    <SelectItem key={member.email} value={member.email}>
-                      <div className="flex items-center gap-2">
-                        <Avatar className="size-5">
-                          <AvatarFallback className="text-[10px]">
-                            {member.avatarFallback}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className="font-medium text-xs">{member.name}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Reporter */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Zgłaszający</label>
-              <div className="flex items-center gap-2 rounded-md border border-border/80 bg-background/50 px-2.5 py-1.5 text-xs text-muted-foreground">
-                <Avatar className="size-5">
-                  <AvatarFallback className="text-[10px]">
-                    {reporterPerson.avatarFallback}
-                  </AvatarFallback>
-                </Avatar>
-                <span className="font-medium text-foreground">{reporterPerson.name}</span>
-                <span className="ml-auto text-[10px] text-muted-foreground">(Ty)</span>
-              </div>
-            </div>
-
-            {/* Sprint */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Sprint</label>
-              <Select value={sprint} onValueChange={setSprint}>
-                <SelectTrigger className="w-full bg-background h-8 text-xs cursor-pointer">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="sprint-4">Sprint 4 — September (Aktywny)</SelectItem>
-                  <SelectItem value="sprint-3">Sprint 3 — September</SelectItem>
-                  <SelectItem value="none">Backlog (Bez sprintu)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Story Points (Wycena) */}
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-medium text-muted-foreground">Story Points</label>
-                {storyPoints !== '' && (
-                  <span className="text-[11px] font-mono font-semibold text-primary">
-                    {storyPoints} SP
-                  </span>
-                )}
-              </div>
-              <div className="grid grid-cols-6 gap-1.5">
-                {STORY_POINTS_OPTIONS.map((pts) => (
-                  <button
-                    key={pts}
-                    type="button"
-                    onClick={() => setStoryPoints(storyPoints === pts ? '' : pts)}
-                    className={cn(
-                      'h-7 rounded border text-xs font-medium transition-all cursor-pointer flex items-center justify-center',
-                      storyPoints === pts
-                        ? 'border-primary bg-primary text-primary-foreground font-semibold shadow-xs'
-                        : 'border-border bg-background hover:bg-muted text-muted-foreground',
-                    )}
-                  >
-                    {pts}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Due date */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground flex items-center gap-1">
-                <Calendar className="size-3" />
-                Termin ukończenia
-              </label>
-              <Input
-                type="date"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-                className="h-8 text-xs bg-background"
-              />
-            </div>
-
-            {/* Time Estimate */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground flex items-center gap-1">
-                <Clock className="size-3" />
-                Szacowany czas
-              </label>
-              <Input
-                value={timeEstimate}
-                onChange={(e) => setTimeEstimate(e.target.value)}
-                placeholder="np. 4h, 1d 2h..."
-                className="h-8 text-xs bg-background"
-              />
-            </div>
-
-            {/* Labels */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground flex items-center gap-1">
-                <Tag className="size-3" />
-                Etykiety
-              </label>
-              
-              <div className="flex flex-wrap gap-1 mb-2">
-                {selectedLabels.map((lbl) => (
-                  <Badge
-                    key={lbl}
-                    variant="secondary"
-                    className="gap-1 py-0 px-2 text-[11px] bg-primary/10 text-primary border-primary/20"
-                  >
-                    {lbl}
-                    <button
-                      type="button"
-                      onClick={() => toggleLabel(lbl)}
-                      className="cursor-pointer hover:text-destructive"
-                    >
-                      <X className="size-2.5" />
-                    </button>
-                  </Badge>
-                ))}
-              </div>
-
-              <div className="flex flex-wrap gap-1">
-                {PRESET_LABELS.filter((l) => !selectedLabels.includes(l))
-                  .slice(0, 4)
-                  .map((lbl) => (
-                    <button
-                      key={lbl}
-                      type="button"
-                      onClick={() => toggleLabel(lbl)}
-                      className="rounded border border-dashed border-border/80 px-1.5 py-0.5 text-[10px] text-muted-foreground hover:bg-muted/40 cursor-pointer"
-                    >
-                      + {lbl}
-                    </button>
-                  ))}
-              </div>
-
-              <Input
-                value={customLabelInput}
-                onChange={(e) => setCustomLabelInput(e.target.value)}
-                onKeyDown={handleAddCustomLabel}
-                placeholder="Wpisz etykietę i wciśnij Enter..."
-                className="h-7 text-xs bg-background mt-1.5"
-              />
-            </div>
-          </div>
+          {/* ──── Right Column: Sidebar properties ─────────────── */}
+          <CreateTicketSidebar
+            status={status}
+            onStatusChange={setStatus}
+            priority={priority}
+            onPriorityChange={setPriority}
+            assigneeEmail={assigneeEmail}
+            onAssigneeChange={setAssigneeEmail}
+            onAssignToMe={handleAssignToMe}
+            sprint={sprint}
+            onSprintChange={setSprint}
+            storyPoints={storyPoints}
+            onStoryPointsChange={setStoryPoints}
+            dueDate={dueDate}
+            onDueDateChange={setDueDate}
+            selectedLabels={selectedLabels}
+            onToggleLabel={handleToggleLabel}
+            onAddCustomLabel={handleAddCustomLabel}
+            teamMembers={TEAM_MEMBERS}
+            reporter={reporterPerson}
+          />
         </div>
 
-        {/* ── Dialog Footer with Shortcuts ─────────────────────── */}
-        <DialogFooter className="border-t px-6 py-3 bg-muted/20 flex flex-row items-center justify-between sm:justify-between">
-          <div className="flex items-center gap-2">
-            <Checkbox
-              id="create-another"
-              checked={createAnother}
-              onCheckedChange={(checked) => setCreateAnother(!!checked)}
-            />
-            <label
-              htmlFor="create-another"
-              className="text-xs font-medium text-muted-foreground cursor-pointer select-none"
-            >
-              Utwórz kolejne zadanie
-            </label>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={closeCreateModal}
-              className="h-9 px-3 text-xs cursor-pointer"
-            >
-              Anuluj
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              disabled={isSubmitting}
-              onClick={() => handleSubmit()}
-              className="h-9 px-4 text-xs font-semibold gap-1.5 bg-primary text-primary-foreground shadow-sm hover:opacity-95 cursor-pointer"
-            >
-              <Sparkles className="size-3.5" />
-              {isSubmitting ? 'Tworzenie...' : 'Utwórz zadanie'}
-              <kbd className="ml-1 hidden sm:inline-flex items-center gap-0.5 rounded bg-primary-foreground/20 px-1 py-0.5 text-[10px] font-mono leading-none">
-                ⌘↵
-              </kbd>
-            </Button>
-          </div>
-        </DialogFooter>
+        {/* ── Modal Footer ─────────────────────────────────────── */}
+        <CreateTicketFooter
+          createAnother={createAnother}
+          onCreateAnotherChange={setCreateAnother}
+          isSubmitting={isSubmitting}
+          onCancel={closeCreateModal}
+          onSubmit={handleSubmit}
+        />
       </DialogContent>
     </Dialog>
   );
 }
+
+export default CreateTicketModal;
