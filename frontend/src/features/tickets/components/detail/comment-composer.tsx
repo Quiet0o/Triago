@@ -52,9 +52,6 @@ export function CommentComposer({ onSubmit, userFallback = 'ZU' }: CommentCompos
           className="border-border/80 focus-within:border-primary/60"
         />
         <div className="flex items-center justify-between flex-wrap gap-2">
-          <span className="text-[11px] text-muted-foreground">
-            Wspiera formatowanie tekstu ProseKit, kod, listy oraz dodawanie zdjęć.
-          </span>
           <div className="flex items-center gap-2">
             {hasContent && (
               <Button
