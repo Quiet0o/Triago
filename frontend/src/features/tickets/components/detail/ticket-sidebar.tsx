@@ -1,9 +1,8 @@
-'use client';
-
-import * as React from 'react';
-import { Calendar, CheckSquare, Clock, Tag, User } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
+import { Calendar, CheckSquare, Clock, ExternalLink, Tag, User, Zap } from 'lucide-react';
 import { Avatar, AvatarFallback } from '#/components/ui/avatar.tsx';
 import { Badge } from '#/components/ui/badge.tsx';
+import { Button } from '#/components/ui/button.tsx';
 import { Input } from '#/components/ui/input.tsx';
 import {
   Select,
@@ -32,11 +31,13 @@ export interface TicketSidebarProps {
   ticket: Ticket;
   teamMembers: TicketPerson[];
   sprints: Sprint[];
+  availableEpics?: Ticket[];
   onTypeChange: (type: TicketType) => void;
   onStatusChange: (status: TicketStatus) => void;
   onPriorityChange: (priority: TicketPriority) => void;
   onAssigneeChange: (assignee: TicketPerson | null) => void;
   onSprintChange: (sprintId: string | null) => void;
+  onEpicChange?: (epicId: string | null) => void;
   onStoryPointsChange: (points: number) => void;
   onDueDateChange: (dueDate: string) => void;
 }
@@ -45,11 +46,13 @@ export function TicketSidebar({
   ticket,
   teamMembers,
   sprints,
+  availableEpics = [],
   onTypeChange,
   onStatusChange,
   onPriorityChange,
   onAssigneeChange,
   onSprintChange,
+  onEpicChange,
   onStoryPointsChange,
   onDueDateChange,
 }: TicketSidebarProps) {
@@ -92,6 +95,12 @@ export function TicketSidebar({
               <div className="flex items-center gap-2">
                 <TicketTypeIcon type="improvement" />
                 <span>Usprawnienie (Improvement)</span>
+              </div>
+            </SelectItem>
+            <SelectItem value="epic">
+              <div className="flex items-center gap-2">
+                <TicketTypeIcon type="epic" />
+                <span>Epik (Epic)</span>
               </div>
             </SelectItem>
             <SelectItem value="subtask">
@@ -236,6 +245,74 @@ export function TicketSidebar({
           </SelectContent>
         </Select>
       </div>
+
+      {/* Epik (Inicjatywa) - if this ticket is not an epic itself */}
+      {ticket.type !== 'epic' && onEpicChange && (
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+              <Zap className="size-3.5 text-purple-500" />
+              Epik (Inicjatywa)
+            </label>
+            {ticket.epicId && (
+              <Link
+                to="/project/tickets/$ticketId"
+                params={{ ticketId: ticket.epicId }}
+                className="text-[11px] font-semibold text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 inline-flex items-center gap-1 hover:underline cursor-pointer"
+                title={`Otwórz epik ${ticket.epicId}`}
+              >
+                Przejdź do epika
+                <ExternalLink className="size-2.5" />
+              </Link>
+            )}
+          </div>
+
+          <div className="flex items-center gap-1.5">
+            <div className="flex-1 min-w-0">
+              <Select
+                value={ticket.epicId ?? 'none'}
+                onValueChange={(val) => onEpicChange(val === 'none' ? null : val)}
+              >
+                <SelectTrigger className="w-full bg-background h-9 text-xs cursor-pointer border-purple-500/20 focus:border-purple-500">
+                  <SelectValue placeholder="Wybierz epik..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">
+                    <span className="text-muted-foreground">Brak epika</span>
+                  </SelectItem>
+                  {availableEpics.map((epic) => (
+                    <SelectItem key={epic.id} value={epic.id}>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-[10px] text-purple-600 font-semibold">
+                          {epic.id}
+                        </span>
+                        <span className="truncate max-w-[190px]">{epic.title}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {ticket.epicId && (
+              <Button
+                variant="outline"
+                size="sm"
+                asChild
+                className="h-9 w-9 p-0 border-purple-500/30 text-purple-600 hover:text-purple-700 hover:bg-purple-500/10 shrink-0 cursor-pointer"
+                title={`Otwórz epik ${ticket.epicId}`}
+              >
+                <Link
+                  to="/project/tickets/$ticketId"
+                  params={{ ticketId: ticket.epicId }}
+                >
+                  <ExternalLink className="size-3.5" />
+                </Link>
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Story Points */}
       <div className="space-y-1.5">

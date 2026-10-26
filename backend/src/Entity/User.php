@@ -39,6 +39,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?string $password = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $jobTitle = null;
+
     #[ORM\Column]
     private \DateTimeImmutable $createdAt;
 
@@ -86,6 +89,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->fullName = $name;
 
         return $this;
+    }
+
+    public function getJobTitle(): ?string
+    {
+        return $this->jobTitle;
+    }
+
+    public function setJobTitle(?string $jobTitle): static
+    {
+        $this->jobTitle = $jobTitle;
+
+        return $this;
+    }
+
+    public function getAvatarFallback(): string
+    {
+        $name = $this->fullName ?? $this->email ?? 'U';
+        $parts = preg_split('/\s+/', trim((string) $name));
+        $initials = '';
+        if ($parts) {
+            foreach ($parts as $part) {
+                if ('' !== $part) {
+                    $initials .= mb_strtoupper(mb_substr($part, 0, 1));
+                }
+            }
+        }
+
+        return mb_substr($initials, 0, 2) ?: 'U';
     }
 
     public function getCreatedAt(): \DateTimeImmutable

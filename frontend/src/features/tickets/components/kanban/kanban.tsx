@@ -1,5 +1,5 @@
 import type { ComponentProps } from 'react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Calendar, ChevronsLeft, ChevronsRight, GripVerticalIcon, Plus } from 'lucide-react';
 import { cn } from 'cn';
@@ -16,14 +16,17 @@ import {
   KanbanItemHandle,
   KanbanOverlay,
 } from '#/components/reui/kanban.tsx';
+import { useQuery } from '@tanstack/react-query';
 import type { MockData, Ticket, TicketStatus } from '#/types/tickets';
 import {
   AssigneeAvatar,
+  EpicBadge,
   PriorityBadge,
   StoryPointsBadge,
   TicketMeta,
   TicketTypeIcon,
 } from '../ticket-badges.tsx';
+import { ticketQueries, useUpdateTicketMutation } from '../../queries.ts';
 import mockData from '#/data/mock-tickets.json';
 
 export type Task = Ticket;
@@ -45,6 +48,14 @@ const STATUS_TO_COLUMN: Record<TicketStatus, ColumnId> = {
   testowanie: 'testing',
   zamknięty: 'done',
   zablokowany: 'backlog',
+};
+
+const COLUMN_TO_STATUS: Record<ColumnId, TicketStatus> = {
+  backlog: 'nowy',
+  inProgress: 'w_toku',
+  review: 'review',
+  testing: 'testowanie',
+  done: 'zamknięty',
 };
 
 function formatDueDate(dateStr?: string | null): string {
@@ -88,6 +99,9 @@ export function TaskCard({ task, asHandle, isOverlay, isDone = false, ...props }
             >
               {task.id}
             </Link>
+            {task.epicTitle && (
+              <EpicBadge epicId={task.epicId} epicTitle={task.epicTitle} />
+            )}
           </div>
           <PriorityBadge priority={task.priority} />
         </div>
@@ -277,14 +291,18 @@ export function TaskColumn({
 }
 
 export function ProjectKanbanBoard({
-  tickets = (mockData as MockData).tickets,
+  tickets: initialTicketsProp,
 }: {
   tickets?: Ticket[];
 }) {
+  const { data: fetchedTickets } = useQuery(ticketQueries.list());
+  const updateTicketMutation = useUpdateTicketMutation();
+  const tickets = initialTicketsProp ?? fetchedTickets ?? (mockData as MockData).tickets;
+
   const [collapsedColumns, setCollapsedColumns] = useState<Record<string, boolean>>({});
 
-  const [columns, setColumns] = useState<Record<string, Ticket[]>>(() => {
-    const initialColumns: Record<ColumnId, Ticket[]> = {
+  const buildColumns = (ticketList: Ticket[]): Record<ColumnId, Ticket[]> => {
+    const nextColumns: Record<ColumnId, Ticket[]> = {
       backlog: [],
       inProgress: [],
       review: [],
@@ -292,13 +310,23 @@ export function ProjectKanbanBoard({
       done: [],
     };
 
-    for (const ticket of tickets) {
-      const columnId = STATUS_TO_COLUMN[ticket.status];
-      initialColumns[columnId].push(ticket);
+    for (const ticket of ticketList) {
+      const columnId = STATUS_TO_COLUMN[ticket.status] || 'backlog';
+      nextColumns[columnId].push(ticket);
     }
 
-    return initialColumns;
-  });
+    return nextColumns;
+  };
+
+  const [columns, setColumns] = useState<Record<string, Ticket[]>>(() => buildColumns(tickets));
+
+  const prevTicketsRef = useRef(tickets);
+  useEffect(() => {
+    if (tickets !== prevTicketsRef.current) {
+      prevTicketsRef.current = tickets;
+      setColumns(buildColumns(tickets));
+    }
+  }, [tickets]);
 
   const toggleCollapse = (columnId: string) => {
     setCollapsedColumns((prev) => ({
@@ -307,11 +335,35 @@ export function ProjectKanbanBoard({
     }));
   };
 
+  const handleColumnsChange = (newColumns: Record<string, Ticket[]>) => {
+    // Detect which ticket moved to which column
+    for (const [colId, colTickets] of Object.entries(newColumns)) {
+      const targetStatus = COLUMN_TO_STATUS[colId as ColumnId];
+      if (!targetStatus) continue;
+
+      for (const ticket of colTickets) {
+        const previousColId = (Object.keys(columns) as ColumnId[]).find((cId) =>
+          columns[cId]?.some((t) => t.id === ticket.id),
+        );
+
+        if (previousColId && previousColId !== colId && ticket.status !== targetStatus) {
+          ticket.status = targetStatus;
+          updateTicketMutation.mutate({
+            id: ticket.id,
+            patch: { status: targetStatus },
+          });
+        }
+      }
+    }
+
+    setColumns(newColumns);
+  };
+
   return (
     <Kanban
       id="project-kanban"
       value={columns}
-      onValueChange={setColumns}
+      onValueChange={handleColumnsChange}
       getItemValue={(item) => item.id}
     >
       <KanbanBoard className="flex gap-4 overflow-x-auto pb-4 items-stretch min-w-full">

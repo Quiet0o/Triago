@@ -15,6 +15,7 @@ import {
   MessageSquare,
   Minus,
   Paperclip,
+  Zap,
 } from 'lucide-react';
 import { Badge } from '#/components/ui/badge.tsx';
 import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar.tsx';
@@ -25,6 +26,11 @@ import { CriticalIcon } from '#/components/ui/icons/critical';
 
 // ── Type config ──────────────────────────────────────────────────────
 const typeConfig: Record<TicketType, { icon: typeof Bug; label: string; color: string }> = {
+  epic: {
+    icon: Zap,
+    label: 'Epic',
+    color: 'text-purple-600 dark:text-purple-400',
+  },
   bug: {
     icon: Bug,
     label: 'Bug',
@@ -254,6 +260,16 @@ export function TicketMeta({ comments, attachments }: { comments: number; attach
         </span>
       )}
     </div>
+  );
+}
+
+export function EpicBadge({ epicId, epicTitle }: { epicId?: string | null; epicTitle?: string | null }) {
+  if (!epicId) return null;
+  return (
+    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 max-w-[130px] truncate">
+      <Zap className="size-2.5 shrink-0" />
+      <span className="truncate">{epicTitle || epicId}</span>
+    </span>
   );
 }
 

@@ -1,7 +1,7 @@
 export type TicketPriority = 'krytyczny' | 'wysoki' | 'średni' | 'niski';
 export type TicketStatus =
   'nowy' | 'w_toku' | 'review' | 'testowanie' | 'zamknięty' | 'zablokowany';
-export type TicketType = 'bug' | 'task' | 'story' | 'subtask' | 'improvement';
+export type TicketType = 'epic' | 'bug' | 'task' | 'story' | 'subtask' | 'improvement';
 
 export type TicketPerson = {
   name: string;
@@ -48,6 +48,12 @@ export type Ticket = {
   attachments: number;
   blockedBy?: string;
   blockedReason?: string;
+  parentId?: string | null;
+  parentTitle?: string | null;
+  epicId?: string | null;
+  epicTitle?: string | null;
+  childTicketsCount?: number;
+  epicTicketsCount?: number;
 };
 
 export type Reaction = {

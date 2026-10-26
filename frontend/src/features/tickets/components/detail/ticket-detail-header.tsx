@@ -1,13 +1,14 @@
 'use client';
 
-import * as React from 'react';
-import { useNavigate } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import {
   ArrowLeft,
   Check,
   Copy,
+  ExternalLink,
   MoreHorizontal,
   Share2,
+  Zap,
 } from 'lucide-react';
 import { Button } from '#/components/ui/button.tsx';
 import { Badge } from '#/components/ui/badge.tsx';
@@ -46,7 +47,7 @@ export function TicketDetailHeader({
 
   return (
     <div className="flex items-center justify-between gap-4 border-b pb-4 flex-wrap">
-      <div className="flex items-center gap-2.5 min-w-0">
+      <div className="flex items-center gap-2.5 min-w-0 flex-wrap">
         <Button
           variant="ghost"
           size="sm"
@@ -58,6 +59,28 @@ export function TicketDetailHeader({
         </Button>
 
         <span className="text-muted-foreground/50">/</span>
+
+        {/* Epic badge & link if ticket is assigned to an epic */}
+        {ticket.epicId && (
+          <>
+            <Link
+              to="/project/tickets/$ticketId"
+              params={{ ticketId: ticket.epicId }}
+              className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-purple-500/10 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/30 text-xs font-medium transition-colors cursor-pointer group"
+              title="Przejdź do Epika"
+            >
+              <Zap className="size-3 text-purple-600 dark:text-purple-400 fill-purple-500/30 shrink-0" />
+              <span className="font-mono font-semibold">{ticket.epicId}</span>
+              {ticket.epicTitle && (
+                <span className="truncate max-w-[140px] text-muted-foreground group-hover:text-foreground transition-colors">
+                  {ticket.epicTitle}
+                </span>
+              )}
+              <ExternalLink className="size-2.5 opacity-60 group-hover:opacity-100 transition-opacity" />
+            </Link>
+            <span className="text-muted-foreground/50">/</span>
+          </>
+        )}
 
         <span className="font-mono text-xs font-semibold text-foreground px-2 py-0.5 rounded bg-muted/60 border border-border/60">
           {ticket.id}

@@ -38,6 +38,7 @@ import { TicketTypeIcon } from './ticket-badges';
 import { useCreateTicketModal } from '../context/create-ticket-context';
 import { BasicTaskEditor } from '#/components/editor/basic-editor';
 import { TEAM_MEMBERS } from '../api';
+import { useCreateTicketMutation } from '../queries';
 import type { CreateSubtaskItem } from './create-ticket/create-ticket-subtasks';
 import { CreateTicketSubtasks } from './create-ticket/create-ticket-subtasks';
 import type { AttachmentItem } from './create-ticket/create-ticket-attachments';
@@ -52,6 +53,13 @@ export const TICKET_TYPES: {
   desc: string;
   color: string;
 }[] = [
+  {
+    type: 'epic',
+    label: 'Epik (Epic)',
+    icon: Lightbulb,
+    desc: 'Duża inicjatywa grupująca powiązane zadania',
+    color: 'text-purple-500',
+  },
   {
     type: 'task',
     label: 'Zadanie (Task)',
@@ -213,6 +221,8 @@ export function CreateTicketModal() {
     setAttachments((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const createTicketMutation = useCreateTicketMutation();
+
   // Submit handler
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -224,25 +234,45 @@ export function CreateTicketModal() {
     setErrorMessage(null);
     setIsSubmitting(true);
 
-    const generatedId = `TRG-${Math.floor(150 + Math.random() * 100)}`;
+    createTicketMutation.mutate(
+      {
+        title: title.trim(),
+        description,
+        descriptionHtml,
+        type,
+        priority,
+        status,
+        assigneeEmail: assigneeEmail && assigneeEmail !== 'unassigned' ? assigneeEmail : undefined,
+        sprintId: sprint && sprint !== 'none' ? sprint : undefined,
+        storyPoints: typeof storyPoints === 'number' ? storyPoints : 0,
+        labels: selectedLabels,
+        dueDate: dueDate || undefined,
+        subtasks: subtasks.map((s) => s.title),
+      },
+      {
+        onSuccess: (newTicket) => {
+          setIsSubmitting(false);
+          setSuccessToast(`Zadanie ${newTicket.id} zostało pomyślnie utworzone!`);
 
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setSuccessToast(`Zadanie ${generatedId} zostało pomyślnie utworzone!`);
-
-      if (createAnother) {
-        setTitle('');
-        setDescription('');
-        setDescriptionHtml('');
-        setEditorKey((k) => k + 1);
-        setSubtasks([]);
-        setAttachments([]);
-      } else {
-        setTimeout(() => {
-          closeCreateModal();
-        }, 1200);
-      }
-    }, 600);
+          if (createAnother) {
+            setTitle('');
+            setDescription('');
+            setDescriptionHtml('');
+            setEditorKey((k) => k + 1);
+            setSubtasks([]);
+            setAttachments([]);
+          } else {
+            setTimeout(() => {
+              closeCreateModal();
+            }, 1000);
+          }
+        },
+        onError: (err) => {
+          setIsSubmitting(false);
+          setErrorMessage(err.message || 'Wystąpił błąd podczas tworzenia zadania');
+        },
+      },
+    );
   };
 
   // Keyboard shortcut listener for Cmd+Enter / Ctrl+Enter

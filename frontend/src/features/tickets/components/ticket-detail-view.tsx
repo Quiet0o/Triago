@@ -15,21 +15,24 @@ import type {
   TicketStatus,
   TicketType,
 } from '#/types/tickets';
-import { ticketQueries } from '../queries';
+import {
+  ticketQueries,
+  useAddCommentMutation,
+  useAddSubtaskMutation,
+  useDeleteSubtaskMutation,
+  useUpdateSubtaskMutation,
+  useUpdateTicketMutation,
+} from '../queries';
 import { TEAM_MEMBERS } from '../api';
 import { TicketDetailHeader } from './detail/ticket-detail-header';
 import { TicketDescriptionSection } from './detail/ticket-description-section';
 import { TicketSubtasksSection } from './detail/ticket-subtasks-section';
+import { TicketEpicTasksSection } from './detail/ticket-epic-tasks-section';
 import type { AttachmentItem } from './detail/ticket-attachments-section';
 import { TicketAttachmentsSection } from './detail/ticket-attachments-section';
 import type { ActivityTab, SortOrder } from './detail/ticket-activity-feed';
 import { TicketActivityFeed } from './detail/ticket-activity-feed';
 import { TicketSidebar } from './detail/ticket-sidebar';
-
-const INITIAL_ATTACHMENTS: AttachmentItem[] = [
-  { id: 'att-1', name: 'smtp_error_log_2026-09-17.txt', size: '24.5 KB', type: 'text' },
-  { id: 'att-2', name: 'error_screenshot_modal.png', size: '412.8 KB', type: 'image' },
-];
 
 export interface TicketDetailViewProps {
   ticketId: string;
@@ -46,6 +49,7 @@ export function TicketDetailView({ ticketId }: TicketDetailViewProps) {
     error,
   } = useQuery(ticketQueries.detail(ticketId ? ticketId : skipToken));
 
+  const { data: allTickets = [] } = useQuery(ticketQueries.list());
   const { data: sprints = [] } = useQuery(ticketQueries.sprints());
   const { data: fetchedComments = [] } = useQuery(
     ticketQueries.comments(ticketId ? ticketId : skipToken),
@@ -54,11 +58,17 @@ export function TicketDetailView({ ticketId }: TicketDetailViewProps) {
     ticketQueries.activities(ticketId ? ticketId : skipToken),
   );
 
+  const updateTicketMutation = useUpdateTicketMutation();
+  const addCommentMutation = useAddCommentMutation(ticketId);
+  const addSubtaskMutation = useAddSubtaskMutation(ticketId);
+  const updateSubtaskMutation = useUpdateSubtaskMutation(ticketId);
+  const deleteSubtaskMutation = useDeleteSubtaskMutation(ticketId);
+
   // Local state for active editing and interactions
   const [ticket, setTicket] = React.useState<Ticket | null>(null);
   const [comments, setComments] = React.useState<Comment[]>([]);
   const [activities, setActivities] = React.useState<ActivityEvent[]>([]);
-  const [attachments, setAttachments] = React.useState<AttachmentItem[]>(INITIAL_ATTACHMENTS);
+  const [attachments, setAttachments] = React.useState<AttachmentItem[]>([]);
 
   // Feed & view state
   const [activeTab, setActiveTab] = React.useState<ActivityTab>('all');
@@ -139,28 +149,43 @@ export function TicketDetailView({ ticketId }: TicketDetailViewProps) {
   };
 
   const handleSaveTitle = () => {
-    if (titleDraft.trim()) {
+    if (titleDraft.trim() && ticket) {
       setTicket((prev) => (prev ? { ...prev, title: titleDraft.trim() } : prev));
+      updateTicketMutation.mutate({ id: ticket.id, patch: { title: titleDraft.trim() } });
     }
     setIsEditingTitle(false);
   };
 
   const handleSaveDesc = () => {
-    setTicket((prev) =>
-      prev
-        ? {
-            ...prev,
-            description:
-              descDraft.trim() ||
-              (descHtmlDraft.includes('<img') ? 'Załączono zdjęcie w opisie' : ''),
-            descriptionHtml: descHtmlDraft.trim() || undefined,
-          }
-        : prev,
-    );
+    if (ticket) {
+      const description =
+        descDraft.trim() ||
+        (descHtmlDraft.includes('<img') ? 'Załączono zdjęcie w opisie' : '');
+      const descriptionHtml = descHtmlDraft.trim() || undefined;
+
+      setTicket((prev) =>
+        prev
+          ? {
+              ...prev,
+              description,
+              descriptionHtml,
+            }
+          : prev,
+      );
+
+      updateTicketMutation.mutate({
+        id: ticket.id,
+        patch: { description, descriptionHtml },
+      });
+    }
     setIsEditingDesc(false);
   };
 
   const handleToggleSubtask = (subtaskId: string) => {
+    if (!ticket) return;
+    const current = ticket.subtasks.find((st) => st.id === subtaskId);
+    const newStatus: TicketStatus = current?.status === 'zamknięty' ? 'nowy' : 'zamknięty';
+
     setTicket((prev) => {
       if (!prev) return prev;
       return {
@@ -169,22 +194,58 @@ export function TicketDetailView({ ticketId }: TicketDetailViewProps) {
           st.id === subtaskId
             ? {
                 ...st,
-                status: st.status === 'zamknięty' ? 'nowy' : 'zamknięty',
+                status: newStatus,
               }
             : st,
         ),
       };
     });
+
+    updateSubtaskMutation.mutate({
+      subtaskId,
+      patch: { status: newStatus },
+    });
   };
 
   const handleAddSubtask = (title: string) => {
-    const nextId = `${ticket.id}-${ticket.subtasks.length + 1}`;
+    if (!ticket) return;
+    addSubtaskMutation.mutate(title);
+  };
+
+  const handleDeleteSubtask = (subtaskId: string) => {
+    if (!ticket) return;
     setTicket((prev) => {
       if (!prev) return prev;
       return {
         ...prev,
-        subtasks: [...prev.subtasks, { id: nextId, title, status: 'nowy' }],
+        subtasks: prev.subtasks.filter((st) => st.id !== subtaskId),
       };
+    });
+    deleteSubtaskMutation.mutate(subtaskId);
+  };
+
+  const handleEpicChange = (epicId: string | null) => {
+    setTicket((prev) => (prev ? { ...prev, epicId: epicId ?? undefined } : prev));
+    if (ticket) {
+      updateTicketMutation.mutate({
+        id: ticket.id,
+        patch: { epicId: epicId ?? 'none' },
+      });
+    }
+  };
+
+  const handleAttachTicketToEpic = (childTicketId: string) => {
+    if (!ticket) return;
+    updateTicketMutation.mutate({
+      id: childTicketId,
+      patch: { epicId: ticket.id },
+    });
+  };
+
+  const handleDetachTicketFromEpic = (childTicketId: string) => {
+    updateTicketMutation.mutate({
+      id: childTicketId,
+      patch: { epicId: 'none' },
     });
   };
 
@@ -205,23 +266,10 @@ export function TicketDetailView({ ticketId }: TicketDetailViewProps) {
   const handleAddComment = (text: string, html: string) => {
     if (!text.trim() && !html.includes('<img')) return;
 
-    const now = Date.now();
-    const newComment: Comment = {
-      id: `c-${now}`,
-      author: {
-        name: 'Zalogowany użytkownik',
-        email: 'user@triago.pl',
-        avatarFallback: 'ZU',
-        role: 'Current User',
-      },
+    addCommentMutation.mutate({
       content: text.trim() || 'Załączono zdjęcie',
       contentHtml: html.trim() || undefined,
-      createdAt: 'Przed chwilą',
-      timestamp: now,
-      reactions: [],
-    };
-
-    setComments((prev) => [...prev, newComment]);
+    });
   };
 
   const handleToggleReaction = (commentId: string, emoji: string) => {
@@ -257,67 +305,70 @@ export function TicketDetailView({ ticketId }: TicketDetailViewProps) {
 
   const handleTypeChange = (type: TicketType) => {
     setTicket((prev) => (prev ? { ...prev, type } : prev));
+    if (ticket) updateTicketMutation.mutate({ id: ticket.id, patch: { type } });
   };
 
   const handleStatusChange = (status: TicketStatus) => {
     setTicket((prev) => (prev ? { ...prev, status } : prev));
-    const statusNames: Record<TicketStatus, string> = {
-      nowy: 'Nowy',
-      w_toku: 'W toku',
-      review: 'W recenzji',
-      testowanie: 'Testowanie',
-      zamknięty: 'Zamknięty',
-      zablokowany: 'Zablokowany',
-    };
-    setActivities((prev) => [
-      ...prev,
-      {
-        id: `a-${Date.now()}`,
-        user: 'Zalogowany użytkownik',
-        userAvatarFallback: 'ZU',
-        action: 'zmienił status na',
-        target: statusNames[status],
-        time: 'Przed chwilą',
-        timestamp: Date.now(),
-        type: 'status',
-      },
-    ]);
+    if (ticket) updateTicketMutation.mutate({ id: ticket.id, patch: { status } });
   };
 
   const handlePriorityChange = (priority: TicketPriority) => {
     setTicket((prev) => (prev ? { ...prev, priority } : prev));
+    if (ticket) updateTicketMutation.mutate({ id: ticket.id, patch: { priority } });
   };
 
   const handleAssigneeChange = (assignee: TicketPerson | null) => {
     setTicket((prev) => (prev ? { ...prev, assignee } : prev));
-    setActivities((prev) => [
-      ...prev,
-      {
-        id: `a-${Date.now()}`,
-        user: 'Zalogowany użytkownik',
-        userAvatarFallback: 'ZU',
-        action: 'przypisał zadanie do',
-        target: assignee ? assignee.name : 'Nieprzypisane',
-        time: 'Przed chwilą',
-        timestamp: Date.now(),
-        type: 'assignee',
-      },
-    ]);
+    if (ticket) {
+      updateTicketMutation.mutate({
+        id: ticket.id,
+        patch: { assigneeEmail: assignee ? assignee.email : 'unassigned' },
+      });
+    }
   };
 
   const handleSprintChange = (sprint: string | null) => {
     setTicket((prev) => (prev ? { ...prev, sprint } : prev));
+    if (ticket) {
+      updateTicketMutation.mutate({
+        id: ticket.id,
+        patch: { sprintId: sprint ?? 'none' },
+      });
+    }
   };
 
   const handleStoryPointsChange = (storyPoints: number) => {
     setTicket((prev) => (prev ? { ...prev, storyPoints } : prev));
+    if (ticket) updateTicketMutation.mutate({ id: ticket.id, patch: { storyPoints } });
   };
 
   const handleDueDateChange = (dueDate: string) => {
     setTicket((prev) => (prev ? { ...prev, dueDate } : prev));
+    if (ticket) updateTicketMutation.mutate({ id: ticket.id, patch: { dueDate } });
   };
 
   const activeSprint = sprints.find((s) => s.id === ticket.sprint);
+
+  const availableEpics = React.useMemo(
+    () => allTickets.filter((t) => t.type === 'epic' && t.id !== ticket.id),
+    [allTickets, ticket.id],
+  );
+
+  const attachedTicketsToEpic = React.useMemo(
+    () => (ticket.type === 'epic' ? allTickets.filter((t) => t.epicId === ticket.id) : []),
+    [allTickets, ticket.type, ticket.id],
+  );
+
+  const availableTicketsToAttach = React.useMemo(
+    () =>
+      ticket.type === 'epic'
+        ? allTickets.filter(
+            (t) => t.id !== ticket.id && t.type !== 'epic' && t.epicId !== ticket.id,
+          )
+        : [],
+    [allTickets, ticket.type, ticket.id],
+  );
 
   return (
     <div className="mx-auto max-w-6xl p-4 sm:p-6 space-y-6">
@@ -398,11 +449,22 @@ export function TicketDetailView({ ticketId }: TicketDetailViewProps) {
             }}
           />
 
+          {/* Epic Tasks Section (if this ticket is an Epic) */}
+          {ticket.type === 'epic' && (
+            <TicketEpicTasksSection
+              attachedTickets={attachedTicketsToEpic}
+              availableTicketsToAttach={availableTicketsToAttach}
+              onAttachTicket={handleAttachTicketToEpic}
+              onDetachTicket={handleDetachTicketFromEpic}
+            />
+          )}
+
           {/* Subtasks / Acceptance Criteria Section */}
           <TicketSubtasksSection
             subtasks={ticket.subtasks}
             onToggleSubtask={handleToggleSubtask}
             onAddSubtask={handleAddSubtask}
+            onDeleteSubtask={handleDeleteSubtask}
           />
 
           {/* Attachments Section */}
@@ -430,11 +492,13 @@ export function TicketDetailView({ ticketId }: TicketDetailViewProps) {
           ticket={ticket}
           teamMembers={TEAM_MEMBERS}
           sprints={sprints}
+          availableEpics={availableEpics}
           onTypeChange={handleTypeChange}
           onStatusChange={handleStatusChange}
           onPriorityChange={handlePriorityChange}
           onAssigneeChange={handleAssigneeChange}
           onSprintChange={handleSprintChange}
+          onEpicChange={handleEpicChange}
           onStoryPointsChange={handleStoryPointsChange}
           onDueDateChange={handleDueDateChange}
         />

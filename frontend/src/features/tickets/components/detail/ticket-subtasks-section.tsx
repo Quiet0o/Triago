@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { CheckSquare, Plus } from 'lucide-react';
+import { CheckSquare, Plus, Trash2 } from 'lucide-react';
 import { cn } from '#/lib/utils';
 import { Button } from '#/components/ui/button.tsx';
 import { Input } from '#/components/ui/input.tsx';
@@ -12,12 +12,14 @@ export interface TicketSubtasksSectionProps {
   subtasks: Subtask[];
   onToggleSubtask: (subtaskId: string) => void;
   onAddSubtask: (title: string) => void;
+  onDeleteSubtask?: (subtaskId: string) => void;
 }
 
 export function TicketSubtasksSection({
   subtasks,
   onToggleSubtask,
   onAddSubtask,
+  onDeleteSubtask,
 }: TicketSubtasksSectionProps) {
   const [newSubtaskTitle, setNewSubtaskTitle] = React.useState('');
 
@@ -84,6 +86,21 @@ export function TicketSubtasksSection({
                 <span className="text-[10px] font-mono text-muted-foreground uppercase">
                   {st.id}
                 </span>
+                {onDeleteSubtask && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteSubtask(st.id);
+                    }}
+                    className="size-6 p-0 opacity-0 group-hover:opacity-100 hover:text-destructive hover:bg-destructive/10 transition-opacity cursor-pointer shrink-0"
+                    title="Usuń podzadanie"
+                  >
+                    <Trash2 className="size-3 text-muted-foreground hover:text-destructive" />
+                  </Button>
+                )}
               </div>
             );
           })

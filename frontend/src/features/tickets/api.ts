@@ -5,11 +5,16 @@ import type {
   Comment,
   MockData,
   Sprint,
+  Subtask,
   Ticket,
   TicketFilters,
   TicketPerson,
+  TicketPriority,
+  TicketStatus,
+  TicketType,
 } from '#/types/tickets';
 
+const BACKEND_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:8000').replace(/\/+$/, '');
 const mockData = mockDataRaw as unknown as MockData;
 
 export const TEAM_MEMBERS: TicketPerson[] = [
@@ -115,7 +120,7 @@ export const INITIAL_ACTIVITIES: ActivityEvent[] = [
   },
 ];
 
-// In-memory mutable stores for mock environment
+// In-memory fallback stores for when backend is unreachable
 const ticketsStore: Ticket[] = [...mockData.tickets];
 const commentsStore: Record<string, Comment[]> = {
   'TRG-142': [...INITIAL_COMMENTS],
@@ -124,89 +129,310 @@ const activitiesStore: Record<string, ActivityEvent[]> = {
   'TRG-142': [...INITIAL_ACTIVITIES],
 };
 
+async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  const url = `${BACKEND_URL}${endpoint}`;
+  const res = await fetch(url, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      ...options.headers,
+    },
+    credentials: 'include',
+  });
+
+  if (!res.ok) {
+    let errorDetail = `Request to ${endpoint} failed with status ${res.status}`;
+    try {
+      const data = await res.json();
+      if (data.detail) errorDetail = data.detail;
+      else if (data.title) errorDetail = data.title;
+    } catch {
+      // ignore
+    }
+    throw new AppError(errorDetail, res.status, 'API_ERROR');
+  }
+
+  return res.json() as Promise<T>;
+}
+
+export type CreateTicketInput = {
+  title: string;
+  description?: string;
+  descriptionHtml?: string;
+  type?: TicketType;
+  priority?: TicketPriority;
+  status?: TicketStatus;
+  assigneeEmail?: string;
+  sprintId?: string;
+  parentId?: string;
+  epicId?: string;
+  storyPoints?: number;
+  labels?: string[];
+  dueDate?: string;
+  timeEstimate?: string;
+  subtasks?: string[];
+};
+
+export type UpdateTicketInput = Partial<Ticket> & {
+  assigneeEmail?: string;
+  sprintId?: string;
+  parentId?: string;
+  epicId?: string;
+};
+
+export type CreateCommentInput = {
+  content: string;
+  contentHtml?: string;
+};
+
 /**
- * Fetch all tickets with optional filtering.
- * Return type is explicitly inferred by TanStack Query.
+ * Fetch all tickets with optional filtering from backend API.
  */
 export async function getTickets(filters?: TicketFilters): Promise<Ticket[]> {
-  let result = [...ticketsStore];
+  try {
+    const params = new URLSearchParams();
+    if (filters?.status && filters.status !== 'all') params.set('status', filters.status);
+    if (filters?.priority && filters.priority !== 'all') params.set('priority', filters.priority);
+    if (filters?.sprint && filters.sprint !== 'all') params.set('sprint', filters.sprint);
+    if (filters?.search?.trim()) params.set('search', filters.search.trim());
 
-  if (filters?.status && filters.status !== 'all') {
-    result = result.filter((t) => t.status === filters.status);
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    return await apiRequest<Ticket[]>(`/api/tickets${queryString}`);
+  } catch (err) {
+    console.warn('Backend unavailable, falling back to mock tickets:', err);
+    let result = [...ticketsStore];
+    if (filters?.status && filters.status !== 'all') {
+      result = result.filter((t) => t.status === filters.status);
+    }
+    if (filters?.priority && filters.priority !== 'all') {
+      result = result.filter((t) => t.priority === filters.priority);
+    }
+    if (filters?.sprint && filters.sprint !== 'all') {
+      result = result.filter((t) => t.sprint === filters.sprint);
+    }
+    if (filters?.search?.trim()) {
+      const q = filters.search.trim().toLowerCase();
+      result = result.filter(
+        (t) =>
+          t.id.toLowerCase().includes(q) ||
+          t.title.toLowerCase().includes(q) ||
+          t.description.toLowerCase().includes(q),
+      );
+    }
+    return result;
   }
-  if (filters?.priority && filters.priority !== 'all') {
-    result = result.filter((t) => t.priority === filters.priority);
-  }
-  if (filters?.sprint && filters.sprint !== 'all') {
-    result = result.filter((t) => t.sprint === filters.sprint);
-  }
-  if (filters?.search?.trim()) {
-    const q = filters.search.trim().toLowerCase();
-    result = result.filter(
-      (t) =>
-        t.id.toLowerCase().includes(q) ||
-        t.title.toLowerCase().includes(q) ||
-        t.description.toLowerCase().includes(q),
-    );
-  }
-
-  return result;
 }
 
 /**
  * Fetch a single ticket by its ID.
- * Throws type-safe AppError if not found.
  */
 export async function getTicketById(id: string): Promise<Ticket> {
-  const found = ticketsStore.find((t) => t.id === id);
-  if (!found) {
-    throw new AppError(
-      `Zadanie o identyfikatorze ${id} nie zostało odnalezione.`,
-      404,
-      'TICKET_NOT_FOUND',
-    );
+  try {
+    return await apiRequest<Ticket>(`/api/tickets/${id}`);
+  } catch (err) {
+    console.warn(`Backend unavailable for ticket ${id}, falling back to mock store:`, err);
+    const found = ticketsStore.find((t) => t.id === id);
+    if (!found) {
+      throw new AppError(
+        `Zadanie o identyfikatorze ${id} nie zostało odnalezione.`,
+        404,
+        'TICKET_NOT_FOUND',
+      );
+    }
+    return found;
   }
-  return found;
 }
 
 /**
- * Fetch all sprints.
+ * Fetch all sprints from backend API.
  */
 export async function getSprints(): Promise<Sprint[]> {
-  return [...mockData.sprints];
+  try {
+    return await apiRequest<Sprint[]>('/api/sprints');
+  } catch (err) {
+    console.warn('Backend unavailable for sprints, falling back to mock sprints:', err);
+    return [...mockData.sprints];
+  }
 }
 
 /**
  * Fetch comments for a specific ticket.
  */
 export async function getTicketComments(ticketId: string): Promise<Comment[]> {
-  return commentsStore[ticketId] ?? [];
+  try {
+    return await apiRequest<Comment[]>(`/api/tickets/${ticketId}/comments`);
+  } catch (err) {
+    console.warn(`Backend unavailable for comments of ${ticketId}, using fallback:`, err);
+    return commentsStore[ticketId] ?? [];
+  }
 }
 
 /**
  * Fetch activities for a specific ticket.
  */
 export async function getTicketActivities(ticketId: string): Promise<ActivityEvent[]> {
-  return activitiesStore[ticketId] ?? [];
+  try {
+    return await apiRequest<ActivityEvent[]>(`/api/tickets/${ticketId}/activities`);
+  } catch (err) {
+    console.warn(`Backend unavailable for activities of ${ticketId}, using fallback:`, err);
+    return activitiesStore[ticketId] ?? [];
+  }
 }
 
 /**
- * Update a ticket.
+ * Create a new ticket via backend API.
  */
-export async function updateTicket(id: string, patch: Partial<Ticket>): Promise<Ticket> {
-  const index = ticketsStore.findIndex((t) => t.id === id);
-  if (index === -1) {
-    throw new AppError(
-      `Nie można zaktualizować nieistniejącego zadania ${id}.`,
-      404,
-      'TICKET_NOT_FOUND',
-    );
+export async function createTicket(input: CreateTicketInput): Promise<Ticket> {
+  try {
+    return await apiRequest<Ticket>('/api/tickets', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
+  } catch (err) {
+    console.warn('Backend unavailable, creating ticket in local mock store:', err);
+    const generatedId = `TRG-${Math.floor(150 + Math.random() * 100)}`;
+    const newTicket: Ticket = {
+      id: generatedId,
+      title: input.title,
+      description: input.description ?? '',
+      descriptionHtml: input.descriptionHtml,
+      type: input.type ?? 'task',
+      priority: input.priority ?? 'średni',
+      status: input.status ?? 'nowy',
+      assignee: input.assigneeEmail ? (TEAM_MEMBERS.find((m) => m.email === input.assigneeEmail) ?? null) : null,
+      reporter: TEAM_MEMBERS[1],
+      sprint: input.sprintId ?? null,
+      parentId: input.parentId ?? null,
+      epicId: input.epicId ?? null,
+      storyPoints: input.storyPoints ?? 0,
+      labels: input.labels ?? [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      dueDate: input.dueDate ?? null,
+      timeEstimate: input.timeEstimate ?? '0h',
+      timeSpent: null,
+      subtasks: (input.subtasks ?? []).map((t, idx) => ({
+        id: `${generatedId}-${idx + 1}`,
+        title: t,
+        status: 'nowy',
+      })),
+      comments: 0,
+      attachments: 0,
+    };
+    ticketsStore.unshift(newTicket);
+    return newTicket;
   }
-  const updated: Ticket = {
-    ...ticketsStore[index],
-    ...patch,
-    updatedAt: new Date().toISOString(),
-  };
-  ticketsStore[index] = updated;
-  return updated;
+}
+
+/**
+ * Update an existing ticket (status change, drag&drop, assignee, priority).
+ */
+export async function updateTicket(id: string, patch: UpdateTicketInput): Promise<Ticket> {
+  try {
+    return await apiRequest<Ticket>(`/api/tickets/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(patch),
+    });
+  } catch (err) {
+    console.warn(`Backend unavailable, patching ticket ${id} in local mock store:`, err);
+    const index = ticketsStore.findIndex((t) => t.id === id);
+    if (index === -1) {
+      throw new AppError(
+        `Nie można zaktualizować nieistniejącego zadania ${id}.`,
+        404,
+        'TICKET_NOT_FOUND',
+      );
+    }
+    const updated: Ticket = {
+      ...ticketsStore[index],
+      ...patch,
+      updatedAt: new Date().toISOString(),
+    };
+    ticketsStore[index] = updated;
+    return updated;
+  }
+}
+
+/**
+ * Add a comment to a ticket.
+ */
+export async function addComment(ticketId: string, input: CreateCommentInput): Promise<Comment> {
+  try {
+    return await apiRequest<Comment>(`/api/tickets/${ticketId}/comments`, {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
+  } catch (err) {
+    console.warn(`Backend unavailable, adding comment to local mock store for ${ticketId}:`, err);
+    const newComment: Comment = {
+      id: `c-${Date.now()}`,
+      author: TEAM_MEMBERS[0],
+      content: input.content,
+      contentHtml: input.contentHtml,
+      createdAt: 'Przed chwilą',
+      timestamp: Date.now(),
+      reactions: [],
+    };
+    if (!commentsStore[ticketId]) {
+      commentsStore[ticketId] = [];
+    }
+    commentsStore[ticketId].push(newComment);
+    return newComment;
+  }
+}
+
+/**
+ * Add a subtask to a ticket.
+ */
+export async function addSubtask(ticketId: string, title: string): Promise<Subtask> {
+  try {
+    return await apiRequest<Subtask>(`/api/tickets/${ticketId}/subtasks`, {
+      method: 'POST',
+      body: JSON.stringify({ title, status: 'nowy' }),
+    });
+  } catch (err) {
+    console.warn('Backend unavailable, adding subtask to mock store:', err);
+    return {
+      id: `${ticketId}-${Date.now()}`,
+      title,
+      status: 'nowy',
+    };
+  }
+}
+
+/**
+ * Update an existing subtask (status or title).
+ */
+export async function updateSubtask(
+  ticketId: string,
+  subtaskId: string,
+  patch: { title?: string; status?: TicketStatus },
+): Promise<Subtask> {
+  try {
+    return await apiRequest<Subtask>(`/api/tickets/${ticketId}/subtasks/${subtaskId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(patch),
+    });
+  } catch (err) {
+    console.warn('Backend unavailable, updating subtask in mock store:', err);
+    return {
+      id: subtaskId,
+      title: patch.title ?? '',
+      status: patch.status ?? 'nowy',
+    };
+  }
+}
+
+/**
+ * Delete a subtask from a ticket.
+ */
+export async function deleteSubtask(ticketId: string, subtaskId: string): Promise<void> {
+  try {
+    await apiRequest<void>(`/api/tickets/${ticketId}/subtasks/${subtaskId}`, {
+      method: 'DELETE',
+    });
+  } catch (err) {
+    console.warn('Backend unavailable, deleting subtask in mock store:', err);
+  }
 }

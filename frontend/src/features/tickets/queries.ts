@@ -1,15 +1,23 @@
-import { queryOptions, skipToken } from '@tanstack/react-query';
+import { queryOptions, skipToken, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
+  addComment,
+  addSubtask,
+  createTicket,
+  deleteSubtask,
   getSprints,
   getTicketActivities,
   getTicketById,
   getTicketComments,
   getTickets,
+  updateSubtask,
+  updateTicket,
+  type CreateCommentInput,
+  type CreateTicketInput,
+  type UpdateTicketInput,
 } from './api';
 import type { TicketFilters } from '#/types/tickets';
 
 /**
- * 4. Query Key Discipline
  * Hierarchical query key factory ensuring predictable caching and targeted invalidation.
  */
 export const ticketKeys = {
@@ -25,11 +33,6 @@ export const ticketKeys = {
   sprints: () => ['sprints'] as const,
 };
 
-/**
- * 1. Types: Infer via Functions, Don't Manually Pass Generics
- * 2. Share Options via queryOptions
- * 3. Handle Conditional Queries with skipToken
- */
 export const ticketQueries = {
   // All tickets or filtered list
   list: (filters?: TicketFilters) =>
@@ -71,3 +74,97 @@ export const ticketQueries = {
       staleTime: 1000 * 60 * 10,
     }),
 };
+
+/**
+ * Mutation to create a new ticket with automatic cache invalidation.
+ */
+export function useCreateTicketMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: CreateTicketInput) => createTicket(input),
+    onSuccess: (newTicket) => {
+      queryClient.invalidateQueries({ queryKey: ticketKeys.lists() });
+      queryClient.setQueryData(ticketKeys.detail(newTicket.id), newTicket);
+    },
+  });
+}
+
+/**
+ * Mutation to update an existing ticket (status, assignee, sprint, epic, etc.).
+ */
+export function useUpdateTicketMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, patch }: { id: string; patch: UpdateTicketInput }) =>
+      updateTicket(id, patch),
+    onSuccess: (updatedTicket) => {
+      queryClient.invalidateQueries({ queryKey: ticketKeys.lists() });
+      queryClient.setQueryData(ticketKeys.detail(updatedTicket.id), updatedTicket);
+      queryClient.invalidateQueries({ queryKey: ticketKeys.activities(updatedTicket.id) });
+    },
+  });
+}
+
+/**
+ * Mutation to add a comment to a ticket.
+ */
+export function useAddCommentMutation(ticketId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: CreateCommentInput) => addComment(ticketId, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ticketKeys.comments(ticketId) });
+      queryClient.invalidateQueries({ queryKey: ticketKeys.activities(ticketId) });
+      queryClient.invalidateQueries({ queryKey: ticketKeys.detail(ticketId) });
+    },
+  });
+}
+
+/**
+ * Mutation to add a subtask to a ticket.
+ */
+export function useAddSubtaskMutation(ticketId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (title: string) => addSubtask(ticketId, title),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ticketKeys.detail(ticketId) });
+      queryClient.invalidateQueries({ queryKey: ticketKeys.lists() });
+    },
+  });
+}
+
+/**
+ * Mutation to update/toggle a subtask.
+ */
+export function useUpdateSubtaskMutation(ticketId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ subtaskId, patch }: { subtaskId: string; patch: { title?: string; status?: import('#/types/tickets').TicketStatus } }) =>
+      updateSubtask(ticketId, subtaskId, patch),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ticketKeys.detail(ticketId) });
+      queryClient.invalidateQueries({ queryKey: ticketKeys.lists() });
+    },
+  });
+}
+
+/**
+ * Mutation to delete a subtask.
+ */
+export function useDeleteSubtaskMutation(ticketId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (subtaskId: string) => deleteSubtask(ticketId, subtaskId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ticketKeys.detail(ticketId) });
+      queryClient.invalidateQueries({ queryKey: ticketKeys.lists() });
+    },
+  });
+}
