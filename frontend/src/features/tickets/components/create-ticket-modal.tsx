@@ -28,12 +28,7 @@ import {
   SelectValue,
 } from '#/components/ui/select.tsx';
 import { useAuth } from '#/features/auth/queries';
-import type {
-  TicketPerson,
-  TicketPriority,
-  TicketStatus,
-  TicketType,
-} from '#/types/tickets';
+import type { TicketPerson, TicketPriority, TicketStatus, TicketType } from '#/types/tickets';
 import { TicketTypeIcon } from './ticket-badges';
 import { useCreateTicketModal } from '../context/create-ticket-context';
 import { BasicTaskEditor } from '#/components/editor/basic-editor';
@@ -196,9 +191,7 @@ export function CreateTicketModal() {
   };
 
   const handleToggleSubtask = (id: string) => {
-    setSubtasks((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, done: !s.done } : s)),
-    );
+    setSubtasks((prev) => prev.map((s) => (s.id === id ? { ...s, done: !s.done } : s)));
   };
 
   const handleRemoveSubtask = (id: string) => {
@@ -310,14 +303,15 @@ export function CreateTicketModal() {
                 <span className="text-muted-foreground/60">•</span>
                 <div className="flex items-center gap-1.5">
                   <TicketTypeIcon type={type} />
-                  <Badge variant="outline" className="text-[10px] h-4.5 px-1.5 font-mono font-medium">
+                  <Badge
+                    variant="outline"
+                    className="text-[10px] h-4.5 px-1.5 font-mono font-medium"
+                  >
                     TRG
                   </Badge>
                 </div>
               </div>
-              <DialogTitle className="text-lg font-bold text-foreground">
-                Nowe zadanie
-              </DialogTitle>
+              <DialogTitle className="text-lg font-bold text-foreground">Nowe zadanie</DialogTitle>
             </div>
           </div>
 

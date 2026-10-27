@@ -113,7 +113,9 @@ export const AppSidebar = ({ ...props }: ComponentProps<typeof Sidebar>) => {
                   <Command className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
-                  <span className="truncate font-semibold tracking-tight text-foreground">Triago</span>
+                  <span className="truncate font-semibold tracking-tight text-foreground">
+                    Triago
+                  </span>
                 </div>
               </Link>
             </SidebarMenuButton>

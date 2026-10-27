@@ -99,9 +99,7 @@ export function TaskCard({ task, asHandle, isOverlay, isDone = false, ...props }
             >
               {task.id}
             </Link>
-            {task.epicTitle && (
-              <EpicBadge epicId={task.epicId} epicTitle={task.epicTitle} />
-            )}
+            {task.epicTitle && <EpicBadge epicId={task.epicId} epicTitle={task.epicTitle} />}
           </div>
           <PriorityBadge priority={task.priority} />
         </div>
@@ -255,7 +253,10 @@ export function TaskColumn({
 
         {/* Scrollable Content inside column */}
         <CardContent className="p-2.5 overflow-y-auto flex-1 min-h-0 flex flex-col">
-          <KanbanColumnContent value={value} className="flex flex-col gap-2.5 flex-1 min-h-[140px] pb-2">
+          <KanbanColumnContent
+            value={value}
+            className="flex flex-col gap-2.5 flex-1 min-h-[140px] pb-2"
+          >
             {tasks.map((task) => (
               <TaskCard
                 key={task.id}
@@ -290,11 +291,7 @@ export function TaskColumn({
   );
 }
 
-export function ProjectKanbanBoard({
-  tickets: initialTicketsProp,
-}: {
-  tickets?: Ticket[];
-}) {
+export function ProjectKanbanBoard({ tickets: initialTicketsProp }: { tickets?: Ticket[] }) {
   const { data: fetchedTickets } = useQuery(ticketQueries.list());
   const updateTicketMutation = useUpdateTicketMutation();
   const tickets = initialTicketsProp ?? fetchedTickets ?? (mockData as MockData).tickets;

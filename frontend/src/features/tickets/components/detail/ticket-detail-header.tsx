@@ -1,15 +1,7 @@
 'use client';
 
 import { Link, useNavigate } from '@tanstack/react-router';
-import {
-  ArrowLeft,
-  Check,
-  Copy,
-  ExternalLink,
-  MoreHorizontal,
-  Share2,
-  Zap,
-} from 'lucide-react';
+import { ArrowLeft, Check, Copy, ExternalLink, MoreHorizontal, Share2, Zap } from 'lucide-react';
 import { Button } from '#/components/ui/button.tsx';
 import { Badge } from '#/components/ui/badge.tsx';
 import {
@@ -19,11 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '#/components/ui/dropdown-menu.tsx';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '#/components/ui/tooltip.tsx';
+import { Tooltip, TooltipContent, TooltipTrigger } from '#/components/ui/tooltip.tsx';
 import type { Ticket } from '#/types/tickets';
 
 export interface TicketDetailHeaderProps {

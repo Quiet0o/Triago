@@ -1,30 +1,30 @@
-'use client'
+'use client';
 
-import type { BasicExtension } from 'prosekit/basic'
-import type { Union } from 'prosekit/core'
-import type { MentionExtension } from 'prosekit/extensions/mention'
-import { useEditor } from 'prosekit/react'
+import type { BasicExtension } from 'prosekit/basic';
+import type { Union } from 'prosekit/core';
+import type { MentionExtension } from 'prosekit/extensions/mention';
+import { useEditor } from 'prosekit/react';
 import {
   AutocompleteEmpty,
   AutocompleteItem,
   AutocompletePopup,
   AutocompletePositioner,
   AutocompleteRoot,
-} from 'prosekit/react/autocomplete'
+} from 'prosekit/react/autocomplete';
 
-const regex = /#[\da-z]*$/i
+const regex = /#[\da-z]*$/i;
 
 export default function TagMenu(props: { tags: { id: number; label: string }[] }) {
-  const editor = useEditor<Union<[MentionExtension, BasicExtension]>>()
+  const editor = useEditor<Union<[MentionExtension, BasicExtension]>>();
 
   const handleTagInsert = (id: number, label: string) => {
     editor.commands.insertMention({
       id: id.toString(),
       value: '#' + label,
       kind: 'tag',
-    })
-    editor.commands.insertText({ text: ' ' })
-  }
+    });
+    editor.commands.insertText({ text: ' ' });
+  };
 
   return (
     <AutocompleteRoot regex={regex}>
@@ -48,5 +48,5 @@ export default function TagMenu(props: { tags: { id: number; label: string }[] }
         </AutocompletePopup>
       </AutocompletePositioner>
     </AutocompleteRoot>
-  )
+  );
 }

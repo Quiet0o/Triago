@@ -172,11 +172,7 @@ export function TicketActivityFeed({
           ) : (
             <div className="space-y-4">
               {sortedComments.map((c) => (
-                <CommentCard
-                  key={c.id}
-                  comment={c}
-                  onToggleReaction={onToggleReaction}
-                />
+                <CommentCard key={c.id} comment={c} onToggleReaction={onToggleReaction} />
               ))}
             </div>
           )}
@@ -194,9 +190,7 @@ export function TicketActivityFeed({
               Brak historii zmian dla tego zadania.
             </div>
           ) : (
-            sortedActivities.map((a) => (
-              <ActivityRow key={a.id} activity={a} />
-            ))
+            sortedActivities.map((a) => <ActivityRow key={a.id} activity={a} />)
           )}
         </div>
       )}

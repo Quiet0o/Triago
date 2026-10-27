@@ -1,8 +1,8 @@
-import { createEditor, type NodeJSON } from 'prosekit/core'
+import { createEditor, type NodeJSON } from 'prosekit/core';
 
-import { sampleContent } from '../../sample/sample-doc-full.ts'
+import { sampleContent } from '../../sample/sample-doc-full.ts';
 
-import { defineExtension } from './extension.ts'
+import { defineExtension } from './extension.ts';
 
 /**
  * Renders a ProseMirror document JSON object to an HTML string.
@@ -19,14 +19,14 @@ import { defineExtension } from './extension.ts'
  * ```
  */
 export function renderHTML(document: Document, content: NodeJSON = sampleContent): string {
-  const extension = defineExtension()
-  const editor = createEditor({ extension })
-  editor.setContent(content)
-  const html: string = editor.getDocHTML({ document })
+  const extension = defineExtension();
+  const editor = createEditor({ extension });
+  editor.setContent(content);
+  const html: string = editor.getDocHTML({ document });
   if (html.startsWith('<div>') && html.endsWith('</div>')) {
-    return html.slice(5, -6) // Remove the wrapping <div> tags
+    return html.slice(5, -6); // Remove the wrapping <div> tags
   } else {
-    console.error('Unexpected HTML format: expected a single <div> wrapper')
-    return html
+    console.error('Unexpected HTML format: expected a single <div> wrapper');
+    return html;
   }
 }

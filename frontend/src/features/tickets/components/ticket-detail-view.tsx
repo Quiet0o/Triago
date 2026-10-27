@@ -159,8 +159,7 @@ export function TicketDetailView({ ticketId }: TicketDetailViewProps) {
   const handleSaveDesc = () => {
     if (ticket) {
       const description =
-        descDraft.trim() ||
-        (descHtmlDraft.includes('<img') ? 'Załączono zdjęcie w opisie' : '');
+        descDraft.trim() || (descHtmlDraft.includes('<img') ? 'Załączono zdjęcie w opisie' : '');
       const descriptionHtml = descHtmlDraft.trim() || undefined;
 
       setTicket((prev) =>
@@ -282,9 +281,7 @@ export function TicketDetailView({ ticketId }: TicketDetailViewProps) {
             return {
               ...c,
               reactions: c.reactions
-                .map((r) =>
-                  r.emoji === emoji ? { ...r, count: r.count - 1, reacted: false } : r,
-                )
+                .map((r) => (r.emoji === emoji ? { ...r, count: r.count - 1, reacted: false } : r))
                 .filter((r) => r.count > 0),
             };
           }

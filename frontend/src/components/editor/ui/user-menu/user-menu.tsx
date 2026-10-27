@@ -1,38 +1,37 @@
-import type { BasicExtension } from 'prosekit/basic'
-import { canUseRegexLookbehind, type Union } from 'prosekit/core'
-import type { MentionExtension } from 'prosekit/extensions/mention'
-import { useEditor } from 'prosekit/react'
+import type { BasicExtension } from 'prosekit/basic';
+import { canUseRegexLookbehind, type Union } from 'prosekit/core';
+import type { MentionExtension } from 'prosekit/extensions/mention';
+import { useEditor } from 'prosekit/react';
 import {
   AutocompleteEmpty,
   AutocompleteItem,
   AutocompletePopup,
   AutocompletePositioner,
   AutocompleteRoot,
-} from 'prosekit/react/autocomplete'
+} from 'prosekit/react/autocomplete';
 
 // Match inputs like "@", "@foo", "@foo bar" etc. Do not match "@ foo".
 const regex = new RegExp(
-  (canUseRegexLookbehind() ? String.raw`(?<!\S)` : '')
-    + String.raw`@(\S.*)?$`,
+  (canUseRegexLookbehind() ? String.raw`(?<!\S)` : '') + String.raw`@(\S.*)?$`,
   'u',
-)
+);
 
 export default function UserMenu(props: {
-  users: { id: number; name: string }[]
-  loading?: boolean
-  onQueryChange?: (query: string) => void
-  onOpenChange?: (open: boolean) => void
+  users: { id: number; name: string }[];
+  loading?: boolean;
+  onQueryChange?: (query: string) => void;
+  onOpenChange?: (open: boolean) => void;
 }) {
-  const editor = useEditor<Union<[MentionExtension, BasicExtension]>>()
+  const editor = useEditor<Union<[MentionExtension, BasicExtension]>>();
 
   const handleUserInsert = (id: number, username: string) => {
     editor.commands.insertMention({
       id: id.toString(),
       value: '@' + username,
       kind: 'user',
-    })
-    editor.commands.insertText({ text: ' ' })
-  }
+    });
+    editor.commands.insertText({ text: ' ' });
+  };
 
   return (
     <AutocompleteRoot
@@ -53,14 +52,12 @@ export default function UserMenu(props: {
                 className="relative flex items-center justify-between min-w-32 scroll-my-1 rounded-md px-3 py-1.5 text-sm box-border cursor-default select-none whitespace-nowrap outline-hidden data-highlighted:bg-gray-100 dark:data-highlighted:bg-gray-800"
                 onSelect={() => handleUserInsert(user.id, user.name)}
               >
-                <span className={props.loading ? 'opacity-50' : undefined}>
-                  {user.name}
-                </span>
+                <span className={props.loading ? 'opacity-50' : undefined}>{user.name}</span>
               </AutocompleteItem>
             ))}
           </div>
         </AutocompletePopup>
       </AutocompletePositioner>
     </AutocompleteRoot>
-  )
+  );
 }

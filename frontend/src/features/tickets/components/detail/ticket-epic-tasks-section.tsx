@@ -12,11 +12,7 @@ import {
   SelectValue,
 } from '#/components/ui/select.tsx';
 import type { Ticket } from '#/types/tickets';
-import {
-  PriorityBadge,
-  StatusBadge,
-  TicketTypeIcon,
-} from '../ticket-badges';
+import { PriorityBadge, StatusBadge, TicketTypeIcon } from '../ticket-badges';
 
 export interface TicketEpicTasksSectionProps {
   attachedTickets: Ticket[];
@@ -143,10 +139,7 @@ export function TicketEpicTasksSection({
       {/* Attach Existing Ticket Controls */}
       <div className="pt-2 border-t border-purple-500/10 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
         <div className="flex-1 min-w-0">
-          <Select
-            value={selectedTicketToAttach}
-            onValueChange={setSelectedTicketToAttach}
-          >
+          <Select value={selectedTicketToAttach} onValueChange={setSelectedTicketToAttach}>
             <SelectTrigger className="w-full bg-background h-8 text-xs cursor-pointer">
               <SelectValue placeholder="Wybierz istniejące zadanie do podpięcia..." />
             </SelectTrigger>

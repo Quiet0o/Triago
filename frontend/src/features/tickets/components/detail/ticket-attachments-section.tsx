@@ -43,12 +43,7 @@ export function TicketAttachmentsSection({
             Załączniki ({attachments.length})
           </h3>
         </div>
-        <input
-          ref={fileInputRef}
-          type="file"
-          onChange={handleFileChange}
-          className="hidden"
-        />
+        <input ref={fileInputRef} type="file" onChange={handleFileChange} className="hidden" />
         <Button
           variant="outline"
           size="sm"

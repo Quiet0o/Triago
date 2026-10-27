@@ -41,12 +41,7 @@ export function CreateTicketAttachments({
         <span className="text-[11px] text-muted-foreground">Opcjonalnie</span>
       </div>
 
-      <input
-        ref={fileInputRef}
-        type="file"
-        onChange={handleFileChange}
-        className="hidden"
-      />
+      <input ref={fileInputRef} type="file" onChange={handleFileChange} className="hidden" />
 
       <div
         onClick={() => fileInputRef.current?.click()}

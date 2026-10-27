@@ -1,74 +1,75 @@
-import type { Uploader } from 'prosekit/extensions/file'
-import type { ImageExtension } from 'prosekit/extensions/image'
-import { useEditor } from 'prosekit/react'
-import { PopoverPopup, PopoverPositioner, PopoverRoot, PopoverTrigger } from 'prosekit/react/popover'
-import type { OpenChangeEvent } from 'prosekit/web/popover'
-import { useId, useState, type ReactNode } from 'react'
+import type { Uploader } from 'prosekit/extensions/file';
+import type { ImageExtension } from 'prosekit/extensions/image';
+import { useEditor } from 'prosekit/react';
+import {
+  PopoverPopup,
+  PopoverPositioner,
+  PopoverRoot,
+  PopoverTrigger,
+} from 'prosekit/react/popover';
+import type { OpenChangeEvent } from 'prosekit/web/popover';
+import { useId, useState, type ReactNode } from 'react';
 
-import { Button } from '../button/index.ts'
+import { Button } from '../button/index.ts';
 
 export default function ImageUploadPopover(props: {
-  uploader: Uploader<string>
-  tooltip: string
-  disabled: boolean
-  children: ReactNode
+  uploader: Uploader<string>;
+  tooltip: string;
+  disabled: boolean;
+  children: ReactNode;
 }) {
-  const [open, setOpen] = useState(false)
-  const [url, setUrl] = useState('')
-  const [file, setFile] = useState<File | null>(null)
-  const ariaId = useId()
+  const [open, setOpen] = useState(false);
+  const [url, setUrl] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  const ariaId = useId();
 
-  const editor = useEditor<ImageExtension>()
+  const editor = useEditor<ImageExtension>();
 
-  const handleFileChange: React.ChangeEventHandler<HTMLInputElement> = (
-    event,
-  ) => {
-    const file = event.target.files?.[0]
+  const handleFileChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+    const file = event.target.files?.[0];
 
     if (file) {
-      setFile(file)
-      setUrl('')
+      setFile(file);
+      setUrl('');
     } else {
-      setFile(null)
+      setFile(null);
     }
-  }
+  };
 
-  const handleUrlChange: React.ChangeEventHandler<HTMLInputElement> = (
-    event,
-  ) => {
-    const url = event.target.value
+  const handleUrlChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+    const url = event.target.value;
 
     if (url) {
-      setUrl(url)
-      setFile(null)
+      setUrl(url);
+      setFile(null);
     } else {
-      setUrl('')
+      setUrl('');
     }
-  }
+  };
 
   const deferResetState = () => {
     setTimeout(() => {
-      setUrl('')
-      setFile(null)
-    }, 300)
-  }
+      setUrl('');
+      setFile(null);
+    }, 300);
+  };
 
   const handleSubmit = () => {
     if (url) {
-      editor.commands.insertImage({ src: url })
+      editor.commands.insertImage({ src: url });
     } else if (file) {
-      editor.commands.uploadImage({ file, uploader: props.uploader })
+      editor.commands.uploadImage({ file, uploader: props.uploader });
     }
-    setOpen(false)
-    deferResetState()
-  }
+    setOpen(false);
+    deferResetState();
+  };
 
   const handleOpenChange = (event: OpenChangeEvent) => {
     if (!event.detail) {
-      deferResetState()
+      deferResetState();
     }
-    setOpen(event.detail)
-  }
+    setOpen(event.detail);
+  };
 
   return (
     <PopoverRoot open={open} onOpenChange={handleOpenChange}>
@@ -78,7 +79,10 @@ export default function ImageUploadPopover(props: {
         </Button>
       </PopoverTrigger>
 
-      <PopoverPositioner placement="bottom" className="block overflow-visible w-min h-min z-50 ease-out transition-transform duration-100 motion-reduce:transition-none">
+      <PopoverPositioner
+        placement="bottom"
+        className="block overflow-visible w-min h-min z-50 ease-out transition-transform duration-100 motion-reduce:transition-none"
+      >
         <PopoverPopup className="box-border origin-(--transform-origin) transition-[opacity,scale] transition-discrete motion-reduce:transition-none data-[state=closed]:duration-150 data-[state=closed]:opacity-0 starting:opacity-0 data-[state=closed]:scale-95 starting:scale-95 duration-40 rounded-xl border border-gray-200 dark:border-gray-800 shadow-lg bg-[canvas] flex flex-col gap-y-4 p-6 text-sm w-sm">
           {file ? null : (
             <>
@@ -107,23 +111,25 @@ export default function ImageUploadPopover(props: {
             </>
           )}
 
-          {url
-            ? (
-              <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-white dark:ring-offset-gray-950 transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-gray-900 dark:focus-visible:ring-gray-300 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border-0 bg-gray-900 dark:bg-gray-50 text-gray-50 dark:text-gray-900 hover:bg-gray-900/90 dark:hover:bg-gray-50/90 h-10 px-4 py-2 w-full" onClick={handleSubmit}>
-                Insert Image
-              </button>
-            )
-            : null}
+          {url ? (
+            <button
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-white dark:ring-offset-gray-950 transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-gray-900 dark:focus-visible:ring-gray-300 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border-0 bg-gray-900 dark:bg-gray-50 text-gray-50 dark:text-gray-900 hover:bg-gray-900/90 dark:hover:bg-gray-50/90 h-10 px-4 py-2 w-full"
+              onClick={handleSubmit}
+            >
+              Insert Image
+            </button>
+          ) : null}
 
-          {file
-            ? (
-              <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-white dark:ring-offset-gray-950 transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-gray-900 dark:focus-visible:ring-gray-300 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border-0 bg-gray-900 dark:bg-gray-50 text-gray-50 dark:text-gray-900 hover:bg-gray-900/90 dark:hover:bg-gray-50/90 h-10 px-4 py-2 w-full" onClick={handleSubmit}>
-                Upload Image
-              </button>
-            )
-            : null}
+          {file ? (
+            <button
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-white dark:ring-offset-gray-950 transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-gray-900 dark:focus-visible:ring-gray-300 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border-0 bg-gray-900 dark:bg-gray-50 text-gray-50 dark:text-gray-900 hover:bg-gray-900/90 dark:hover:bg-gray-50/90 h-10 px-4 py-2 w-full"
+              onClick={handleSubmit}
+            >
+              Upload Image
+            </button>
+          ) : null}
         </PopoverPopup>
       </PopoverPositioner>
     </PopoverRoot>
-  )
+  );
 }

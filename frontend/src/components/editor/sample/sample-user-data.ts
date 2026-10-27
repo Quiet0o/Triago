@@ -51,4 +51,4 @@ export const users = [
   { id: 50, name: 'Yvonne' },
   { id: 51, name: 'Zack' },
   { id: 52, name: 'Zara' },
-]
+];

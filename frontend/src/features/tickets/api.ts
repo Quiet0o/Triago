@@ -300,7 +300,9 @@ export async function createTicket(input: CreateTicketInput): Promise<Ticket> {
       type: input.type ?? 'task',
       priority: input.priority ?? 'średni',
       status: input.status ?? 'nowy',
-      assignee: input.assigneeEmail ? (TEAM_MEMBERS.find((m) => m.email === input.assigneeEmail) ?? null) : null,
+      assignee: input.assigneeEmail
+        ? (TEAM_MEMBERS.find((m) => m.email === input.assigneeEmail) ?? null)
+        : null,
       reporter: TEAM_MEMBERS[1],
       sprint: input.sprintId ?? null,
       parentId: input.parentId ?? null,

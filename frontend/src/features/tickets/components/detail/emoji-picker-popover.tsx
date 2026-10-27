@@ -3,16 +3,8 @@
 import * as React from 'react';
 import { Search, SmilePlus, X } from 'lucide-react';
 import { Input } from '#/components/ui/input.tsx';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '#/components/ui/popover.tsx';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '#/components/ui/tooltip.tsx';
+import { Popover, PopoverContent, PopoverTrigger } from '#/components/ui/popover.tsx';
+import { Tooltip, TooltipContent, TooltipTrigger } from '#/components/ui/tooltip.tsx';
 
 export interface EmojiItem {
   emoji: string;
@@ -84,9 +76,7 @@ export function EmojiPickerPopover({
     if (!q) return ALL_EMOJIS;
     return ALL_EMOJIS.filter(
       (e) =>
-        e.emoji.includes(q) ||
-        e.name.toLowerCase().includes(q) ||
-        e.tags.toLowerCase().includes(q),
+        e.emoji.includes(q) || e.name.toLowerCase().includes(q) || e.tags.toLowerCase().includes(q),
     );
   }, [search]);
 
@@ -211,9 +201,13 @@ export function EmojiPickerPopover({
               <span className="font-medium text-foreground truncate">{hoveredEmoji.name}</span>
             </div>
           ) : (
-            <span className="text-[10px] text-muted-foreground/80">Wybierz emotkę aby zareagować</span>
+            <span className="text-[10px] text-muted-foreground/80">
+              Wybierz emotkę aby zareagować
+            </span>
           )}
-          <span className="text-[9px] font-mono text-muted-foreground/60 shrink-0 ml-1">{filteredEmojis.length} emotek</span>
+          <span className="text-[9px] font-mono text-muted-foreground/60 shrink-0 ml-1">
+            {filteredEmojis.length} emotek
+          </span>
         </div>
       </PopoverContent>
     </Popover>

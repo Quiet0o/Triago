@@ -9,4 +9,4 @@ export const tags = [
   { id: 8, label: 'technology' },
   { id: 9, label: 'fashion' },
   { id: 10, label: 'nature' },
-]
+];

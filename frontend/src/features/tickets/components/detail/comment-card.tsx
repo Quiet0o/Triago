@@ -1,6 +1,5 @@
 'use client';
 
-import * as React from 'react';
 import { cn } from '#/lib/utils';
 import { Avatar, AvatarFallback } from '#/components/ui/avatar.tsx';
 import { Badge } from '#/components/ui/badge.tsx';
@@ -22,9 +21,7 @@ export function CommentCard({ comment, onToggleReaction }: CommentCardProps) {
       </Avatar>
       <div className="flex-1 space-y-1.5 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="font-semibold text-xs text-foreground">
-            {comment.author.name}
-          </span>
+          <span className="font-semibold text-xs text-foreground">{comment.author.name}</span>
           <span className="text-[10px] text-muted-foreground">•</span>
           <span className="text-[11px] text-muted-foreground">{comment.createdAt}</span>
           <Badge variant="outline" className="text-[9px] h-4 px-1.5 py-0 font-normal">

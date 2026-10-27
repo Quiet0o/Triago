@@ -145,8 +145,13 @@ export function useUpdateSubtaskMutation(ticketId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ subtaskId, patch }: { subtaskId: string; patch: { title?: string; status?: import('#/types/tickets').TicketStatus } }) =>
-      updateSubtask(ticketId, subtaskId, patch),
+    mutationFn: ({
+      subtaskId,
+      patch,
+    }: {
+      subtaskId: string;
+      patch: { title?: string; status?: import('#/types/tickets').TicketStatus };
+    }) => updateSubtask(ticketId, subtaskId, patch),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ticketKeys.detail(ticketId) });
       queryClient.invalidateQueries({ queryKey: ticketKeys.lists() });

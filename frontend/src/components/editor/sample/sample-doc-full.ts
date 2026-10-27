@@ -1,8 +1,8 @@
-import type { NodeJSON } from 'prosekit/core'
+import type { NodeJSON } from 'prosekit/core';
 
-const EULER_IDENTITY = String.raw`e^{i\pi} + 1 = 0`
+const EULER_IDENTITY = String.raw`e^{i\pi} + 1 = 0`;
 
-const GAUSSIAN_INTEGRAL = String.raw`\int_{-\infty}^{\infty} e^{-x^2} \, dx = \sqrt{\pi}`
+const GAUSSIAN_INTEGRAL = String.raw`\int_{-\infty}^{\infty} e^{-x^2} \, dx = \sqrt{\pi}`;
 
 export const sampleContent: NodeJSON = {
   type: 'doc',
@@ -328,4 +328,4 @@ export const sampleContent: NodeJSON = {
       content: [{ type: 'text', text: 'Start typing. Everything else just flows.' }],
     },
   ],
-}
+};

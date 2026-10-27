@@ -1,100 +1,104 @@
-'use client'
+'use client';
 
-import type { BasicExtension } from 'prosekit/basic'
-import type { Editor } from 'prosekit/core'
-import type { LinkAttrs } from 'prosekit/extensions/link'
-import type { EditorState } from 'prosekit/pm/state'
-import { useEditor, useEditorDerivedValue } from 'prosekit/react'
-import { InlinePopoverPopup, InlinePopoverPositioner, InlinePopoverRoot } from 'prosekit/react/inline-popover'
-import { useState } from 'react'
+import type { BasicExtension } from 'prosekit/basic';
+import type { Editor } from 'prosekit/core';
+import type { LinkAttrs } from 'prosekit/extensions/link';
+import type { EditorState } from 'prosekit/pm/state';
+import { useEditor, useEditorDerivedValue } from 'prosekit/react';
+import {
+  InlinePopoverPopup,
+  InlinePopoverPositioner,
+  InlinePopoverRoot,
+} from 'prosekit/react/inline-popover';
+import { useState } from 'react';
 
-import { Button } from '../button/index.ts'
+import { Button } from '../button/index.ts';
 
 function getInlineMenuItems(editor: Editor<BasicExtension>) {
   return {
     bold: editor.commands.toggleBold
       ? {
-        isActive: editor.marks.bold.isActive(),
-        canExec: editor.commands.toggleBold.canExec(),
-        command: () => editor.commands.toggleBold(),
-      }
+          isActive: editor.marks.bold.isActive(),
+          canExec: editor.commands.toggleBold.canExec(),
+          command: () => editor.commands.toggleBold(),
+        }
       : undefined,
     italic: editor.commands.toggleItalic
       ? {
-        isActive: editor.marks.italic.isActive(),
-        canExec: editor.commands.toggleItalic.canExec(),
-        command: () => editor.commands.toggleItalic(),
-      }
+          isActive: editor.marks.italic.isActive(),
+          canExec: editor.commands.toggleItalic.canExec(),
+          command: () => editor.commands.toggleItalic(),
+        }
       : undefined,
     underline: editor.commands.toggleUnderline
       ? {
-        isActive: editor.marks.underline.isActive(),
-        canExec: editor.commands.toggleUnderline.canExec(),
-        command: () => editor.commands.toggleUnderline(),
-      }
+          isActive: editor.marks.underline.isActive(),
+          canExec: editor.commands.toggleUnderline.canExec(),
+          command: () => editor.commands.toggleUnderline(),
+        }
       : undefined,
     strike: editor.commands.toggleStrike
       ? {
-        isActive: editor.marks.strike.isActive(),
-        canExec: editor.commands.toggleStrike.canExec(),
-        command: () => editor.commands.toggleStrike(),
-      }
+          isActive: editor.marks.strike.isActive(),
+          canExec: editor.commands.toggleStrike.canExec(),
+          command: () => editor.commands.toggleStrike(),
+        }
       : undefined,
     code: editor.commands.toggleCode
       ? {
-        isActive: editor.marks.code.isActive(),
-        canExec: editor.commands.toggleCode.canExec(),
-        command: () => editor.commands.toggleCode(),
-      }
+          isActive: editor.marks.code.isActive(),
+          canExec: editor.commands.toggleCode.canExec(),
+          command: () => editor.commands.toggleCode(),
+        }
       : undefined,
     link: editor.commands.addLink
       ? {
-        isActive: editor.marks.link.isActive(),
-        canExec: editor.commands.addLink.canExec({ href: '' }),
-        command: () => editor.commands.expandLink(),
-        currentLink: getCurrentLink(editor.state) || '',
-      }
+          isActive: editor.marks.link.isActive(),
+          canExec: editor.commands.addLink.canExec({ href: '' }),
+          command: () => editor.commands.expandLink(),
+          currentLink: getCurrentLink(editor.state) || '',
+        }
       : undefined,
-  }
+  };
 }
 
 function getCurrentLink(state: EditorState): string | undefined {
-  const { $from } = state.selection
-  const marks = $from.marksAcross($from)
+  const { $from } = state.selection;
+  const marks = $from.marksAcross($from);
   if (!marks) {
-    return
+    return;
   }
   for (const mark of marks) {
     if (mark.type.name === 'link') {
-      return (mark.attrs as LinkAttrs).href
+      return (mark.attrs as LinkAttrs).href;
     }
   }
 }
 
 export default function InlineMenu() {
-  const editor = useEditor<BasicExtension>()
-  const items = useEditorDerivedValue(getInlineMenuItems)
+  const editor = useEditor<BasicExtension>();
+  const items = useEditorDerivedValue(getInlineMenuItems);
 
-  const [linkMenuOpen, setLinkMenuOpen] = useState(false)
-  const toggleLinkMenuOpen = () => setLinkMenuOpen((open) => !open)
+  const [linkMenuOpen, setLinkMenuOpen] = useState(false);
+  const toggleLinkMenuOpen = () => setLinkMenuOpen((open) => !open);
 
   const handleLinkUpdate = (href?: string) => {
     if (href) {
-      editor.commands.addLink({ href })
+      editor.commands.addLink({ href });
     } else {
-      editor.commands.removeLink()
+      editor.commands.removeLink();
     }
 
-    setLinkMenuOpen(false)
-    editor.focus()
-  }
+    setLinkMenuOpen(false);
+    editor.focus();
+  };
 
   return (
     <>
       <InlinePopoverRoot
         onOpenChange={(event) => {
           if (!event.detail) {
-            setLinkMenuOpen(false)
+            setLinkMenuOpen(false);
           }
         }}
       >
@@ -157,8 +161,8 @@ export default function InlineMenu() {
               <Button
                 pressed={items.link.isActive}
                 onClick={() => {
-                  items.link?.command?.()
-                  toggleLinkMenuOpen()
+                  items.link?.command?.();
+                  toggleLinkMenuOpen();
                 }}
                 tooltip="Link"
               >
@@ -175,7 +179,10 @@ export default function InlineMenu() {
           open={linkMenuOpen}
           onOpenChange={(event) => setLinkMenuOpen(event.detail)}
         >
-          <InlinePopoverPositioner placement="bottom" className="block overflow-visible w-min h-min z-50 ease-out transition-transform duration-100 motion-reduce:transition-none">
+          <InlinePopoverPositioner
+            placement="bottom"
+            className="block overflow-visible w-min h-min z-50 ease-out transition-transform duration-100 motion-reduce:transition-none"
+          >
             <InlinePopoverPopup
               data-testid="inline-menu-link"
               className="box-border origin-(--transform-origin) transition-[opacity,scale] transition-discrete motion-reduce:transition-none data-[state=closed]:duration-150 data-[state=closed]:opacity-0 starting:opacity-0 data-[state=closed]:scale-95 starting:scale-95 duration-40 border border-gray-200 dark:border-gray-800 shadow-lg bg-[canvas] relative flex flex-col w-xs rounded-lg p-4 gap-y-2 items-stretch"
@@ -183,10 +190,10 @@ export default function InlineMenu() {
               {linkMenuOpen && (
                 <form
                   onSubmit={(event) => {
-                    event.preventDefault()
-                    const target = event.target as HTMLFormElement | null
-                    const href = target?.querySelector('input')?.value?.trim()
-                    handleLinkUpdate(href)
+                    event.preventDefault();
+                    const target = event.target as HTMLFormElement | null;
+                    const href = target?.querySelector('input')?.value?.trim();
+                    handleLinkUpdate(href);
                   }}
                 >
                   <input
@@ -210,5 +217,5 @@ export default function InlineMenu() {
         </InlinePopoverRoot>
       )}
     </>
-  )
+  );
 }

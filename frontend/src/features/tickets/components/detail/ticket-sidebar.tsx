@@ -20,12 +20,7 @@ import type {
   TicketStatus,
   TicketType,
 } from '#/types/tickets';
-import {
-  PriorityBadge,
-  StatusBadge,
-  StoryPointsBadge,
-  TicketTypeIcon,
-} from '../ticket-badges';
+import { PriorityBadge, StatusBadge, StoryPointsBadge, TicketTypeIcon } from '../ticket-badges';
 
 export interface TicketSidebarProps {
   ticket: Ticket;
@@ -65,10 +60,7 @@ export function TicketSidebar({
       {/* Typ zadania - RIGHT AT THE TOP */}
       <div className="space-y-1.5">
         <label className="text-xs font-medium text-muted-foreground">Typ zadania</label>
-        <Select
-          value={ticket.type}
-          onValueChange={(val) => onTypeChange(val as TicketType)}
-        >
+        <Select value={ticket.type} onValueChange={(val) => onTypeChange(val as TicketType)}>
           <SelectTrigger className="w-full bg-background h-9 text-xs cursor-pointer">
             <SelectValue />
           </SelectTrigger>
@@ -116,10 +108,7 @@ export function TicketSidebar({
       {/* Status */}
       <div className="space-y-1.5">
         <label className="text-xs font-medium text-muted-foreground">Status</label>
-        <Select
-          value={ticket.status}
-          onValueChange={(val) => onStatusChange(val as TicketStatus)}
-        >
+        <Select value={ticket.status} onValueChange={(val) => onStatusChange(val as TicketStatus)}>
           <SelectTrigger className="w-full bg-background h-9 text-xs cursor-pointer">
             <SelectValue />
           </SelectTrigger>
@@ -197,9 +186,7 @@ export function TicketSidebar({
               <SelectItem key={member.email} value={member.email}>
                 <div className="flex items-center gap-2">
                   <Avatar className="size-5">
-                    <AvatarFallback className="text-[10px]">
-                      {member.avatarFallback}
-                    </AvatarFallback>
+                    <AvatarFallback className="text-[10px]">{member.avatarFallback}</AvatarFallback>
                   </Avatar>
                   <span className="font-medium text-xs">{member.name}</span>
                 </div>
@@ -302,10 +289,7 @@ export function TicketSidebar({
                 className="h-9 w-9 p-0 border-purple-500/30 text-purple-600 hover:text-purple-700 hover:bg-purple-500/10 shrink-0 cursor-pointer"
                 title={`Otwórz epik ${ticket.epicId}`}
               >
-                <Link
-                  to="/project/tickets/$ticketId"
-                  params={{ ticketId: ticket.epicId }}
-                >
+                <Link to="/project/tickets/$ticketId" params={{ ticketId: ticket.epicId }}>
                   <ExternalLink className="size-3.5" />
                 </Link>
               </Button>

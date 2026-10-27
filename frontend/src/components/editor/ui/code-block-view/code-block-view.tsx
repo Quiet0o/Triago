@@ -1,45 +1,49 @@
-'use client'
+'use client';
 
-import { renderMermaidSVG, THEMES } from 'beautiful-mermaid'
-import { isCodeBlockPreviewHiddenDecoration, shikiBundledLanguagesInfo, type CodeBlockAttrs } from 'prosekit/extensions/code-block'
-import { TextSelection } from 'prosekit/pm/state'
-import type { ReactNodeViewProps } from 'prosekit/react'
-import { useMemo, useRef } from 'react'
+import { renderMermaidSVG, THEMES } from 'beautiful-mermaid';
+import {
+  isCodeBlockPreviewHiddenDecoration,
+  shikiBundledLanguagesInfo,
+  type CodeBlockAttrs,
+} from 'prosekit/extensions/code-block';
+import { TextSelection } from 'prosekit/pm/state';
+import type { ReactNodeViewProps } from 'prosekit/react';
+import { useMemo, useRef } from 'react';
 
 export default function CodeBlockView(props: ReactNodeViewProps) {
-  const attrs = props.node.attrs as CodeBlockAttrs
-  const language = attrs.language || ''
-  const hidePreview = props.decorations.some(isCodeBlockPreviewHiddenDecoration)
-  const preRef = useRef<HTMLElement | null>(null)
+  const attrs = props.node.attrs as CodeBlockAttrs;
+  const language = attrs.language || '';
+  const hidePreview = props.decorations.some(isCodeBlockPreviewHiddenDecoration);
+  const preRef = useRef<HTMLElement | null>(null);
 
-  const showMermaidPreview = !hidePreview && language === 'mermaid'
+  const showMermaidPreview = !hidePreview && language === 'mermaid';
 
   const setLanguage = (language: string) => {
-    const attrs: CodeBlockAttrs = { language }
-    props.setAttrs(attrs)
-  }
+    const attrs: CodeBlockAttrs = { language };
+    props.setAttrs(attrs);
+  };
 
   const focusSource = (event: React.MouseEvent | React.KeyboardEvent) => {
-    event.preventDefault()
-    const pos = props.getPos()
-    if (typeof pos !== 'number') return
-    const { state, dispatch } = props.view
-    const selection = TextSelection.near(state.doc.resolve(pos + 1), 1)
-    dispatch(state.tr.setSelection(selection))
-    props.view.focus()
-    preRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-  }
+    event.preventDefault();
+    const pos = props.getPos();
+    if (typeof pos !== 'number') return;
+    const { state, dispatch } = props.view;
+    const selection = TextSelection.near(state.doc.resolve(pos + 1), 1);
+    dispatch(state.tr.setSelection(selection));
+    props.view.focus();
+    preRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
 
-  const code = props.node.textContent
+  const code = props.node.textContent;
 
   const mermaidPreview = useMemo(() => {
-    if (language !== 'mermaid') return { svg: null, error: null }
+    if (language !== 'mermaid') return { svg: null, error: null };
     try {
-      return { svg: renderMermaidSVG(code, THEMES['tokyo-night']), error: null }
+      return { svg: renderMermaidSVG(code, THEMES['tokyo-night']), error: null };
     } catch (err) {
-      return { svg: null, error: err instanceof Error ? err : new Error(String(err)) }
+      return { svg: null, error: err instanceof Error ? err : new Error(String(err)) };
     }
-  }, [code, language])
+  }, [code, language]);
 
   return (
     <>
@@ -64,8 +68,8 @@ export default function CodeBlockView(props: ReactNodeViewProps) {
       </div>
       <pre
         ref={(element) => {
-          props.contentRef(element)
-          preRef.current = element
+          props.contentRef(element);
+          preRef.current = element;
         }}
         className="data-preview:hidden"
         data-preview={showMermaidPreview ? '' : undefined}
@@ -79,9 +83,11 @@ export default function CodeBlockView(props: ReactNodeViewProps) {
           onMouseDown={focusSource}
         >
           {mermaidPreview.error ? <pre>{mermaidPreview.error.message}</pre> : null}
-          {mermaidPreview.svg ? <div dangerouslySetInnerHTML={{ __html: mermaidPreview.svg }}></div> : null}
+          {mermaidPreview.svg ? (
+            <div dangerouslySetInnerHTML={{ __html: mermaidPreview.svg }}></div>
+          ) : null}
         </div>
       )}
     </>
-  )
+  );
 }

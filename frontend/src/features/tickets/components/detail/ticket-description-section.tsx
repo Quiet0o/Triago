@@ -1,6 +1,5 @@
 'use client';
 
-import * as React from 'react';
 import { Edit3, FileText } from 'lucide-react';
 import { Button } from '#/components/ui/button.tsx';
 import { BasicTaskEditor } from '#/components/editor/basic-editor.tsx';
@@ -66,11 +65,7 @@ export function TicketDescriptionSection({
             >
               Anuluj
             </Button>
-            <Button
-              size="sm"
-              onClick={onSave}
-              className="h-8 px-3 text-xs cursor-pointer"
-            >
+            <Button size="sm" onClick={onSave} className="h-8 px-3 text-xs cursor-pointer">
               Zapisz opis
             </Button>
           </div>

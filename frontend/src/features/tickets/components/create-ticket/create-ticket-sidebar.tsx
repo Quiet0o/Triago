@@ -12,15 +12,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from '#/components/ui/select.tsx';
-import type {
-  TicketPerson,
-  TicketPriority,
-  TicketStatus,
-} from '#/types/tickets';
+import type { TicketPerson, TicketPriority, TicketStatus } from '#/types/tickets';
 import { AssigneeAvatar, PriorityBadge, StatusBadge } from '../ticket-badges';
 
 export const STORY_POINTS_OPTIONS = [1, 2, 3, 5, 8, 13];
-export const PRESET_LABELS = ['frontend', 'backend', 'api', 'ui/ux', 'bug', 'auth', 'database', 'security'];
+export const PRESET_LABELS = [
+  'frontend',
+  'backend',
+  'api',
+  'ui/ux',
+  'bug',
+  'auth',
+  'database',
+  'security',
+];
 
 export interface CreateTicketSidebarProps {
   status: TicketStatus;

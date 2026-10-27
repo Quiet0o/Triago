@@ -1,6 +1,5 @@
 'use client';
 
-import * as React from 'react';
 import { ArrowRight, History, Plus, User } from 'lucide-react';
 import type { ActivityEvent } from '#/types/tickets';
 
@@ -40,9 +39,7 @@ export function ActivityRow({ activity }: ActivityRowProps) {
 
   return (
     <div className="flex items-center gap-3 text-xs text-muted-foreground py-0.5">
-      <div className="size-8 flex items-center justify-center shrink-0">
-        {renderIcon()}
-      </div>
+      <div className="size-8 flex items-center justify-center shrink-0">{renderIcon()}</div>
       <div className="flex-1 flex flex-wrap items-center gap-1.5 min-w-0">
         <span className="font-semibold text-foreground">{activity.user}</span>
         <span>{activity.action}</span>

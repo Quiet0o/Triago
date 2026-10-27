@@ -1,7 +1,13 @@
-import { BlockHandleAdd, BlockHandleDraggable, BlockHandlePopup, BlockHandlePositioner, BlockHandleRoot } from 'prosekit/react/block-handle'
+import {
+  BlockHandleAdd,
+  BlockHandleDraggable,
+  BlockHandlePopup,
+  BlockHandlePositioner,
+  BlockHandleRoot,
+} from 'prosekit/react/block-handle';
 
 interface Props {
-  dir?: 'ltr' | 'rtl'
+  dir?: 'ltr' | 'rtl';
 }
 
 export default function BlockHandle(props: Props) {
@@ -21,5 +27,5 @@ export default function BlockHandle(props: Props) {
         </BlockHandlePopup>
       </BlockHandlePositioner>
     </BlockHandleRoot>
-  )
+  );
 }

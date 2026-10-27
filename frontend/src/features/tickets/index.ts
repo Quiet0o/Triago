@@ -19,10 +19,7 @@ export {
 } from './components/ticket-badges';
 
 // Context
-export {
-  CreateTicketProvider,
-  useCreateTicketModal,
-} from './context/create-ticket-context';
+export { CreateTicketProvider, useCreateTicketModal } from './context/create-ticket-context';
 
 // Queries & API
 export { ticketKeys, ticketQueries } from './queries';

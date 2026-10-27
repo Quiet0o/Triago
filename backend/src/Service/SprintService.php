@@ -6,7 +6,6 @@ namespace App\Service;
 
 use App\DTO\CreateSprintRequest;
 use App\Entity\Sprint;
-use App\Repository\SprintRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Uid\Uuid;
 
@@ -14,7 +13,6 @@ final class SprintService
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly SprintRepository $sprintRepository,
     ) {
     }
 

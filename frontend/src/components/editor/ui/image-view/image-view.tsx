@@ -1,54 +1,54 @@
-'use client'
+'use client';
 
-import { UploadTask } from 'prosekit/extensions/file'
-import type { ImageAttrs } from 'prosekit/extensions/image'
-import type { ReactNodeViewProps } from 'prosekit/react'
-import { ResizableHandle, ResizableRoot } from 'prosekit/react/resizable'
-import { useEffect, useState, type SyntheticEvent } from 'react'
+import { UploadTask } from 'prosekit/extensions/file';
+import type { ImageAttrs } from 'prosekit/extensions/image';
+import type { ReactNodeViewProps } from 'prosekit/react';
+import { ResizableHandle, ResizableRoot } from 'prosekit/react/resizable';
+import { useEffect, useState, type SyntheticEvent } from 'react';
 
 export default function ImageView(props: ReactNodeViewProps) {
-  const attrs = props.node.attrs as ImageAttrs
-  const url = attrs.src || ''
-  const uploading = url.startsWith('blob:')
+  const attrs = props.node.attrs as ImageAttrs;
+  const url = attrs.src || '';
+  const uploading = url.startsWith('blob:');
 
-  const [aspectRatio, setAspectRatio] = useState<number | undefined>()
-  const [error, setError] = useState<string | undefined>()
-  const [progress, setProgress] = useState(0)
+  const [aspectRatio, setAspectRatio] = useState<number | undefined>();
+  const [error, setError] = useState<string | undefined>();
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    if (!uploading) return
+    if (!uploading) return;
 
-    const uploadTask = UploadTask.get<string>(url)
-    if (!uploadTask) return
+    const uploadTask = UploadTask.get<string>(url);
+    if (!uploadTask) return;
 
-    let canceled = false
+    let canceled = false;
 
     uploadTask.finished.catch((error) => {
-      if (canceled) return
-      setError(String(error))
-    })
+      if (canceled) return;
+      setError(String(error));
+    });
     const unsubscribeProgress = uploadTask.subscribeProgress(({ loaded, total }) => {
-      if (canceled) return
-      setProgress(total ? loaded / total : 0)
-    })
+      if (canceled) return;
+      setProgress(total ? loaded / total : 0);
+    });
 
     return () => {
-      canceled = true
-      unsubscribeProgress()
-    }
-  }, [url, uploading])
+      canceled = true;
+      unsubscribeProgress();
+    };
+  }, [url, uploading]);
 
   const handleImageLoad = (event: SyntheticEvent) => {
-    const img = event.target as HTMLImageElement
-    const { naturalWidth, naturalHeight } = img
-    const ratio = naturalWidth / naturalHeight
+    const img = event.target as HTMLImageElement;
+    const { naturalWidth, naturalHeight } = img;
+    const ratio = naturalWidth / naturalHeight;
     if (ratio && Number.isFinite(ratio)) {
-      setAspectRatio(ratio)
+      setAspectRatio(ratio);
     }
     if (naturalWidth && naturalHeight && (!attrs.width || !attrs.height)) {
-      props.setAttrs({ width: naturalWidth, height: naturalHeight })
+      props.setAttrs({ width: naturalWidth, height: naturalHeight });
     }
-  }
+  };
 
   return (
     <ResizableRoot
@@ -76,9 +76,7 @@ export default function ImageView(props: ReactNodeViewProps) {
       {error && (
         <div className="absolute bottom-0 left-0 right-0 top-0 flex flex-col items-center justify-center gap-4 bg-gray-200 p-2 text-sm dark:bg-gray-800 @container">
           <div className="i-lucide-image-off size-8 block"></div>
-          <div className="hidden opacity-80 @xs:block">
-            Failed to upload image
-          </div>
+          <div className="hidden opacity-80 @xs:block">Failed to upload image</div>
         </div>
       )}
       <ResizableHandle
@@ -88,5 +86,5 @@ export default function ImageView(props: ReactNodeViewProps) {
         <div className="i-lucide-arrow-down-right size-4 block"></div>
       </ResizableHandle>
     </ResizableRoot>
-  )
+  );
 }

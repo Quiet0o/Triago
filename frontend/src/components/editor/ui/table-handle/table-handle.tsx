@@ -1,7 +1,7 @@
-import type { Editor } from 'prosekit/core'
-import type { TableExtension } from 'prosekit/extensions/table'
-import { useEditorDerivedValue } from 'prosekit/react'
-import { MenuItem, MenuPopup, MenuPositioner } from 'prosekit/react/menu'
+import type { Editor } from 'prosekit/core';
+import type { TableExtension } from 'prosekit/extensions/table';
+import { useEditorDerivedValue } from 'prosekit/react';
+import { MenuItem, MenuPopup, MenuPositioner } from 'prosekit/react/menu';
 import {
   TableHandleColumnMenuRoot,
   TableHandleColumnMenuTrigger,
@@ -14,7 +14,7 @@ import {
   TableHandleRowMenuTrigger,
   TableHandleRowPopup,
   TableHandleRowPositioner,
-} from 'prosekit/react/table-handle'
+} from 'prosekit/react/table-handle';
 
 function getTableHandleState(editor: Editor<TableExtension>) {
   return {
@@ -50,15 +50,15 @@ function getTableHandleState(editor: Editor<TableExtension>) {
       canExec: editor.commands.deleteTable.canExec(),
       command: () => editor.commands.deleteTable(),
     },
-  }
+  };
 }
 
 interface Props {
-  dir?: 'ltr' | 'rtl'
+  dir?: 'ltr' | 'rtl';
 }
 
 export default function TableHandle(props: Props) {
-  const state = useEditorDerivedValue(getTableHandleState)
+  const state = useEditorDerivedValue(getTableHandleState);
 
   return (
     <TableHandleRoot>
@@ -94,7 +94,9 @@ export default function TableHandle(props: Props) {
                     onSelect={state.deleteCellSelection.command}
                   >
                     <span>Clear Contents</span>
-                    <span className="text-xs tracking-widest text-gray-500 dark:text-gray-500">Del</span>
+                    <span className="text-xs tracking-widest text-gray-500 dark:text-gray-500">
+                      Del
+                    </span>
                   </MenuItem>
                 )}
                 {state.deleteTableColumn.canExec && (
@@ -152,7 +154,9 @@ export default function TableHandle(props: Props) {
                     onSelect={state.deleteCellSelection.command}
                   >
                     <span>Clear Contents</span>
-                    <span className="text-xs tracking-widest text-gray-500 dark:text-gray-500">Del</span>
+                    <span className="text-xs tracking-widest text-gray-500 dark:text-gray-500">
+                      Del
+                    </span>
                   </MenuItem>
                 )}
                 {state.deleteTableRow.canExec && (
@@ -178,5 +182,5 @@ export default function TableHandle(props: Props) {
         </TableHandleRowPopup>
       </TableHandleRowPositioner>
     </TableHandleRoot>
-  )
+  );
 }

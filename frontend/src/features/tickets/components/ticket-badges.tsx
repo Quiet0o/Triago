@@ -263,7 +263,13 @@ export function TicketMeta({ comments, attachments }: { comments: number; attach
   );
 }
 
-export function EpicBadge({ epicId, epicTitle }: { epicId?: string | null; epicTitle?: string | null }) {
+export function EpicBadge({
+  epicId,
+  epicTitle,
+}: {
+  epicId?: string | null;
+  epicTitle?: string | null;
+}) {
   if (!epicId) return null;
   return (
     <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 max-w-[130px] truncate">

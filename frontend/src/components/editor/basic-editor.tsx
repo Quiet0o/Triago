@@ -7,11 +7,7 @@ import * as React from 'react';
 import type { BasicExtension } from 'prosekit/basic';
 import { defineBasicExtension } from 'prosekit/basic';
 import type { Editor, NodeJSON } from 'prosekit/core';
-import {
-  createEditor,
-  defineDocChangeHandler,
-  union,
-} from 'prosekit/core';
+import { createEditor, defineDocChangeHandler, union } from 'prosekit/core';
 import type { Uploader } from 'prosekit/extensions/file';
 import type { ImageExtension } from 'prosekit/extensions/image';
 import { defineImageUploadHandler } from 'prosekit/extensions/image';
@@ -47,11 +43,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '#/components/ui/dialog.tsx';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '#/components/ui/tooltip.tsx';
+import { Tooltip, TooltipContent, TooltipTrigger } from '#/components/ui/tooltip.tsx';
 import { defineImageView } from './ui/image-view/index.ts';
 import { InlineMenu } from './ui/inline-menu/index.ts';
 
@@ -195,11 +187,7 @@ function InsertImageDialog({
             />
             {previewUrl ? (
               <div className="relative rounded-lg border bg-muted/20 p-2 flex flex-col items-center gap-2">
-                <img
-                  src={previewUrl}
-                  alt="Podgląd"
-                  className="max-h-48 rounded object-contain"
-                />
+                <img src={previewUrl} alt="Podgląd" className="max-h-48 rounded object-contain" />
                 <Button
                   type="button"
                   variant="outline"
@@ -222,9 +210,7 @@ function InsertImageDialog({
                   <p className="text-xs font-semibold text-foreground">
                     Kliknij, aby wybrać zdjęcie
                   </p>
-                  <p className="text-[11px] text-muted-foreground">
-                    PNG, JPG, GIF, WebP lub SVG
-                  </p>
+                  <p className="text-[11px] text-muted-foreground">PNG, JPG, GIF, WebP lub SVG</p>
                 </div>
               </div>
             )}
@@ -232,9 +218,7 @@ function InsertImageDialog({
         ) : (
           <div className="space-y-3 py-2">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">
-                Adres URL zdjęcia
-              </label>
+              <label className="text-xs font-medium text-muted-foreground">Adres URL zdjęcia</label>
               <Input
                 placeholder="https://example.com/zdjecie.png"
                 value={url}
