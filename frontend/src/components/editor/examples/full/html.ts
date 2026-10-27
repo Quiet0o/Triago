@@ -1,4 +1,5 @@
-import { createEditor, type NodeJSON } from 'prosekit/core';
+import { createEditor  } from 'prosekit/core';
+import type {NodeJSON} from 'prosekit/core';
 
 import { sampleContent } from '../../sample/sample-doc-full.ts';
 

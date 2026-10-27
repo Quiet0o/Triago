@@ -12,12 +12,7 @@ import {
   UploadCloud,
 } from 'lucide-react';
 import { Button } from '#/components/ui/button.tsx';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '#/components/ui/dialog.tsx';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '#/components/ui/dialog.tsx';
 import { cn } from '#/lib/utils';
 
 export interface AttachmentItem {
@@ -210,7 +205,10 @@ export function TicketAttachmentsSection({
 
                     {/* Image Footer info */}
                     <div className="p-2 text-xs">
-                      <p className="font-medium truncate text-foreground text-[11px]" title={img.name}>
+                      <p
+                        className="font-medium truncate text-foreground text-[11px]"
+                        title={img.name}
+                      >
                         {img.name}
                       </p>
                       <p className="text-[10px] text-muted-foreground">{img.size}</p>

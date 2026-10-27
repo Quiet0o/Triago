@@ -113,7 +113,8 @@ export function UserProfileView({ userIdOrEmail }: UserProfileViewProps) {
   React.useEffect(() => {
     if (!user?.email) return;
     try {
-      const savedAvatar = user.avatarUrl ?? localStorage.getItem(`triago_user_avatar_${user.email}`);
+      const savedAvatar =
+        user.avatarUrl ?? localStorage.getItem(`triago_user_avatar_${user.email}`);
       if (savedAvatar) setCustomAvatar(resolveMediaUrl(savedAvatar));
       const savedBanner = user.banner ?? localStorage.getItem(`triago_user_banner_${user.email}`);
       if (savedBanner) setCustomBanner(resolveMediaUrl(savedBanner));
@@ -213,7 +214,6 @@ export function UserProfileView({ userIdOrEmail }: UserProfileViewProps) {
       patch: { banner: null },
     });
   };
-
 
   const handleCopyEmail = () => {
     if (!user?.email) return;
@@ -333,9 +333,16 @@ export function UserProfileView({ userIdOrEmail }: UserProfileViewProps) {
           )}
           style={
             customBanner && !PRESET_BANNERS[customBanner]
-              ? { backgroundImage: `url(${customBanner})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+              ? {
+                  backgroundImage: `url(${customBanner})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }
               : !customBanner
-                ? { background: 'linear-gradient(to right, hsl(var(--primary) / 0.25), hsl(270 80% 60% / 0.18), hsl(220 80% 60% / 0.22))' }
+                ? {
+                    background:
+                      'linear-gradient(to right, hsl(var(--primary) / 0.25), hsl(270 80% 60% / 0.18), hsl(220 80% 60% / 0.22))',
+                  }
                 : undefined
           }
         >
@@ -377,7 +384,9 @@ export function UserProfileView({ userIdOrEmail }: UserProfileViewProps) {
                     className="gap-2 cursor-pointer text-xs flex items-center justify-between"
                   >
                     <div className="flex items-center gap-2">
-                      <span className={cn('size-3 rounded-full shrink-0 shadow-2xs', preset.dotClass)} />
+                      <span
+                        className={cn('size-3 rounded-full shrink-0 shadow-2xs', preset.dotClass)}
+                      />
                       <span>{preset.name}</span>
                     </div>
                     {customBanner === key && <Check className="size-3.5 text-primary shrink-0" />}
@@ -483,11 +492,13 @@ export function UserProfileView({ userIdOrEmail }: UserProfileViewProps) {
                   <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
                     {user.name}
                   </h1>
-                  <Badge variant="secondary" className="text-xs font-semibold px-2.5 py-0.5 rounded-md">
+                  <Badge
+                    variant="secondary"
+                    className="text-xs font-semibold px-2.5 py-0.5 rounded-md"
+                  >
                     {user.role}
                   </Badge>
                 </div>
-              
               </div>
             </div>
 
@@ -537,9 +548,11 @@ export function UserProfileView({ userIdOrEmail }: UserProfileViewProps) {
               <Briefcase className="size-3.5 text-muted-foreground shrink-0" />
               <span>
                 Stanowisko:{' '}
-                <strong className="font-medium text-foreground/90">{user.jobTitle ?? user.role}</strong>
+                <strong className="font-medium text-foreground/90">
+                  {user.jobTitle ?? user.role}
+                </strong>
               </span>
-            </div>           
+            </div>
           </div>
         </div>
       </div>
@@ -584,7 +597,9 @@ export function UserProfileView({ userIdOrEmail }: UserProfileViewProps) {
           </div>
           <div className="flex items-baseline justify-between">
             <span className="text-2xl font-bold text-foreground">{closedCount}</span>
-            <span className="text-[11px] text-emerald-600 font-medium">{completionRate}% zrobione</span>
+            <span className="text-[11px] text-emerald-600 font-medium">
+              {completionRate}% zrobione
+            </span>
           </div>
         </div>
 
@@ -654,8 +669,7 @@ export function UserProfileView({ userIdOrEmail }: UserProfileViewProps) {
                   : 'text-muted-foreground hover:text-foreground',
               )}
             >
-              <Clock className="size-3.5 text-amber-500" />
-              W toku ({userInProgressTickets.length})
+              <Clock className="size-3.5 text-amber-500" />W toku ({userInProgressTickets.length})
             </button>
             <button
               type="button"

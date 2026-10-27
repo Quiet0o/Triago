@@ -338,7 +338,6 @@ export function ProjectKanbanBoard({ tickets: initialTicketsProp }: { tickets?: 
     }
   }, [tickets, reorderTicketsMutation.isPending]);
 
-
   const toggleCollapse = (columnId: string) => {
     setCollapsedColumns((prev) => ({
       ...prev,
@@ -386,7 +385,6 @@ export function ProjectKanbanBoard({ tickets: initialTicketsProp }: { tickets?: 
   };
 
   return (
-
     <Kanban
       id="project-kanban"
       value={columns}

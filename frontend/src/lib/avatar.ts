@@ -49,7 +49,9 @@ export function useUserAvatar(
         !customEvent.detail.email ||
         customEvent.detail.email.toLowerCase() === email.toLowerCase()
       ) {
-        setAvatar(getUserAvatarUrl({ email, avatarUrl: customEvent.detail.avatarUrl ?? avatarUrl }));
+        setAvatar(
+          getUserAvatarUrl({ email, avatarUrl: customEvent.detail.avatarUrl ?? avatarUrl }),
+        );
       }
     };
 

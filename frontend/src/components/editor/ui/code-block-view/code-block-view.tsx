@@ -2,10 +2,11 @@
 
 import { renderMermaidSVG, THEMES } from 'beautiful-mermaid';
 import {
+  
   isCodeBlockPreviewHiddenDecoration,
-  shikiBundledLanguagesInfo,
-  type CodeBlockAttrs,
+  shikiBundledLanguagesInfo
 } from 'prosekit/extensions/code-block';
+import type {CodeBlockAttrs} from 'prosekit/extensions/code-block';
 import { TextSelection } from 'prosekit/pm/state';
 import type { ReactNodeViewProps } from 'prosekit/react';
 import { useMemo, useRef } from 'react';

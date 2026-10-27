@@ -8,7 +8,8 @@ import {
   PopoverTrigger,
 } from 'prosekit/react/popover';
 import type { OpenChangeEvent } from 'prosekit/web/popover';
-import { useId, useState, type ReactNode } from 'react';
+import {  useId, useState } from 'react';
+import type {ReactNode} from 'react';
 
 import { Button } from '../button/index.ts';
 

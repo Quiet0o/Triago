@@ -1,5 +1,6 @@
 import type { Extension } from 'prosekit/core';
-import { defineReactNodeView, type ReactNodeViewComponent } from 'prosekit/react';
+import { defineReactNodeView  } from 'prosekit/react';
+import type {ReactNodeViewComponent} from 'prosekit/react';
 
 import CodeBlockView from './code-block-view.tsx';
 

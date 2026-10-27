@@ -269,7 +269,8 @@ export function TicketDetailView({ ticketId }: TicketDetailViewProps) {
   };
 
   const handleAddAttachment = (file: File) => {
-    const isImage = file.type.startsWith('image/') || file.name.match(/\.(png|jpe?g|gif|webp|svg)$/i);
+    const isImage =
+      file.type.startsWith('image/') || file.name.match(/\.(png|jpe?g|gif|webp|svg)$/i);
     const sizeStr =
       file.size < 1024 * 1024
         ? `${(file.size / 1024).toFixed(1)} KB`

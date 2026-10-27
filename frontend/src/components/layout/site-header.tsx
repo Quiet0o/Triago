@@ -97,10 +97,16 @@ export const SiteHeader = ({
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-full cursor-pointer hover:ring-2 hover:ring-primary/20 transition-all">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full cursor-pointer hover:ring-2 hover:ring-primary/20 transition-all"
+            >
               <Avatar className="size-8">
                 {avatarUrl && <AvatarImage src={avatarUrl} alt={user?.fullName ?? ''} />}
-                <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xs">{initials}</AvatarFallback>
+                <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xs">
+                  {initials}
+                </AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
@@ -108,10 +114,14 @@ export const SiteHeader = ({
             <div className="flex items-center gap-2.5 p-2">
               <Avatar className="size-9 shrink-0">
                 {avatarUrl && <AvatarImage src={avatarUrl} alt={user?.fullName ?? ''} />}
-                <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xs">{initials}</AvatarFallback>
+                <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xs">
+                  {initials}
+                </AvatarFallback>
               </Avatar>
               <div className="flex flex-col space-y-0.5 min-w-0">
-                <p className="text-sm font-semibold leading-none truncate text-foreground">{user?.fullName ?? 'Użytkownik'}</p>
+                <p className="text-sm font-semibold leading-none truncate text-foreground">
+                  {user?.fullName ?? 'Użytkownik'}
+                </p>
                 <p className="text-xs leading-none text-muted-foreground truncate">{user?.email}</p>
               </div>
             </div>

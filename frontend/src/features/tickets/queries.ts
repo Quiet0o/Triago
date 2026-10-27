@@ -21,7 +21,6 @@ import {
 import type { CreateCommentInput, CreateTicketInput, UpdateTicketInput } from './api';
 import type { Ticket, TicketFilters, TicketStatus } from '#/types/tickets';
 
-
 /**
  * Hierarchical query key factory ensuring predictable caching and targeted invalidation.
  */

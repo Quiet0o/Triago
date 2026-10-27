@@ -252,7 +252,9 @@ export const AssigneeAvatar = ({
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0">
-            <p className="font-semibold text-xs text-foreground truncate leading-tight">{person.name}</p>
+            <p className="font-semibold text-xs text-foreground truncate leading-tight">
+              {person.name}
+            </p>
             <p className="text-[11px] text-muted-foreground truncate">{person.role}</p>
           </div>
         </div>

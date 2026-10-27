@@ -1,7 +1,8 @@
 import 'prosekit/basic/style.css';
 import 'prosekit/basic/typography.css';
 
-import { createEditor, type NodeJSON } from 'prosekit/core';
+import { createEditor  } from 'prosekit/core';
+import type {NodeJSON} from 'prosekit/core';
 import { ProseKit } from 'prosekit/react';
 import { useMemo } from 'react';
 
