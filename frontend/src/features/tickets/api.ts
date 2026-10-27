@@ -438,3 +438,76 @@ export async function deleteSubtask(ticketId: string, subtaskId: string): Promis
     console.warn('Backend unavailable, deleting subtask in mock store:', err);
   }
 }
+
+export interface BackendUserDto {
+  id: string;
+  email: string;
+  fullName: string | null;
+  jobTitle: string | null;
+  avatarFallback: string;
+  roles: string[];
+  createdAt: string;
+}
+
+/**
+ * Fetch all users from backend or fallback to TEAM_MEMBERS.
+ */
+export async function getUsers(): Promise<TicketPerson[]> {
+  try {
+    const data = await apiRequest<BackendUserDto[]>('/api/users');
+    if (Array.isArray(data) && data.length > 0) {
+      return data.map((u) => ({
+        id: u.id,
+        name: u.fullName ?? u.email,
+        email: u.email,
+        avatarFallback: u.avatarFallback,
+        role: u.jobTitle ?? (u.roles.includes('ROLE_ADMIN') ? 'Administrator' : 'Developer'),
+        jobTitle: u.jobTitle ?? undefined,
+        createdAt: u.createdAt,
+      }));
+    }
+  } catch (err) {
+    console.warn('Backend unavailable, using TEAM_MEMBERS fallback:', err);
+  }
+  return TEAM_MEMBERS;
+}
+
+/**
+ * Fetch user profile by ID or email.
+ */
+export async function getUserProfile(idOrEmail: string): Promise<TicketPerson> {
+  const decoded = decodeURIComponent(idOrEmail);
+  try {
+    const u = await apiRequest<BackendUserDto>(`/api/users/${encodeURIComponent(decoded)}`);
+    return {
+      id: u.id,
+      name: u.fullName ?? u.email,
+      email: u.email,
+      avatarFallback: u.avatarFallback,
+      role: u.jobTitle ?? (u.roles.includes('ROLE_ADMIN') ? 'Administrator' : 'Developer'),
+      jobTitle: u.jobTitle ?? undefined,
+      createdAt: u.createdAt,
+    };
+  } catch (err) {
+    console.warn('Backend user profile not found, checking local TEAM_MEMBERS:', err);
+  }
+
+  const found = TEAM_MEMBERS.find(
+    (m) =>
+      m.email.toLowerCase() === decoded.toLowerCase() ||
+      m.name.toLowerCase() === decoded.toLowerCase() ||
+      m.id === decoded,
+  );
+
+  if (found) {
+    return found;
+  }
+
+  return {
+    id: 'user-unknown',
+    name: decoded.includes('@') ? decoded.split('@')[0] : decoded,
+    email: decoded.includes('@') ? decoded : `${decoded.toLowerCase()}@triago.pl`,
+    avatarFallback: decoded.slice(0, 2).toUpperCase(),
+    role: 'Team Member',
+  };
+}

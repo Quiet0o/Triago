@@ -68,7 +68,15 @@ export function TicketDetailView({ ticketId }: TicketDetailViewProps) {
   const [ticket, setTicket] = React.useState<Ticket | null>(null);
   const [comments, setComments] = React.useState<Comment[]>([]);
   const [activities, setActivities] = React.useState<ActivityEvent[]>([]);
-  const [attachments, setAttachments] = React.useState<AttachmentItem[]>([]);
+  const [attachments, setAttachments] = React.useState<AttachmentItem[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem(`triago_attachments_${ticketId}`);
+        if (stored) return JSON.parse(stored);
+      } catch {}
+    }
+    return [];
+  });
 
   // Feed & view state
   const [activeTab, setActiveTab] = React.useState<ActivityTab>('all');
@@ -249,17 +257,63 @@ export function TicketDetailView({ ticketId }: TicketDetailViewProps) {
   };
 
   const handleRemoveAttachment = (attachmentId: string) => {
-    setAttachments((prev) => prev.filter((a) => a.id !== attachmentId));
+    setAttachments((prev) => {
+      const next = prev.filter((a) => a.id !== attachmentId);
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(`triago_attachments_${ticketId}`, JSON.stringify(next));
+        } catch {}
+      }
+      return next;
+    });
   };
 
   const handleAddAttachment = (file: File) => {
-    const newAtt: AttachmentItem = {
-      id: `att-${Date.now()}`,
-      name: file.name,
-      size: `${(file.size / 1024).toFixed(1)} KB`,
-      type: file.type.startsWith('image/') ? 'image' : 'file',
-    };
-    setAttachments((prev) => [...prev, newAtt]);
+    const isImage = file.type.startsWith('image/') || file.name.match(/\.(png|jpe?g|gif|webp|svg)$/i);
+    const sizeStr =
+      file.size < 1024 * 1024
+        ? `${(file.size / 1024).toFixed(1)} KB`
+        : `${(file.size / (1024 * 1024)).toFixed(1)} MB`;
+
+    if (isImage) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        const newAtt: AttachmentItem = {
+          id: `att-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+          name: file.name,
+          size: sizeStr,
+          type: 'image',
+          url: dataUrl,
+        };
+        setAttachments((prev) => {
+          const next = [...prev, newAtt];
+          if (typeof window !== 'undefined') {
+            try {
+              localStorage.setItem(`triago_attachments_${ticketId}`, JSON.stringify(next));
+            } catch {}
+          }
+          return next;
+        });
+      };
+      reader.readAsDataURL(file);
+    } else {
+      const newAtt: AttachmentItem = {
+        id: `att-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+        name: file.name,
+        size: sizeStr,
+        type: 'file',
+      };
+      setAttachments((prev) => {
+        const next = [...prev, newAtt];
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem(`triago_attachments_${ticketId}`, JSON.stringify(next));
+          } catch {}
+        }
+        return next;
+      });
+    }
   };
 
   const handleAddComment = (text: string, html: string) => {

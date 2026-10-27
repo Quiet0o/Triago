@@ -1,5 +1,4 @@
-'use client';
-
+import { Link } from '@tanstack/react-router';
 import { cn } from '#/lib/utils';
 import { Avatar, AvatarFallback } from '#/components/ui/avatar.tsx';
 import { Badge } from '#/components/ui/badge.tsx';
@@ -14,14 +13,28 @@ export interface CommentCardProps {
 export function CommentCard({ comment, onToggleReaction }: CommentCardProps) {
   return (
     <div className="flex gap-3 text-sm group relative">
-      <Avatar className="size-8 shrink-0">
-        <AvatarFallback className="text-xs font-semibold bg-primary/10 text-primary">
-          {comment.author.avatarFallback}
-        </AvatarFallback>
-      </Avatar>
+      <Link
+        to="/project/profile/$userId"
+        params={{ userId: comment.author.email }}
+        className="shrink-0 hover:opacity-85 transition-opacity cursor-pointer"
+        title={`Profil użytkownika: ${comment.author.name}`}
+      >
+        <Avatar className="size-8">
+          <AvatarFallback className="text-xs font-semibold bg-primary/10 text-primary">
+            {comment.author.avatarFallback}
+          </AvatarFallback>
+        </Avatar>
+      </Link>
       <div className="flex-1 space-y-1.5 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="font-semibold text-xs text-foreground">{comment.author.name}</span>
+          <Link
+            to="/project/profile/$userId"
+            params={{ userId: comment.author.email }}
+            className="font-semibold text-xs text-foreground hover:text-primary hover:underline cursor-pointer"
+            title={`Profil: ${comment.author.name}`}
+          >
+            {comment.author.name}
+          </Link>
           <span className="text-[10px] text-muted-foreground">•</span>
           <span className="text-[11px] text-muted-foreground">{comment.createdAt}</span>
           <Badge variant="outline" className="text-[9px] h-4 px-1.5 py-0 font-normal">

@@ -20,6 +20,8 @@ import { Route as ProjectBacklogIndexRouteImport } from './routes/project/backlo
 import { Route as ProjectBoardIndexRouteImport } from './routes/project/board/index'
 import { Route as ProjectDevelopmentIndexRouteImport } from './routes/project/development/index'
 import { Route as ProjectDocumentsIndexRouteImport } from './routes/project/documents/index'
+import { Route as ProjectProfileIndexRouteImport } from './routes/project/profile/index'
+import { Route as ProjectProfileUserIdRouteImport } from './routes/project/profile/$userId'
 import { Route as ProjectSummaryIndexRouteImport } from './routes/project/summary/index'
 import { Route as ProjectTicketsTicketIdRouteImport } from './routes/project/tickets/$ticketId'
 import { Route as ProjectTimelineIndexRouteImport } from './routes/project/timeline/index'
@@ -79,6 +81,16 @@ const ProjectDocumentsIndexRoute = ProjectDocumentsIndexRouteImport.update({
   path: '/documents/',
   getParentRoute: () => ProjectRouteRoute,
 } as any)
+const ProjectProfileIndexRoute = ProjectProfileIndexRouteImport.update({
+  id: '/profile/',
+  path: '/profile/',
+  getParentRoute: () => ProjectRouteRoute,
+} as any)
+const ProjectProfileUserIdRoute = ProjectProfileUserIdRouteImport.update({
+  id: '/profile/$userId',
+  path: '/profile/$userId',
+  getParentRoute: () => ProjectRouteRoute,
+} as any)
 const ProjectSummaryIndexRoute = ProjectSummaryIndexRouteImport.update({
   id: '/summary/',
   path: '/summary/',
@@ -101,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/project/': typeof ProjectIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/project/profile/$userId': typeof ProjectProfileUserIdRoute
   '/project/tickets/$ticketId': typeof ProjectTicketsTicketIdRoute
   '/auth/login/': typeof AuthLoginIndexRoute
   '/auth/register/': typeof AuthRegisterIndexRoute
@@ -108,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/project/board/': typeof ProjectBoardIndexRoute
   '/project/development/': typeof ProjectDevelopmentIndexRoute
   '/project/documents/': typeof ProjectDocumentsIndexRoute
+  '/project/profile/': typeof ProjectProfileIndexRoute
   '/project/summary/': typeof ProjectSummaryIndexRoute
   '/project/timeline/': typeof ProjectTimelineIndexRoute
 }
@@ -116,6 +130,7 @@ export interface FileRoutesByTo {
   '/project': typeof ProjectIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/project/profile/$userId': typeof ProjectProfileUserIdRoute
   '/project/tickets/$ticketId': typeof ProjectTicketsTicketIdRoute
   '/auth/login': typeof AuthLoginIndexRoute
   '/auth/register': typeof AuthRegisterIndexRoute
@@ -123,6 +138,7 @@ export interface FileRoutesByTo {
   '/project/board': typeof ProjectBoardIndexRoute
   '/project/development': typeof ProjectDevelopmentIndexRoute
   '/project/documents': typeof ProjectDocumentsIndexRoute
+  '/project/profile': typeof ProjectProfileIndexRoute
   '/project/summary': typeof ProjectSummaryIndexRoute
   '/project/timeline': typeof ProjectTimelineIndexRoute
 }
@@ -133,6 +149,7 @@ export interface FileRoutesById {
   '/project/': typeof ProjectIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/project/profile/$userId': typeof ProjectProfileUserIdRoute
   '/project/tickets/$ticketId': typeof ProjectTicketsTicketIdRoute
   '/auth/login/': typeof AuthLoginIndexRoute
   '/auth/register/': typeof AuthRegisterIndexRoute
@@ -140,6 +157,7 @@ export interface FileRoutesById {
   '/project/board/': typeof ProjectBoardIndexRoute
   '/project/development/': typeof ProjectDevelopmentIndexRoute
   '/project/documents/': typeof ProjectDocumentsIndexRoute
+  '/project/profile/': typeof ProjectProfileIndexRoute
   '/project/summary/': typeof ProjectSummaryIndexRoute
   '/project/timeline/': typeof ProjectTimelineIndexRoute
 }
@@ -151,6 +169,7 @@ export interface FileRouteTypes {
     | '/project/'
     | '/api/auth/$'
     | '/api/trpc/$'
+    | '/project/profile/$userId'
     | '/project/tickets/$ticketId'
     | '/auth/login/'
     | '/auth/register/'
@@ -158,6 +177,7 @@ export interface FileRouteTypes {
     | '/project/board/'
     | '/project/development/'
     | '/project/documents/'
+    | '/project/profile/'
     | '/project/summary/'
     | '/project/timeline/'
   fileRoutesByTo: FileRoutesByTo
@@ -166,6 +186,7 @@ export interface FileRouteTypes {
     | '/project'
     | '/api/auth/$'
     | '/api/trpc/$'
+    | '/project/profile/$userId'
     | '/project/tickets/$ticketId'
     | '/auth/login'
     | '/auth/register'
@@ -173,6 +194,7 @@ export interface FileRouteTypes {
     | '/project/board'
     | '/project/development'
     | '/project/documents'
+    | '/project/profile'
     | '/project/summary'
     | '/project/timeline'
   id:
@@ -182,6 +204,7 @@ export interface FileRouteTypes {
     | '/project/'
     | '/api/auth/$'
     | '/api/trpc/$'
+    | '/project/profile/$userId'
     | '/project/tickets/$ticketId'
     | '/auth/login/'
     | '/auth/register/'
@@ -189,6 +212,7 @@ export interface FileRouteTypes {
     | '/project/board/'
     | '/project/development/'
     | '/project/documents/'
+    | '/project/profile/'
     | '/project/summary/'
     | '/project/timeline/'
   fileRoutesById: FileRoutesById
@@ -281,6 +305,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectDocumentsIndexRouteImport
       parentRoute: typeof ProjectRouteRoute
     }
+    '/project/profile/': {
+      id: '/project/profile/'
+      path: '/profile'
+      fullPath: '/project/profile/'
+      preLoaderRoute: typeof ProjectProfileIndexRouteImport
+      parentRoute: typeof ProjectRouteRoute
+    }
+    '/project/profile/$userId': {
+      id: '/project/profile/$userId'
+      path: '/profile/$userId'
+      fullPath: '/project/profile/$userId'
+      preLoaderRoute: typeof ProjectProfileUserIdRouteImport
+      parentRoute: typeof ProjectRouteRoute
+    }
     '/project/summary/': {
       id: '/project/summary/'
       path: '/summary'
@@ -307,22 +345,26 @@ declare module '@tanstack/react-router' {
 
 interface ProjectRouteRouteChildren {
   ProjectIndexRoute: typeof ProjectIndexRoute
+  ProjectProfileUserIdRoute: typeof ProjectProfileUserIdRoute
   ProjectTicketsTicketIdRoute: typeof ProjectTicketsTicketIdRoute
   ProjectBacklogIndexRoute: typeof ProjectBacklogIndexRoute
   ProjectBoardIndexRoute: typeof ProjectBoardIndexRoute
   ProjectDevelopmentIndexRoute: typeof ProjectDevelopmentIndexRoute
   ProjectDocumentsIndexRoute: typeof ProjectDocumentsIndexRoute
+  ProjectProfileIndexRoute: typeof ProjectProfileIndexRoute
   ProjectSummaryIndexRoute: typeof ProjectSummaryIndexRoute
   ProjectTimelineIndexRoute: typeof ProjectTimelineIndexRoute
 }
 
 const ProjectRouteRouteChildren: ProjectRouteRouteChildren = {
   ProjectIndexRoute: ProjectIndexRoute,
+  ProjectProfileUserIdRoute: ProjectProfileUserIdRoute,
   ProjectTicketsTicketIdRoute: ProjectTicketsTicketIdRoute,
   ProjectBacklogIndexRoute: ProjectBacklogIndexRoute,
   ProjectBoardIndexRoute: ProjectBoardIndexRoute,
   ProjectDevelopmentIndexRoute: ProjectDevelopmentIndexRoute,
   ProjectDocumentsIndexRoute: ProjectDocumentsIndexRoute,
+  ProjectProfileIndexRoute: ProjectProfileIndexRoute,
   ProjectSummaryIndexRoute: ProjectSummaryIndexRoute,
   ProjectTimelineIndexRoute: ProjectTimelineIndexRoute,
 }

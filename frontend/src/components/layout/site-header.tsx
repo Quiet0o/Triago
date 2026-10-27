@@ -1,5 +1,5 @@
 import { Bell, Plus, Search, Settings } from 'lucide-react';
-import { useNavigate } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 
 import { Button } from '#/components/ui/button.tsx';
 import { Input } from '#/components/ui/input.tsx';
@@ -107,7 +107,11 @@ export const SiteHeader = ({
             </div>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>Profile</DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/project/profile" className="cursor-pointer w-full">
+                  Profile
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuItem>Billing</DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

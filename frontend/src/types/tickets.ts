@@ -4,10 +4,13 @@ export type TicketStatus =
 export type TicketType = 'epic' | 'bug' | 'task' | 'story' | 'subtask' | 'improvement';
 
 export type TicketPerson = {
+  id?: string;
   name: string;
   email: string;
   avatarFallback: string;
   role: string;
+  jobTitle?: string;
+  createdAt?: string;
 };
 
 export type Subtask = {

@@ -1,5 +1,4 @@
-'use client';
-
+import { Link } from '@tanstack/react-router';
 import { ArrowRight, History, Plus, User } from 'lucide-react';
 import type { ActivityEvent } from '#/types/tickets';
 
@@ -41,7 +40,14 @@ export function ActivityRow({ activity }: ActivityRowProps) {
     <div className="flex items-center gap-3 text-xs text-muted-foreground py-0.5">
       <div className="size-8 flex items-center justify-center shrink-0">{renderIcon()}</div>
       <div className="flex-1 flex flex-wrap items-center gap-1.5 min-w-0">
-        <span className="font-semibold text-foreground">{activity.user}</span>
+        <Link
+          to="/project/profile/$userId"
+          params={{ userId: activity.user }}
+          className="font-semibold text-foreground hover:text-primary hover:underline cursor-pointer"
+          title={`Profil: ${activity.user}`}
+        >
+          {activity.user}
+        </Link>
         <span>{activity.action}</span>
         <span className="font-semibold text-foreground px-2 py-0.5 rounded bg-muted/60 border border-border/60 text-[11px]">
           {activity.target}

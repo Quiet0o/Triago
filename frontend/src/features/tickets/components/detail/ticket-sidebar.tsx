@@ -164,7 +164,20 @@ export function TicketSidebar({
 
       {/* Assignee */}
       <div className="space-y-1.5">
-        <label className="text-xs font-medium text-muted-foreground">Przypisana osoba</label>
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-medium text-muted-foreground">Przypisana osoba</label>
+          {ticket.assignee && (
+            <Link
+              to="/project/profile/$userId"
+              params={{ userId: ticket.assignee.email }}
+              className="text-[11px] font-medium text-primary hover:underline flex items-center gap-1 cursor-pointer"
+              title={`Zobacz profil: ${ticket.assignee.name}`}
+            >
+              <span>Profil</span>
+              <ExternalLink className="size-2.5" />
+            </Link>
+          )}
+        </div>
         <Select
           value={ticket.assignee?.email ?? 'unassigned'}
           onValueChange={(val) => {
@@ -199,17 +212,27 @@ export function TicketSidebar({
       {/* Reporter */}
       <div className="space-y-1.5">
         <label className="text-xs font-medium text-muted-foreground">Zgłaszający</label>
-        <div className="flex items-center gap-2 rounded-lg border bg-muted/20 px-3 py-2 text-xs">
-          <Avatar className="size-6">
-            <AvatarFallback className="text-[10px]">
-              {ticket.reporter.avatarFallback}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="font-medium text-foreground">{ticket.reporter.name}</p>
-            <p className="text-[10px] text-muted-foreground">{ticket.reporter.role}</p>
+        <Link
+          to="/project/profile/$userId"
+          params={{ userId: ticket.reporter.email }}
+          className="flex items-center justify-between gap-2 rounded-lg border bg-muted/20 hover:bg-muted/40 hover:border-primary/30 px-3 py-2 text-xs transition-all group cursor-pointer"
+          title={`Zobacz profil: ${ticket.reporter.name}`}
+        >
+          <div className="flex items-center gap-2.5">
+            <Avatar className="size-6">
+              <AvatarFallback className="text-[10px]">
+                {ticket.reporter.avatarFallback}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-medium text-foreground group-hover:text-primary transition-colors">
+                {ticket.reporter.name}
+              </p>
+              <p className="text-[10px] text-muted-foreground">{ticket.reporter.role}</p>
+            </div>
           </div>
-        </div>
+          <ExternalLink className="size-3 text-muted-foreground opacity-40 group-hover:opacity-100 group-hover:text-primary transition-all shrink-0" />
+        </Link>
       </div>
 
       {/* Sprint */}

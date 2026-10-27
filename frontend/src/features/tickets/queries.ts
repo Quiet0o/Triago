@@ -9,6 +9,8 @@ import {
   getTicketById,
   getTicketComments,
   getTickets,
+  getUserProfile,
+  getUsers,
   updateSubtask,
   updateTicket,
   type CreateCommentInput,
@@ -31,6 +33,8 @@ export const ticketKeys = {
   activities: (ticketId: string | typeof skipToken) =>
     [...ticketKeys.details(), ticketId, 'activities'] as const,
   sprints: () => ['sprints'] as const,
+  users: () => ['users'] as const,
+  userProfile: (idOrEmail: string | typeof skipToken) => ['users', 'profile', idOrEmail] as const,
 };
 
 export const ticketQueries = {
@@ -72,6 +76,22 @@ export const ticketQueries = {
       queryKey: ticketKeys.sprints(),
       queryFn: () => getSprints(),
       staleTime: 1000 * 60 * 10,
+    }),
+
+  // Users list
+  users: () =>
+    queryOptions({
+      queryKey: ticketKeys.users(),
+      queryFn: () => getUsers(),
+      staleTime: 1000 * 60 * 5,
+    }),
+
+  // User profile
+  userProfile: (idOrEmail: string | typeof skipToken) =>
+    queryOptions({
+      queryKey: ticketKeys.userProfile(idOrEmail),
+      queryFn: idOrEmail === skipToken ? skipToken : () => getUserProfile(idOrEmail),
+      staleTime: 1000 * 60 * 5,
     }),
 };
 

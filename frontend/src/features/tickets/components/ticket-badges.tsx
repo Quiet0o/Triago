@@ -17,6 +17,7 @@ import {
   Paperclip,
   Zap,
 } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
 import { Badge } from '#/components/ui/badge.tsx';
 import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar.tsx';
 import { Tooltip, TooltipContent, TooltipTrigger } from '#/components/ui/tooltip.tsx';
@@ -216,21 +217,29 @@ export const AssigneeAvatar = ({
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Avatar className={cn('border', size === 'sm' ? 'size-6' : 'size-7')}>
-          <AvatarImage src={`https://i.pravatar.cc/150?u=${person.email}`} alt={person.name} />
-          <AvatarFallback
-            className={cn(
-              'bg-primary/10 text-primary font-medium',
-              size === 'sm' ? 'text-[0.6rem]' : 'text-xs',
-            )}
-          >
-            {person.avatarFallback}
-          </AvatarFallback>
-        </Avatar>
+        <Link
+          to="/project/profile/$userId"
+          params={{ userId: person.email }}
+          onClick={(e) => e.stopPropagation()}
+          className="inline-block rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary hover:opacity-85 transition-opacity cursor-pointer shrink-0"
+        >
+          <Avatar className={cn('border', size === 'sm' ? 'size-6' : 'size-7')}>
+            <AvatarImage src={`https://i.pravatar.cc/150?u=${encodeURIComponent(person.email)}`} alt={person.name} />
+            <AvatarFallback
+              className={cn(
+                'bg-primary/10 text-primary font-medium',
+                size === 'sm' ? 'text-[0.6rem]' : 'text-xs',
+              )}
+            >
+              {person.avatarFallback}
+            </AvatarFallback>
+          </Avatar>
+        </Link>
       </TooltipTrigger>
-      <TooltipContent side="top" className="px-3 py-2">
-        <p className="text-sm font-semibold leading-none mb-1 text-background">{person.name}</p>
-        <p className="text-xs leading-none text-background/70">{person.role}</p>
+      <TooltipContent side="top" className="px-3 py-2 text-xs">
+        <p className="font-semibold leading-none mb-1 text-foreground">{person.name}</p>
+        <p className="text-muted-foreground text-[11px]">{person.role}</p>
+        <p className="text-[10px] text-primary font-medium mt-1">Zobacz profil ↗</p>
       </TooltipContent>
     </Tooltip>
   );

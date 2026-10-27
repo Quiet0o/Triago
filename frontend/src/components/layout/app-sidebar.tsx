@@ -10,6 +10,7 @@ import {
   PanelLeftOpen,
   Settings,
   Sparkles,
+  User,
   Users,
 } from 'lucide-react';
 
@@ -91,6 +92,11 @@ export const AppSidebar = ({ ...props }: ComponentProps<typeof Sidebar>) => {
 
   const secondaryNavItems = [
     {
+      title: 'Mój profil',
+      url: '/project/profile',
+      icon: User,
+    },
+    {
       title: m['navbar.settings'](),
       url: '#',
       icon: Settings,
@@ -150,10 +156,17 @@ export const AppSidebar = ({ ...props }: ComponentProps<typeof Sidebar>) => {
               {secondaryNavItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={item.title}>
-                    <a href={item.url} className="flex min-w-0 items-center gap-2">
-                      <item.icon className="size-4 shrink-0" />
-                      <span className="truncate">{item.title}</span>
-                    </a>
+                    {item.url.startsWith('/') ? (
+                      <Link to={item.url} className="flex min-w-0 items-center gap-2">
+                        <item.icon className="size-4 shrink-0" />
+                        <span className="truncate">{item.title}</span>
+                      </Link>
+                    ) : (
+                      <a href={item.url} className="flex min-w-0 items-center gap-2">
+                        <item.icon className="size-4 shrink-0" />
+                        <span className="truncate">{item.title}</span>
+                      </a>
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
