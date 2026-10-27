@@ -329,18 +329,20 @@ export function UserProfileView({ userIdOrEmail }: UserProfileViewProps) {
             'h-44 sm:h-52 w-full relative border-b border-border/40 transition-all duration-300 overflow-hidden',
             customBanner && PRESET_BANNERS[customBanner]
               ? PRESET_BANNERS[customBanner].bgClass
-              : !customBanner
-                ? 'bg-gradient-to-r from-primary/20 via-purple-500/15 to-blue-500/20'
-                : 'bg-cover bg-center',
+              : 'bg-cover bg-center',
           )}
           style={
             customBanner && !PRESET_BANNERS[customBanner]
-              ? { backgroundImage: `url(${customBanner})` }
-              : undefined
+              ? { backgroundImage: `url(${customBanner})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+              : !customBanner
+                ? { background: 'linear-gradient(to right, hsl(var(--primary) / 0.25), hsl(270 80% 60% / 0.18), hsl(220 80% 60% / 0.22))' }
+                : undefined
           }
         >
-          {/* Subtle grid pattern overlay */}
-          <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#1f2937_1px,transparent_1px)] [background-size:16px_16px] opacity-30 pointer-events-none" />
+          {/* Subtle grid pattern overlay — hidden when a real image is set */}
+          {(!customBanner || !!PRESET_BANNERS[customBanner]) && (
+            <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#1f2937_1px,transparent_1px)] [background-size:16px_16px] opacity-30 pointer-events-none" />
+          )}
 
           {/* Banner action button: change background */}
           <div className="absolute top-3 right-3 z-20">

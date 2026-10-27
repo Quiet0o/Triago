@@ -44,9 +44,14 @@ function ProjectLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [globalSearch, setGlobalSearch] = React.useState('');
+  const [isMounted, setIsMounted] = React.useState(false);
 
   React.useEffect(() => {
-    if (!user) {
+    setIsMounted(true);
+  }, []);
+
+  React.useEffect(() => {
+    if (isMounted && !user) {
       void navigate({
         to: '/auth/login',
         search: {
@@ -54,9 +59,9 @@ function ProjectLayout() {
         },
       });
     }
-  }, [user, navigate, location.href]);
+  }, [isMounted, user, navigate, location.href]);
 
-  if (!user) {
+  if (!isMounted || !user) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <Loader2 className="size-8 animate-spin text-primary" />

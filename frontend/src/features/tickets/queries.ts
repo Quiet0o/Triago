@@ -19,7 +19,8 @@ import {
   uploadUserBanner,
 } from './api';
 import type { CreateCommentInput, CreateTicketInput, UpdateTicketInput } from './api';
-import type { TicketFilters, TicketStatus } from '#/types/tickets';
+import type { Ticket, TicketFilters, TicketStatus } from '#/types/tickets';
+
 
 /**
  * Hierarchical query key factory ensuring predictable caching and targeted invalidation.
@@ -256,6 +257,7 @@ export function useUploadUserBannerMutation() {
 
 /**
  * Mutation to batch reorder tickets (column movement & position inside column).
+ * Uses optimistic cache update so the kanban board never reverts after a drag.
  */
 export function useReorderTicketsMutation() {
   const queryClient = useQueryClient();
@@ -269,9 +271,43 @@ export function useReorderTicketsMutation() {
         rank?: string;
       }>,
     ) => reorderTickets(items),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ticketKeys.lists() });
+    onMutate: async (items) => {
+      // Cancel any in-flight ticket list queries so they don't overwrite our optimistic update
+      await queryClient.cancelQueries({ queryKey: ticketKeys.lists() });
+
+      // Snapshot the previous value for rollback
+      const previousTickets = queryClient.getQueryData<unknown>(ticketKeys.list());
+
+      // Optimistically update the cache with the new order
+      queryClient.setQueriesData<Ticket[]>({ queryKey: ticketKeys.lists() }, (old) => {
+        if (!old) return old;
+        const itemMap = new Map(items.map((i) => [i.id, i]));
+        return old.map((ticket) => {
+          const update = itemMap.get(ticket.id);
+          if (!update) return ticket;
+          return {
+            ...ticket,
+            ...(update.status ? { status: update.status } : {}),
+            ...(update.rank ? { rank: update.rank } : {}),
+            ...(update.position !== undefined ? { position: update.position } : {}),
+          };
+        });
+      });
+
+      return { previousTickets };
+    },
+    onError: (_err, _items, context) => {
+      // Rollback to previous state on error
+      if (context?.previousTickets) {
+        queryClient.setQueryData(ticketKeys.list(), context.previousTickets);
+      }
+    },
+    onSettled: () => {
+      // After success, do a quiet background refetch to sync any server-computed values
+      // Use refetchType: 'none' for a short delay so we don't race with Doctrine flush
+      setTimeout(() => {
+        void queryClient.invalidateQueries({ queryKey: ticketKeys.lists(), refetchType: 'none' });
+      }, 800);
     },
   });
 }
-

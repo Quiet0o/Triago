@@ -330,11 +330,14 @@ export function ProjectKanbanBoard({ tickets: initialTicketsProp }: { tickets?: 
 
   const prevTicketsRef = useRef(tickets);
   useEffect(() => {
+    // Don't overwrite the local drag state while a reorder is in-flight
+    if (reorderTicketsMutation.isPending) return;
     if (tickets !== prevTicketsRef.current) {
       prevTicketsRef.current = tickets;
       setColumns(buildColumns(tickets));
     }
-  }, [tickets]);
+  }, [tickets, reorderTicketsMutation.isPending]);
+
 
   const toggleCollapse = (columnId: string) => {
     setCollapsedColumns((prev) => ({
@@ -349,46 +352,32 @@ export function ProjectKanbanBoard({ tickets: initialTicketsProp }: { tickets?: 
   ) => {
     if (meta.kind !== 'item') return;
 
-    // Collect updates to persist changed column and LexoRank positions
-    const updates: Array<{ id: string; status: TicketStatus; position: number; rank?: string }> = [];
-    const containersToUpdate = new Set<string>();
-    if (meta.overContainer) containersToUpdate.add(meta.overContainer);
-    if (meta.activeContainer) containersToUpdate.add(meta.activeContainer);
+    const targetColId = (meta.overContainer || meta.activeContainer) as ColumnId;
+    const sourceColId = meta.activeContainer as ColumnId;
+
+    // Collect all columns whose tickets need rank + status persisted
+    const containersToUpdate = new Set<ColumnId>();
+    if (targetColId) containersToUpdate.add(targetColId);
+    if (sourceColId && sourceColId !== targetColId) containersToUpdate.add(sourceColId);
+
+    const updates: Array<{ id: string; status: TicketStatus; position: number; rank: string }> = [];
 
     for (const colId of containersToUpdate) {
-      const targetStatus = COLUMN_TO_STATUS[colId as ColumnId];
-      if (!targetStatus) continue;
+      const colStatus = COLUMN_TO_STATUS[colId];
+      if (!colStatus) continue;
 
       const colTickets = newColumns[colId] ?? [];
+      // Assign a fresh, evenly-distributed rank to EVERY ticket in the column so
+      // the full order is persisted and survives a page refresh.
+      const freshRanks = LexoRank.generateRanks(colTickets.length);
+
       colTickets.forEach((ticket, index) => {
-        ticket.status = targetStatus;
+        const rank = freshRanks[index] ?? LexoRank.INITIAL;
+        ticket.rank = rank;
+        ticket.status = colStatus;
         ticket.position = index;
+        updates.push({ id: ticket.id, status: colStatus, position: index, rank });
       });
-    }
-
-    // Compute LexoRank for the moved ticket using its neighbors in the target column
-    const activeId = String(meta.event.active.id);
-    const targetColId = (meta.overContainer || meta.activeContainer) as ColumnId;
-    const targetStatus = COLUMN_TO_STATUS[targetColId];
-    if (targetStatus) {
-      const colTickets = newColumns[targetColId] ?? [];
-      const activeIdx = colTickets.findIndex((t) => t.id === activeId);
-      if (activeIdx !== -1) {
-        const prevTicket = activeIdx > 0 ? colTickets[activeIdx - 1] : null;
-        const nextTicket = activeIdx < colTickets.length - 1 ? colTickets[activeIdx + 1] : null;
-        const newRank = LexoRank.between(prevTicket?.rank, nextTicket?.rank);
-
-        colTickets[activeIdx].rank = newRank;
-        colTickets[activeIdx].status = targetStatus;
-        colTickets[activeIdx].position = activeIdx;
-
-        updates.push({
-          id: colTickets[activeIdx].id,
-          status: targetStatus,
-          position: activeIdx,
-          rank: newRank,
-        });
-      }
     }
 
     if (updates.length > 0) {
@@ -397,6 +386,7 @@ export function ProjectKanbanBoard({ tickets: initialTicketsProp }: { tickets?: 
   };
 
   return (
+
     <Kanban
       id="project-kanban"
       value={columns}
