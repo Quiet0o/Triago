@@ -50,6 +50,10 @@ final readonly class UpdateTicketRequest
         public ?string $blockedBy = null,
 
         public ?string $blockedReason = null,
+
+        public ?int $position = null,
+
+        public ?string $rank = null,
     ) {
     }
 }

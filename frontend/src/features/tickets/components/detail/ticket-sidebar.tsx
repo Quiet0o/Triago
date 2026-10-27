@@ -1,9 +1,10 @@
 import { Link } from '@tanstack/react-router';
 import { Calendar, CheckSquare, Clock, ExternalLink, Tag, User, Zap } from 'lucide-react';
-import { Avatar, AvatarFallback } from '#/components/ui/avatar.tsx';
+import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar.tsx';
 import { Badge } from '#/components/ui/badge.tsx';
 import { Button } from '#/components/ui/button.tsx';
 import { Input } from '#/components/ui/input.tsx';
+import { getUserAvatarUrl } from '#/lib/avatar';
 import {
   Select,
   SelectContent,
@@ -199,6 +200,7 @@ export function TicketSidebar({
               <SelectItem key={member.email} value={member.email}>
                 <div className="flex items-center gap-2">
                   <Avatar className="size-5">
+                    <AvatarImage src={getUserAvatarUrl(member)} alt={member.name} />
                     <AvatarFallback className="text-[10px]">{member.avatarFallback}</AvatarFallback>
                   </Avatar>
                   <span className="font-medium text-xs">{member.name}</span>
@@ -220,6 +222,7 @@ export function TicketSidebar({
         >
           <div className="flex items-center gap-2.5">
             <Avatar className="size-6">
+              <AvatarImage src={getUserAvatarUrl(ticket.reporter)} alt={ticket.reporter.name} />
               <AvatarFallback className="text-[10px]">
                 {ticket.reporter.avatarFallback}
               </AvatarFallback>

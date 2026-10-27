@@ -38,7 +38,8 @@ class TicketRepository extends ServiceEntityRepository
             ->addSelect('sub')
             ->leftJoin('t.comments', 'c')
             ->addSelect('c')
-            ->orderBy('t.createdAt', 'DESC');
+            ->orderBy('t.rank', 'ASC')
+            ->addOrderBy('t.createdAt', 'DESC');
 
         if ($status && 'all' !== $status) {
             $qb->andWhere('t.status = :status')

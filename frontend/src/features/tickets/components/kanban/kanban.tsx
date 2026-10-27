@@ -16,6 +16,7 @@ import {
   KanbanItemHandle,
   KanbanOverlay,
 } from '#/components/reui/kanban.tsx';
+import type { KanbanCommitMeta } from '#/components/reui/kanban.tsx';
 import { useQuery } from '@tanstack/react-query';
 import type { MockData, Ticket, TicketStatus } from '#/types/tickets';
 import {
@@ -26,7 +27,8 @@ import {
   TicketMeta,
   TicketTypeIcon,
 } from '../ticket-badges.tsx';
-import { ticketQueries, useUpdateTicketMutation } from '../../queries.ts';
+import { ticketQueries, useReorderTicketsMutation } from '../../queries.ts';
+import { LexoRank } from '#/lib/lexorank';
 import mockData from '#/data/mock-tickets.json';
 
 export type Task = Ticket;
@@ -293,7 +295,7 @@ export function TaskColumn({
 
 export function ProjectKanbanBoard({ tickets: initialTicketsProp }: { tickets?: Ticket[] }) {
   const { data: fetchedTickets } = useQuery(ticketQueries.list());
-  const updateTicketMutation = useUpdateTicketMutation();
+  const reorderTicketsMutation = useReorderTicketsMutation();
   const tickets = initialTicketsProp ?? fetchedTickets ?? (mockData as MockData).tickets;
 
   const [collapsedColumns, setCollapsedColumns] = useState<Record<string, boolean>>({});
@@ -307,7 +309,16 @@ export function ProjectKanbanBoard({ tickets: initialTicketsProp }: { tickets?: 
       done: [],
     };
 
-    for (const ticket of ticketList) {
+    // Sort by LexoRank ascending, falling back to position or id
+    const sorted = [...ticketList].sort((a, b) => {
+      const rankA = a.rank ?? '0|hzzzzz:';
+      const rankB = b.rank ?? '0|hzzzzz:';
+      const cmp = rankA.localeCompare(rankB);
+      if (cmp !== 0) return cmp;
+      return (a.position ?? 0) - (b.position ?? 0);
+    });
+
+    for (const ticket of sorted) {
       const columnId = STATUS_TO_COLUMN[ticket.status] || 'backlog';
       nextColumns[columnId].push(ticket);
     }
@@ -332,35 +343,65 @@ export function ProjectKanbanBoard({ tickets: initialTicketsProp }: { tickets?: 
     }));
   };
 
-  const handleColumnsChange = (newColumns: Record<string, Ticket[]>) => {
-    // Detect which ticket moved to which column
-    for (const [colId, colTickets] of Object.entries(newColumns)) {
+  const handleValueCommit = (
+    newColumns: Record<string, Ticket[]>,
+    meta: KanbanCommitMeta<Ticket>,
+  ) => {
+    if (meta.kind !== 'item') return;
+
+    // Collect updates to persist changed column and LexoRank positions
+    const updates: Array<{ id: string; status: TicketStatus; position: number; rank?: string }> = [];
+    const containersToUpdate = new Set<string>();
+    if (meta.overContainer) containersToUpdate.add(meta.overContainer);
+    if (meta.activeContainer) containersToUpdate.add(meta.activeContainer);
+
+    for (const colId of containersToUpdate) {
       const targetStatus = COLUMN_TO_STATUS[colId as ColumnId];
       if (!targetStatus) continue;
 
-      for (const ticket of colTickets) {
-        const previousColId = (Object.keys(columns) as ColumnId[]).find((cId) =>
-          columns[cId]?.some((t) => t.id === ticket.id),
-        );
+      const colTickets = newColumns[colId] ?? [];
+      colTickets.forEach((ticket, index) => {
+        ticket.status = targetStatus;
+        ticket.position = index;
+      });
+    }
 
-        if (previousColId && previousColId !== colId && ticket.status !== targetStatus) {
-          ticket.status = targetStatus;
-          updateTicketMutation.mutate({
-            id: ticket.id,
-            patch: { status: targetStatus },
-          });
-        }
+    // Compute LexoRank for the moved ticket using its neighbors in the target column
+    const activeId = String(meta.event.active.id);
+    const targetColId = (meta.overContainer || meta.activeContainer) as ColumnId;
+    const targetStatus = COLUMN_TO_STATUS[targetColId];
+    if (targetStatus) {
+      const colTickets = newColumns[targetColId] ?? [];
+      const activeIdx = colTickets.findIndex((t) => t.id === activeId);
+      if (activeIdx !== -1) {
+        const prevTicket = activeIdx > 0 ? colTickets[activeIdx - 1] : null;
+        const nextTicket = activeIdx < colTickets.length - 1 ? colTickets[activeIdx + 1] : null;
+        const newRank = LexoRank.between(prevTicket?.rank, nextTicket?.rank);
+
+        colTickets[activeIdx].rank = newRank;
+        colTickets[activeIdx].status = targetStatus;
+        colTickets[activeIdx].position = activeIdx;
+
+        updates.push({
+          id: colTickets[activeIdx].id,
+          status: targetStatus,
+          position: activeIdx,
+          rank: newRank,
+        });
       }
     }
 
-    setColumns(newColumns);
+    if (updates.length > 0) {
+      reorderTicketsMutation.mutate(updates);
+    }
   };
 
   return (
     <Kanban
       id="project-kanban"
       value={columns}
-      onValueChange={handleColumnsChange}
+      onValueChange={setColumns}
+      onValueCommit={handleValueCommit}
       getItemValue={(item) => item.id}
     >
       <KanbanBoard className="flex gap-4 overflow-x-auto pb-4 items-stretch min-w-full">

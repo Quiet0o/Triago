@@ -43,6 +43,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $jobTitle = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $avatarUrl = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $banner = null;
+
     #[ORM\Column]
     private \DateTimeImmutable $createdAt;
 
@@ -100,6 +106,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setJobTitle(?string $jobTitle): static
     {
         $this->jobTitle = $jobTitle;
+
+        return $this;
+    }
+
+    public function getAvatarUrl(): ?string
+    {
+        return $this->avatarUrl;
+    }
+
+    public function setAvatarUrl(?string $avatarUrl): static
+    {
+        $this->avatarUrl = $avatarUrl;
+
+        return $this;
+    }
+
+    public function getBanner(): ?string
+    {
+        return $this->banner;
+    }
+
+    public function setBanner(?string $banner): static
+    {
+        $this->banner = $banner;
 
         return $this;
     }

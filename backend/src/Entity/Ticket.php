@@ -14,6 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'ticket')]
 #[ORM\Index(name: 'idx_ticket_status', fields: ['status'])]
 #[ORM\Index(name: 'idx_ticket_priority', fields: ['priority'])]
+#[ORM\Index(name: 'idx_ticket_rank', fields: ['rank'])]
 class Ticket
 {
     #[ORM\Id]
@@ -88,6 +89,12 @@ class Ticket
 
     #[ORM\Column(type: 'integer')]
     private int $attachmentsCount = 0;
+
+    #[ORM\Column(type: 'integer', options: ['default' => 0])]
+    private int $position = 0;
+
+    #[ORM\Column(length: 255, options: ['default' => '0|hzzzzz:'])]
+    private string $rank = '0|hzzzzz:';
 
     /**
      * @var Collection<int, Subtask>
@@ -538,5 +545,29 @@ class Ticket
     public function getEpicTickets(): Collection
     {
         return $this->epicTickets;
+    }
+
+    public function getPosition(): int
+    {
+        return $this->position;
+    }
+
+    public function setPosition(int $position): static
+    {
+        $this->position = $position;
+
+        return $this;
+    }
+
+    public function getRank(): string
+    {
+        return $this->rank;
+    }
+
+    public function setRank(string $rank): static
+    {
+        $this->rank = $rank;
+
+        return $this;
     }
 }

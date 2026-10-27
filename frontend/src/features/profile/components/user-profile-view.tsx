@@ -6,7 +6,6 @@ import { Link, useNavigate } from '@tanstack/react-router';
 import {
   ArrowLeft,
   Briefcase,
-  Calendar,
   Camera,
   Check,
   CheckCircle2,
@@ -19,12 +18,10 @@ import {
   Loader2,
   Mail,
   Palette,
-  ShieldCheck,
   Trash2,
   TrendingUp,
   Upload,
   User as UserIcon,
-  X,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar.tsx';
 import { Badge } from '#/components/ui/badge.tsx';
@@ -38,13 +35,19 @@ import {
 } from '#/components/ui/dropdown-menu.tsx';
 import { cn } from '#/lib/utils';
 import type { Ticket } from '#/types/tickets';
-import { ticketQueries } from '#/features/tickets/queries';
+import {
+  ticketQueries,
+  useUpdateUserProfileMutation,
+  useUploadUserAvatarMutation,
+  useUploadUserBannerMutation,
+} from '#/features/tickets/queries';
 import {
   PriorityBadge,
   StatusBadge,
   StoryPointsBadge,
   TicketTypeIcon,
 } from '#/features/tickets/components/ticket-badges';
+import { notifyAvatarChanged, resolveMediaUrl } from '#/lib/avatar';
 
 const PRESET_BANNERS: Record<string, { name: string; bgClass: string; dotClass: string }> = {
   ocean: {
@@ -103,56 +106,87 @@ export function UserProfileView({ userIdOrEmail }: UserProfileViewProps) {
   // Fetch all tickets to calculate stats and list assigned/reported tasks
   const { data: tickets = [], isLoading: isTicketsLoading } = useQuery(ticketQueries.list());
 
+  const updateProfileMutation = useUpdateUserProfileMutation();
+  const uploadAvatarMutation = useUploadUserAvatarMutation();
+  const uploadBannerMutation = useUploadUserBannerMutation();
+
   React.useEffect(() => {
     if (!user?.email) return;
     try {
-      const savedAvatar = localStorage.getItem(`triago_user_avatar_${user.email}`);
-      if (savedAvatar) setCustomAvatar(savedAvatar);
-      const savedBanner = localStorage.getItem(`triago_user_banner_${user.email}`);
-      if (savedBanner) setCustomBanner(savedBanner);
+      const savedAvatar = user.avatarUrl ?? localStorage.getItem(`triago_user_avatar_${user.email}`);
+      if (savedAvatar) setCustomAvatar(resolveMediaUrl(savedAvatar));
+      const savedBanner = user.banner ?? localStorage.getItem(`triago_user_banner_${user.email}`);
+      if (savedBanner) setCustomBanner(resolveMediaUrl(savedBanner));
     } catch {}
-  }, [user?.email]);
+  }, [user]);
 
   const handleAvatarFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user?.email) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUrl = event.target?.result as string;
-      if (dataUrl) {
-        setCustomAvatar(dataUrl);
-        try {
-          localStorage.setItem(`triago_user_avatar_${user.email}`, dataUrl);
-        } catch {}
-      }
-    };
-    reader.readAsDataURL(file);
+
+    // Fast local preview while uploading
+    const previewUrl = URL.createObjectURL(file);
+    setCustomAvatar(previewUrl);
+
+    uploadAvatarMutation.mutate(
+      { idOrEmail: user.email, file },
+      {
+        onSuccess: (updatedUser) => {
+          const resolved = resolveMediaUrl(updatedUser.avatarUrl);
+          setCustomAvatar(resolved);
+          try {
+            if (updatedUser.avatarUrl) {
+              localStorage.setItem(`triago_user_avatar_${user.email}`, updatedUser.avatarUrl);
+            }
+          } catch {}
+          notifyAvatarChanged(user.email, resolved);
+        },
+        onError: () => {
+          setCustomAvatar(resolveMediaUrl(user.avatarUrl));
+        },
+      },
+    );
     e.target.value = '';
   };
 
-  const handleRemoveAvatar = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleRemoveAvatar = () => {
     if (!user?.email) return;
     setCustomAvatar(null);
     try {
       localStorage.removeItem(`triago_user_avatar_${user.email}`);
     } catch {}
+    notifyAvatarChanged(user.email, null);
+    updateProfileMutation.mutate({
+      idOrEmail: user.email,
+      patch: { avatarUrl: null },
+    });
   };
 
   const handleBannerFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user?.email) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUrl = event.target?.result as string;
-      if (dataUrl) {
-        setCustomBanner(dataUrl);
-        try {
-          localStorage.setItem(`triago_user_banner_${user.email}`, dataUrl);
-        } catch {}
-      }
-    };
-    reader.readAsDataURL(file);
+
+    // Fast local preview while uploading
+    const previewUrl = URL.createObjectURL(file);
+    setCustomBanner(previewUrl);
+
+    uploadBannerMutation.mutate(
+      { idOrEmail: user.email, file },
+      {
+        onSuccess: (updatedUser) => {
+          const resolved = resolveMediaUrl(updatedUser.banner);
+          setCustomBanner(resolved);
+          try {
+            if (updatedUser.banner) {
+              localStorage.setItem(`triago_user_banner_${user.email}`, updatedUser.banner);
+            }
+          } catch {}
+        },
+        onError: () => {
+          setCustomBanner(resolveMediaUrl(user.banner));
+        },
+      },
+    );
     e.target.value = '';
   };
 
@@ -162,6 +196,10 @@ export function UserProfileView({ userIdOrEmail }: UserProfileViewProps) {
     try {
       localStorage.setItem(`triago_user_banner_${user.email}`, presetId);
     } catch {}
+    updateProfileMutation.mutate({
+      idOrEmail: user.email,
+      patch: { banner: presetId },
+    });
   };
 
   const handleRemoveBanner = () => {
@@ -170,7 +208,12 @@ export function UserProfileView({ userIdOrEmail }: UserProfileViewProps) {
     try {
       localStorage.removeItem(`triago_user_banner_${user.email}`);
     } catch {}
+    updateProfileMutation.mutate({
+      idOrEmail: user.email,
+      patch: { banner: null },
+    });
   };
+
 
   const handleCopyEmail = () => {
     if (!user?.email) return;
@@ -276,13 +319,6 @@ export function UserProfileView({ userIdOrEmail }: UserProfileViewProps) {
           <ArrowLeft className="size-4" />
           <span>Wróć</span>
         </Button>
-
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-xs text-muted-foreground gap-1">
-            <ShieldCheck className="size-3 text-emerald-500" />
-            Zweryfikowane konto
-          </Badge>
-        </div>
       </div>
 
       {/* ── Hero Profile Card ────────────────────────────────────── */}
@@ -374,50 +410,61 @@ export function UserProfileView({ userIdOrEmail }: UserProfileViewProps) {
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 -mt-16 sm:-mt-18 mb-4">
             {/* Avatar & Info */}
             <div className="flex items-end gap-4">
-              {/* Avatar with hover change trigger */}
+              {/* Avatar with clean dropdown menu */}
               <div className="relative group shrink-0">
-                <Avatar className="size-28 sm:size-32 rounded-2xl border-4 border-card shadow-xl bg-card overflow-hidden">
-                  <AvatarImage
-                    src={
-                      customAvatar ??
-                      `https://i.pravatar.cc/150?u=${encodeURIComponent(user.email)}`
-                    }
-                    alt={user.name}
-                    className="object-cover size-full"
-                  />
-                  <AvatarFallback className="text-3xl font-bold bg-primary text-primary-foreground">
-                    {user.avatarFallback}
-                  </AvatarFallback>
-                </Avatar>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <div className="relative cursor-pointer group">
+                      <Avatar className="size-28 sm:size-32 rounded-2xl border-4 border-card shadow-xl bg-card overflow-hidden transition-transform duration-200 group-hover:scale-[1.02]">
+                        <AvatarImage
+                          src={
+                            customAvatar ??
+                            `https://i.pravatar.cc/150?u=${encodeURIComponent(user.email)}`
+                          }
+                          alt={user.name}
+                          className="object-cover object-center aspect-square size-full"
+                        />
+                        <AvatarFallback className="text-3xl font-bold bg-primary text-primary-foreground">
+                          {user.avatarFallback}
+                        </AvatarFallback>
+                      </Avatar>
 
-                {/* Online indicator */}
-                <span
-                  className="absolute bottom-1.5 right-1.5 size-4 rounded-full bg-emerald-500 border-2 border-card ring-2 ring-emerald-500/20 z-10"
-                  title="Aktywny w systemie"
-                />
+                      {/* Online indicator - ONLY ONE DOT! */}
+                      <span
+                        className="absolute bottom-1.5 right-1.5 size-4 rounded-full bg-emerald-500 border-2 border-card ring-2 ring-emerald-500/20 z-10"
+                        title="Aktywny w systemie"
+                      />
 
-                {/* Hover overlay to change avatar */}
-                <button
-                  type="button"
-                  onClick={() => avatarInputRef.current?.click()}
-                  className="absolute inset-0 rounded-2xl bg-black/60 text-white flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer z-10 backdrop-blur-xs"
-                  title="Kliknij, aby zmienić zdjęcie profilowe"
-                >
-                  <Camera className="size-5 mb-1 text-white" />
-                  <span className="text-[10px] font-semibold tracking-wide">Zmień</span>
-                </button>
-
-                {/* Reset custom avatar if set */}
-                {customAvatar && (
-                  <button
-                    type="button"
-                    onClick={handleRemoveAvatar}
-                    className="absolute -top-1.5 -right-1.5 size-5 rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90 flex items-center justify-center shadow-md z-20 cursor-pointer transition-transform hover:scale-110"
-                    title="Przywróć domyślny awatar"
-                  >
-                    <X className="size-3" />
-                  </button>
-                )}
+                      {/* Subtle hover camera overlay hint */}
+                      <div className="absolute inset-0 rounded-2xl bg-black/45 text-white flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 backdrop-blur-xs">
+                        <Camera className="size-5 mb-1 text-white" />
+                        <span className="text-[10px] font-semibold tracking-wide">Zmień</span>
+                      </div>
+                    </div>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-56">
+                    <DropdownMenuItem
+                      onClick={() => avatarInputRef.current?.click()}
+                      className="gap-2 cursor-pointer text-xs"
+                    >
+                      <Upload className="size-3.5 text-primary" />
+                      <span>Wgraj nowe zdjęcie...</span>
+                    </DropdownMenuItem>
+                    {customAvatar && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={handleRemoveAvatar}
+                          variant="destructive"
+                          className="gap-2 cursor-pointer text-xs"
+                        >
+                          <Trash2 className="size-3.5" />
+                          <span>Przywróć domyślny awatar</span>
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
 
                 <input
                   ref={avatarInputRef}
@@ -438,17 +485,7 @@ export function UserProfileView({ userIdOrEmail }: UserProfileViewProps) {
                     {user.role}
                   </Badge>
                 </div>
-                <p className="text-xs text-muted-foreground flex items-center gap-1.5 flex-wrap">
-                  {user.jobTitle && user.jobTitle.trim().toLowerCase() !== user.role.trim().toLowerCase() ? (
-                    <>
-                      <Briefcase className="size-3.5 text-primary shrink-0" />
-                      <span className="font-medium text-foreground/85">{user.jobTitle}</span>
-                      <span className="text-muted-foreground/40">•</span>
-                    </>
-                  ) : null}
-                  <ShieldCheck className="size-3.5 text-emerald-500 shrink-0" />
-                  <span>Konto zweryfikowane • Triago Workspace</span>
-                </p>
+              
               </div>
             </div>
 
@@ -500,26 +537,7 @@ export function UserProfileView({ userIdOrEmail }: UserProfileViewProps) {
                 Stanowisko:{' '}
                 <strong className="font-medium text-foreground/90">{user.jobTitle ?? user.role}</strong>
               </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Calendar className="size-3.5 text-muted-foreground shrink-0" />
-              <span>
-                Dołączył(a):{' '}
-                <strong className="font-medium text-foreground/90">
-                  {user.createdAt
-                    ? new Date(user.createdAt).toLocaleDateString('pl-PL', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })
-                    : 'Wrzesień 2026'}
-                </strong>
-              </span>
-            </div>
-            <div className="flex items-center gap-2 sm:ml-auto">
-              <span className="size-2 rounded-full bg-emerald-500 ring-2 ring-emerald-500/20 animate-pulse" />
-              <span className="text-emerald-600 dark:text-emerald-400 font-medium">Aktywny w zespole</span>
-            </div>
+            </div>           
           </div>
         </div>
       </div>

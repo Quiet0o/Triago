@@ -20,6 +20,7 @@ use App\Repository\TicketRepository;
 use App\Service\TicketService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
@@ -45,6 +46,25 @@ final class TicketController extends AbstractController
             sprint: $query?->sprint,
             search: $query?->search,
         );
+
+        $response = array_map(
+            static fn (Ticket $ticket): TicketResponse => TicketResponse::fromEntity($ticket),
+            $tickets,
+        );
+
+        return $this->json($response);
+    }
+
+    #[Route('/reorder', name: 'reorder', methods: ['POST'])]
+    public function reorder(
+        Request $request,
+        #[CurrentUser] ?User $currentUser = null,
+    ): JsonResponse {
+        /** @var array{items?: list<array{id: string, status?: string|null, position?: int|null, rank?: string|null}>} $data */
+        $data = json_decode($request->getContent(), true) ?? [];
+        $items = $data['items'] ?? [];
+
+        $tickets = $this->ticketService->reorderTickets($items, $currentUser);
 
         $response = array_map(
             static fn (Ticket $ticket): TicketResponse => TicketResponse::fromEntity($ticket),

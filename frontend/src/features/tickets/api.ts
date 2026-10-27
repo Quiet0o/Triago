@@ -447,6 +447,8 @@ export interface BackendUserDto {
   avatarFallback: string;
   roles: string[];
   createdAt: string;
+  avatarUrl?: string | null;
+  banner?: string | null;
 }
 
 /**
@@ -464,6 +466,8 @@ export async function getUsers(): Promise<TicketPerson[]> {
         role: u.jobTitle ?? (u.roles.includes('ROLE_ADMIN') ? 'Administrator' : 'Developer'),
         jobTitle: u.jobTitle ?? undefined,
         createdAt: u.createdAt,
+        avatarUrl: u.avatarUrl,
+        banner: u.banner,
       }));
     }
   } catch (err) {
@@ -487,6 +491,8 @@ export async function getUserProfile(idOrEmail: string): Promise<TicketPerson> {
       role: u.jobTitle ?? (u.roles.includes('ROLE_ADMIN') ? 'Administrator' : 'Developer'),
       jobTitle: u.jobTitle ?? undefined,
       createdAt: u.createdAt,
+      avatarUrl: u.avatarUrl,
+      banner: u.banner,
     };
   } catch (err) {
     console.warn('Backend user profile not found, checking local TEAM_MEMBERS:', err);
@@ -510,4 +516,132 @@ export async function getUserProfile(idOrEmail: string): Promise<TicketPerson> {
     avatarFallback: decoded.slice(0, 2).toUpperCase(),
     role: 'Team Member',
   };
+}
+
+/**
+ * Update user profile (avatar, banner, jobTitle, fullName).
+ */
+export async function updateUserProfile(
+  idOrEmail: string,
+  patch: {
+    avatarUrl?: string | null;
+    banner?: string | null;
+    fullName?: string;
+    jobTitle?: string;
+  },
+): Promise<TicketPerson> {
+  const decoded = decodeURIComponent(idOrEmail);
+  try {
+    const u = await apiRequest<BackendUserDto>(`/api/users/${encodeURIComponent(decoded)}`, {
+      method: 'PATCH',
+      body: JSON.stringify(patch),
+    });
+    return {
+      id: u.id,
+      name: u.fullName ?? u.email,
+      email: u.email,
+      avatarFallback: u.avatarFallback,
+      role: u.jobTitle ?? (u.roles.includes('ROLE_ADMIN') ? 'Administrator' : 'Developer'),
+      jobTitle: u.jobTitle ?? undefined,
+      createdAt: u.createdAt,
+      avatarUrl: u.avatarUrl,
+      banner: u.banner,
+    };
+  } catch (err) {
+    console.warn('Backend user update failed:', err);
+    throw err;
+  }
+}
+
+/**
+ * Upload user avatar image file to backend.
+ */
+export async function uploadUserAvatar(idOrEmail: string, file: File): Promise<TicketPerson> {
+  const decoded = decodeURIComponent(idOrEmail);
+  const formData = new FormData();
+  formData.append('avatar', file);
+
+  const url = `${BACKEND_URL}/api/users/${encodeURIComponent(decoded)}/avatar`;
+  const res = await fetch(url, {
+    method: 'POST',
+    body: formData,
+    credentials: 'include',
+  });
+
+  if (!res.ok) {
+    let errorDetail = `Nie udało się przesłać zdjęcia: ${res.status}`;
+    try {
+      const data = await res.json();
+      if (data.detail) errorDetail = data.detail;
+    } catch {}
+    throw new AppError(errorDetail, res.status, 'AVATAR_UPLOAD_ERROR');
+  }
+
+  const u = (await res.json()) as BackendUserDto;
+  return {
+    id: u.id,
+    name: u.fullName ?? u.email,
+    email: u.email,
+    avatarFallback: u.avatarFallback,
+    role: u.jobTitle ?? (u.roles.includes('ROLE_ADMIN') ? 'Administrator' : 'Developer'),
+    jobTitle: u.jobTitle ?? undefined,
+    createdAt: u.createdAt,
+    avatarUrl: u.avatarUrl,
+    banner: u.banner,
+  };
+}
+
+/**
+ * Upload user banner image file to backend.
+ */
+export async function uploadUserBanner(idOrEmail: string, file: File): Promise<TicketPerson> {
+  const decoded = decodeURIComponent(idOrEmail);
+  const formData = new FormData();
+  formData.append('banner', file);
+
+  const url = `${BACKEND_URL}/api/users/${encodeURIComponent(decoded)}/banner`;
+  const res = await fetch(url, {
+    method: 'POST',
+    body: formData,
+    credentials: 'include',
+  });
+
+  if (!res.ok) {
+    let errorDetail = `Nie udało się przesłać banera: ${res.status}`;
+    try {
+      const data = await res.json();
+      if (data.detail) errorDetail = data.detail;
+    } catch {}
+    throw new AppError(errorDetail, res.status, 'BANNER_UPLOAD_ERROR');
+  }
+
+  const u = (await res.json()) as BackendUserDto;
+  return {
+    id: u.id,
+    name: u.fullName ?? u.email,
+    email: u.email,
+    avatarFallback: u.avatarFallback,
+    role: u.jobTitle ?? (u.roles.includes('ROLE_ADMIN') ? 'Administrator' : 'Developer'),
+    jobTitle: u.jobTitle ?? undefined,
+    createdAt: u.createdAt,
+    avatarUrl: u.avatarUrl,
+    banner: u.banner,
+  };
+}
+
+/**
+ * Batch reorder tickets on backend (kanban column and position changes).
+ */
+export async function reorderTickets(
+  items: Array<{ id: string; status?: TicketStatus; position?: number; rank?: string }>,
+): Promise<Ticket[]> {
+  try {
+    return await apiRequest<Ticket[]>('/api/tickets/reorder', {
+      method: 'POST',
+      body: JSON.stringify({ items }),
+    });
+  } catch (err) {
+    console.warn('Backend reorder failed, falling back to client-only:', err);
+    return [];
+  }
 }

@@ -40,9 +40,15 @@ export const BacklogView = ({
 
   const globalFilter = externalSearch || localSearch;
 
-  // Apply client-side filters
+  // Apply client-side filters and sort by LexoRank ascending
   const filteredTickets = useMemo(() => {
-    let result = tickets;
+    let result = [...tickets].sort((a, b) => {
+      const rankA = a.rank ?? '0|hzzzzz:';
+      const rankB = b.rank ?? '0|hzzzzz:';
+      const cmp = rankA.localeCompare(rankB);
+      if (cmp !== 0) return cmp;
+      return (a.position ?? 0) - (b.position ?? 0);
+    });
 
     if (statusFilter !== 'all') {
       result = result.filter((t) => t.status === statusFilter);

@@ -2,9 +2,11 @@
 
 import * as React from 'react';
 import { Send } from 'lucide-react';
-import { Avatar, AvatarFallback } from '#/components/ui/avatar.tsx';
+import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar.tsx';
 import { Button } from '#/components/ui/button.tsx';
 import { BasicTaskEditor } from '#/components/editor/basic-editor.tsx';
+import { useAuth } from '#/features/auth/queries';
+import { useUserAvatar } from '#/lib/avatar';
 
 export interface CommentComposerProps {
   onSubmit: (text: string, html: string) => void;
@@ -12,6 +14,8 @@ export interface CommentComposerProps {
 }
 
 export function CommentComposer({ onSubmit, userFallback = 'ZU' }: CommentComposerProps) {
+  const { user } = useAuth();
+  const avatarUrl = useUserAvatar(user);
   const [textDraft, setTextDraft] = React.useState('');
   const [htmlDraft, setHtmlDraft] = React.useState('');
   const [editorKey, setEditorKey] = React.useState(0);
@@ -36,8 +40,9 @@ export function CommentComposer({ onSubmit, userFallback = 'ZU' }: CommentCompos
   return (
     <form onSubmit={handleSubmit} className="flex gap-3 pt-3 border-t">
       <Avatar className="size-8 shrink-0">
+        {avatarUrl && <AvatarImage src={avatarUrl} alt={user?.fullName ?? ''} />}
         <AvatarFallback className="text-xs bg-primary/10 text-primary font-semibold">
-          {userFallback}
+          {user?.fullName?.slice(0, 2).toUpperCase() || userFallback}
         </AvatarFallback>
       </Avatar>
       <div className="flex-1 space-y-2.5 min-w-0">

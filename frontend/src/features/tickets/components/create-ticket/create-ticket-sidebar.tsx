@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Calendar, UserCheck } from 'lucide-react';
-import { Avatar, AvatarFallback } from '#/components/ui/avatar.tsx';
+import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar.tsx';
 import { Badge } from '#/components/ui/badge.tsx';
 import { Input } from '#/components/ui/input.tsx';
 import {
@@ -14,6 +14,7 @@ import {
 } from '#/components/ui/select.tsx';
 import type { TicketPerson, TicketPriority, TicketStatus } from '#/types/tickets';
 import { AssigneeAvatar, PriorityBadge, StatusBadge } from '../ticket-badges';
+import { getUserAvatarUrl } from '#/lib/avatar';
 
 export const STORY_POINTS_OPTIONS = [1, 2, 3, 5, 8, 13];
 export const PRESET_LABELS = [
@@ -173,6 +174,7 @@ export function CreateTicketSidebar({
                   <SelectItem key={member.email} value={member.email}>
                     <div className="flex items-center gap-2">
                       <Avatar className="size-5">
+                        <AvatarImage src={getUserAvatarUrl(member)} alt={member.name} />
                         <AvatarFallback className="text-[9px]">
                           {member.avatarFallback}
                         </AvatarFallback>
@@ -271,6 +273,7 @@ export function CreateTicketSidebar({
         </label>
         <div className="flex items-center gap-2 p-2 rounded-lg bg-background border">
           <Avatar className="size-6">
+            <AvatarImage src={getUserAvatarUrl(reporter)} alt={reporter.name} />
             <AvatarFallback className="text-[10px] font-semibold">
               {reporter.avatarFallback}
             </AvatarFallback>

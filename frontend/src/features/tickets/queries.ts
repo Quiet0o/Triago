@@ -11,13 +11,15 @@ import {
   getTickets,
   getUserProfile,
   getUsers,
+  reorderTickets,
   updateSubtask,
   updateTicket,
-  type CreateCommentInput,
-  type CreateTicketInput,
-  type UpdateTicketInput,
+  updateUserProfile,
+  uploadUserAvatar,
+  uploadUserBanner,
 } from './api';
-import type { TicketFilters } from '#/types/tickets';
+import type { CreateCommentInput, CreateTicketInput, UpdateTicketInput } from './api';
+import type { TicketFilters, TicketStatus } from '#/types/tickets';
 
 /**
  * Hierarchical query key factory ensuring predictable caching and targeted invalidation.
@@ -170,7 +172,7 @@ export function useUpdateSubtaskMutation(ticketId: string) {
       patch,
     }: {
       subtaskId: string;
-      patch: { title?: string; status?: import('#/types/tickets').TicketStatus };
+      patch: { title?: string; status?: TicketStatus };
     }) => updateSubtask(ticketId, subtaskId, patch),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ticketKeys.detail(ticketId) });
@@ -193,3 +195,83 @@ export function useDeleteSubtaskMutation(ticketId: string) {
     },
   });
 }
+
+/**
+ * Mutation to update user profile on the backend (avatar, banner, job title, name).
+ */
+export function useUpdateUserProfileMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      idOrEmail,
+      patch,
+    }: {
+      idOrEmail: string;
+      patch: {
+        avatarUrl?: string | null;
+        banner?: string | null;
+        fullName?: string;
+        jobTitle?: string;
+      };
+    }) => updateUserProfile(idOrEmail, patch),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ticketKeys.userProfile(variables.idOrEmail) });
+      queryClient.invalidateQueries({ queryKey: ticketKeys.users() });
+    },
+  });
+}
+
+/**
+ * Mutation to upload user avatar file to the backend.
+ */
+export function useUploadUserAvatarMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ idOrEmail, file }: { idOrEmail: string; file: File }) =>
+      uploadUserAvatar(idOrEmail, file),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ticketKeys.userProfile(variables.idOrEmail) });
+      queryClient.invalidateQueries({ queryKey: ticketKeys.users() });
+    },
+  });
+}
+
+/**
+ * Mutation to upload user banner file to the backend.
+ */
+export function useUploadUserBannerMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ idOrEmail, file }: { idOrEmail: string; file: File }) =>
+      uploadUserBanner(idOrEmail, file),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ticketKeys.userProfile(variables.idOrEmail) });
+      queryClient.invalidateQueries({ queryKey: ticketKeys.users() });
+    },
+  });
+}
+
+/**
+ * Mutation to batch reorder tickets (column movement & position inside column).
+ */
+export function useReorderTicketsMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (
+      items: Array<{
+        id: string;
+        status?: TicketStatus;
+        position?: number;
+        rank?: string;
+      }>,
+    ) => reorderTickets(items),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ticketKeys.lists() });
+    },
+  });
+}
+

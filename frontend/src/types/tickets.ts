@@ -11,6 +11,8 @@ export type TicketPerson = {
   role: string;
   jobTitle?: string;
   createdAt?: string;
+  avatarUrl?: string | null;
+  banner?: string | null;
 };
 
 export type Subtask = {
@@ -57,6 +59,8 @@ export type Ticket = {
   epicTitle?: string | null;
   childTicketsCount?: number;
   epicTicketsCount?: number;
+  position?: number;
+  rank?: string;
 };
 
 export type Reaction = {

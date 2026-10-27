@@ -41,6 +41,8 @@ final readonly class TicketResponse
         public ?string $epicTitle = null,
         public int $childTicketsCount = 0,
         public int $epicTicketsCount = 0,
+        public int $position = 0,
+        public string $rank = '0|hzzzzz:',
     ) {
     }
 
@@ -93,6 +95,8 @@ final readonly class TicketResponse
             epicTitle: $ticket->getEpic()?->getTitle(),
             childTicketsCount: $ticket->getChildren()->count(),
             epicTicketsCount: $ticket->getEpicTickets()->count(),
+            position: $ticket->getPosition(),
+            rank: $ticket->getRank(),
         );
     }
 }

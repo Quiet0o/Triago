@@ -258,11 +258,69 @@ final class TicketService
             $ticket->setBlockedReason($request->blockedReason);
         }
 
+        if (null !== $request->position) {
+            $ticket->setPosition($request->position);
+        }
+
+        if (null !== $request->rank) {
+            $ticket->setRank($request->rank);
+        }
+
         $ticket->setUpdatedAt(new \DateTimeImmutable());
 
         $this->entityManager->flush();
 
         return $ticket;
+    }
+
+    /**
+     * @param list<array{id: string, status?: string|null, position?: int|null, rank?: string|null}> $items
+     *
+     * @return list<Ticket>
+     */
+    public function reorderTickets(array $items, ?User $currentUser): array
+    {
+        $userName = $currentUser?->getFullName() ?? $currentUser?->getEmail() ?? 'Użytkownik';
+        $userAvatar = $currentUser?->getAvatarFallback() ?? 'U';
+
+        $updatedTickets = [];
+
+        foreach ($items as $item) {
+            $ticket = $this->ticketRepository->find($item['id']);
+            if (!$ticket) {
+                continue;
+            }
+
+            if (!empty($item['status']) && $item['status'] !== $ticket->getStatus()) {
+                $oldStatus = $ticket->getStatus();
+                $ticket->setStatus($item['status']);
+                $ticket->addActivityEvent(new ActivityEvent(
+                    id: (string) Uuid::v7(),
+                    ticket: $ticket,
+                    userName: $userName,
+                    userAvatarFallback: $userAvatar,
+                    action: sprintf('przeniósł(osła) zadanie z %s do', $oldStatus),
+                    target: $item['status'],
+                    type: 'status',
+                    user: $currentUser,
+                ));
+            }
+
+            if (!empty($item['rank'])) {
+                $ticket->setRank($item['rank']);
+            }
+
+            if (isset($item['position'])) {
+                $ticket->setPosition($item['position']);
+            }
+
+            $ticket->setUpdatedAt(new \DateTimeImmutable());
+            $updatedTickets[] = $ticket;
+        }
+
+        $this->entityManager->flush();
+
+        return $updatedTickets;
     }
 
     public function addComment(Ticket $ticket, CreateCommentRequest $request, ?User $currentUser): Comment

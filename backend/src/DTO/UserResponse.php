@@ -7,7 +7,7 @@ use App\Entity\User;
 final readonly class UserResponse
 {
     /**
-     * @param list<string>
+     * @param list<string> $roles
      */
     public function __construct(
         public string $id,

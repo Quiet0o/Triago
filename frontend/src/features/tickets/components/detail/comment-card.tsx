@@ -1,9 +1,10 @@
 import { Link } from '@tanstack/react-router';
 import { cn } from '#/lib/utils';
-import { Avatar, AvatarFallback } from '#/components/ui/avatar.tsx';
+import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar.tsx';
 import { Badge } from '#/components/ui/badge.tsx';
 import type { Comment } from '#/types/tickets';
 import { EmojiPickerPopover } from './emoji-picker-popover';
+import { getUserAvatarUrl } from '#/lib/avatar';
 
 export interface CommentCardProps {
   comment: Comment;
@@ -20,6 +21,7 @@ export function CommentCard({ comment, onToggleReaction }: CommentCardProps) {
         title={`Profil użytkownika: ${comment.author.name}`}
       >
         <Avatar className="size-8">
+          <AvatarImage src={getUserAvatarUrl(comment.author)} alt={comment.author.name} />
           <AvatarFallback className="text-xs font-semibold bg-primary/10 text-primary">
             {comment.author.avatarFallback}
           </AvatarFallback>

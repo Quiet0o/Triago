@@ -24,6 +24,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '#/components/ui/tooltip
 import { cn } from '#/lib/utils';
 import type { TicketPerson, TicketPriority, TicketStatus, TicketType } from '#/types/tickets';
 import { CriticalIcon } from '#/components/ui/icons/critical';
+import { getUserAvatarUrl } from '#/lib/avatar';
 
 // ── Type config ──────────────────────────────────────────────────────
 const typeConfig: Record<TicketType, { icon: typeof Bug; label: string; color: string }> = {
@@ -214,6 +215,8 @@ export const AssigneeAvatar = ({
     );
   }
 
+  const avatarUrl = getUserAvatarUrl(person);
+
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -224,7 +227,7 @@ export const AssigneeAvatar = ({
           className="inline-block rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary hover:opacity-85 transition-opacity cursor-pointer shrink-0"
         >
           <Avatar className={cn('border', size === 'sm' ? 'size-6' : 'size-7')}>
-            <AvatarImage src={`https://i.pravatar.cc/150?u=${encodeURIComponent(person.email)}`} alt={person.name} />
+            {avatarUrl && <AvatarImage src={avatarUrl} alt={person.name} />}
             <AvatarFallback
               className={cn(
                 'bg-primary/10 text-primary font-medium',
@@ -236,10 +239,27 @@ export const AssigneeAvatar = ({
           </Avatar>
         </Link>
       </TooltipTrigger>
-      <TooltipContent side="top" className="px-3 py-2 text-xs">
-        <p className="font-semibold leading-none mb-1 text-foreground">{person.name}</p>
-        <p className="text-muted-foreground text-[11px]">{person.role}</p>
-        <p className="text-[10px] text-primary font-medium mt-1">Zobacz profil ↗</p>
+      <TooltipContent
+        side="top"
+        sideOffset={6}
+        className="p-3 text-xs bg-popover text-popover-foreground border border-border/80 shadow-xl rounded-xl min-w-[150px]"
+      >
+        <div className="flex items-center gap-2 mb-2 pb-2 border-b border-border/50">
+          <Avatar className="size-6 shrink-0">
+            {avatarUrl && <AvatarImage src={avatarUrl} alt={person.name} />}
+            <AvatarFallback className="text-[10px] bg-primary/10 text-primary font-semibold">
+              {person.avatarFallback}
+            </AvatarFallback>
+          </Avatar>
+          <div className="min-w-0">
+            <p className="font-semibold text-xs text-foreground truncate leading-tight">{person.name}</p>
+            <p className="text-[11px] text-muted-foreground truncate">{person.role}</p>
+          </div>
+        </div>
+        <div className="flex items-center justify-between text-[11px] font-medium text-primary hover:text-primary/80 transition-colors">
+          <span>Zobacz profil</span>
+          <span className="text-xs">↗</span>
+        </div>
       </TooltipContent>
     </Tooltip>
   );

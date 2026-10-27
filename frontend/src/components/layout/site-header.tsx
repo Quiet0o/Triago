@@ -3,7 +3,7 @@ import { Link, useNavigate } from '@tanstack/react-router';
 
 import { Button } from '#/components/ui/button.tsx';
 import { Input } from '#/components/ui/input.tsx';
-import { Avatar, AvatarFallback } from '#/components/ui/avatar.tsx';
+import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar.tsx';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +14,7 @@ import {
 } from '#/components/ui/dropdown-menu.tsx';
 import { useAuth } from '#/features/auth/queries';
 import { useCreateTicketModal } from '#/features/tickets/context/create-ticket-context';
+import { useUserAvatar } from '#/lib/avatar';
 
 export const SiteHeader = ({
   searchQuery,
@@ -42,6 +43,8 @@ export const SiteHeader = ({
     : user?.email
       ? user.email.slice(0, 2).toUpperCase()
       : 'U';
+
+  const avatarUrl = useUserAvatar(user);
 
   return (
     <header className="sticky top-0 z-10 grid h-16 grid-cols-[1fr_auto_1fr] items-center border-b bg-background/95 px-4 backdrop-blur-sm transition-[width,height] ease-linear lg:px-6">
@@ -94,16 +97,23 @@ export const SiteHeader = ({
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <Avatar>
-                <AvatarFallback>{initials}</AvatarFallback>
+            <Button variant="ghost" size="icon" className="rounded-full cursor-pointer hover:ring-2 hover:ring-primary/20 transition-all">
+              <Avatar className="size-8">
+                {avatarUrl && <AvatarImage src={avatarUrl} alt={user?.fullName ?? ''} />}
+                <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xs">{initials}</AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56" align="end">
-            <div className="flex flex-col space-y-1 p-2">
-              <p className="text-sm font-medium leading-none">{user?.fullName ?? 'User'}</p>
-              <p className="text-xs leading-none text-muted-foreground truncate">{user?.email}</p>
+            <div className="flex items-center gap-2.5 p-2">
+              <Avatar className="size-9 shrink-0">
+                {avatarUrl && <AvatarImage src={avatarUrl} alt={user?.fullName ?? ''} />}
+                <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xs">{initials}</AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col space-y-0.5 min-w-0">
+                <p className="text-sm font-semibold leading-none truncate text-foreground">{user?.fullName ?? 'Użytkownik'}</p>
+                <p className="text-xs leading-none text-muted-foreground truncate">{user?.email}</p>
+              </div>
             </div>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
